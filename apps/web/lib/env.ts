@@ -52,7 +52,7 @@ const OPTIONAL_ENV_VARS = {
 function isValidUrl(urlString: string): boolean {
   try {
     const url = new URL(urlString)
-    return url.protocol === 'http:' || url.protocol === 'https:'
+    return url.protocol === 'http:' || url.protocol === 'https:' || url.protocol === 'postgresql:'
   } catch {
     return false
   }
