@@ -28,7 +28,7 @@ const SIGN_MAP: Array<{
 type SystemType = "vedic" | "western";
 
 export default function DailyHoroscopeGrid() {
-  const [system, setSystem] = useState<SystemType>("vedic");
+  const [system, setSystem] = useState<SystemType>("western");
 
   const locale: LocaleCode = system === "vedic" ? "hi" : "en";
 

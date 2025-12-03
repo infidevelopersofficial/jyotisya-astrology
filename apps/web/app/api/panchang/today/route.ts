@@ -7,7 +7,7 @@ const SUPPORTED_LOCALES = ["en", "hi", "ta"] as const satisfies readonly LocaleC
 const querySchema = z.object({
   date: z.string().optional(),
   timezone: z.string().default("Asia/Kolkata"),
-  locale: z.enum(SUPPORTED_LOCALES).default("hi")
+  locale: z.enum(SUPPORTED_LOCALES).default("en")
 });
 
 export async function GET(request: NextRequest) {

@@ -7,6 +7,8 @@ import { Button } from "@digital-astrology/ui";
 import clsx from "clsx";
 import LocaleSwitcher from "@components/layout/locale-switcher";
 import { useLocaleContext } from "@components/providers/intl-provider";
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
+import UserDropdown from "@components/layout/user-dropdown";
 
 const LINKS = [
   { href: "/", key: "home" },
@@ -20,6 +22,7 @@ export default function MainNav() {
   const { copy } = useLocaleContext();
   const { nav } = copy;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, loading } = useSupabaseAuth();
 
   const renderLinks = (onClick?: () => void) => (
     <nav className="flex flex-col gap-3 text-sm text-slate-200 md:flex-row md:items-center">
@@ -55,12 +58,22 @@ export default function MainNav() {
           <LocaleSwitcher />
         </div>
         <div className="hidden items-center gap-3 md:flex">
-          <Button variant="secondary" size="sm" asChild>
-            <Link href="/auth/login">{nav.actions.signIn}</Link>
-          </Button>
-          <Button size="sm" asChild>
-            <Link href="/consultations">{nav.actions.book}</Link>
-          </Button>
+          {!loading && (
+            <>
+              {user ? (
+                <UserDropdown user={user} />
+              ) : (
+                <>
+                  <Button variant="secondary" size="sm" asChild>
+                    <Link href="/auth/signin">{nav.actions.signIn}</Link>
+                  </Button>
+                  <Button size="sm" asChild>
+                    <Link href="/consultations">{nav.actions.book}</Link>
+                  </Button>
+                </>
+              )}
+            </>
+          )}
         </div>
         <button
           type="button"
@@ -80,18 +93,42 @@ export default function MainNav() {
           <div className="space-y-4 border-t border-white/5 bg-[#050816]/95 px-6 py-6">
             {renderLinks(() => setMobileMenuOpen(false))}
             <LocaleSwitcher />
-            <div className="flex flex-col gap-3">
-              <Button variant="secondary" size="sm" asChild>
-                <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                  {nav.actions.signIn}
-                </Link>
-              </Button>
-              <Button size="sm" asChild>
-                <Link href="/consultations" onClick={() => setMobileMenuOpen(false)}>
-                  {nav.actions.book}
-                </Link>
-              </Button>
-            </div>
+            {!loading && (
+              <div className="flex flex-col gap-3">
+                {user ? (
+                  <div className="border-t border-white/10 pt-4">
+                    <p className="text-sm text-slate-400 mb-2">Signed in as</p>
+                    <p className="text-white font-medium mb-3">{user.email}</p>
+                    <div className="flex flex-col gap-2">
+                      <Button variant="secondary" size="sm" asChild>
+                        <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                          Dashboard
+                        </Link>
+                      </Button>
+                      <form action="/auth/signout" method="POST">
+                        <Button variant="secondary" size="sm" type="submit" className="w-full">
+                          Sign Out
+                        </Button>
+                      </form>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <Button variant="secondary" size="sm" asChild>
+                      <Link href="/auth/signin" onClick={() => setMobileMenuOpen(false)}>
+                        {nav.actions.signIn}
+                      </Link>
+                    </Button>
+                    <Button size="sm" asChild>
+                      <Link href="/consultations" onClick={() => setMobileMenuOpen(false)}>
+                        {nav.actions.book}
+                      </Link>
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
+
           </div>
         </div>
       )}

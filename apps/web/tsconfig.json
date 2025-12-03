@@ -15,7 +15,8 @@
       ]
     },
     "types": [
-      "node"
+      "node",
+      "vitest/globals"
     ],
     "incremental": true,
     "plugins": [

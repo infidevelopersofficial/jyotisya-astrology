@@ -5,6 +5,7 @@ import MainNav from "@components/layout/main-nav";
 import Footer from "@components/layout/footer";
 import { IntlProvider } from "@components/providers/intl-provider";
 import { QueryProvider } from "@components/providers/query-provider";
+import "@/lib/env"; // Validate environment variables at startup
 
 const inter = Inter({ subsets: ["latin"] });
 
