@@ -76,6 +76,7 @@ function buildCSP(request: NextRequest): string {
       'https://*.supabase.co',
       'wss://*.supabase.co',
       'https://api.freeastrologyapi.com',
+      'https://nominatim.openstreetmap.org', // 🔧 OPTION A: Allow Nominatim for geocoding
       'https://vercel.live',
       isDevelopment ? 'ws://localhost:*' : '',
       isDevelopment ? 'http://localhost:*' : '',

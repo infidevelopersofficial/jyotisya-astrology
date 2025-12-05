@@ -40,6 +40,13 @@ export default async function DashboardPage() {
         <h2 className="mb-6 text-2xl font-semibold text-white">Explore More</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <ActionCard
+            title="Your Birth Chart"
+            description="Generate your Vedic Kundli with planetary positions"
+            href="/dashboard/birth-chart"
+            gradient="from-yellow-500 to-orange-500"
+            icon="🌟"
+          />
+          <ActionCard
             title="View All Horoscopes"
             description="Explore daily, weekly, and monthly predictions"
             href="/#daily-horoscope"
@@ -67,17 +74,21 @@ function ActionCard({
   title,
   description,
   href,
-  gradient
+  gradient,
+  icon
 }: {
   title: string
   description: string
   href: string
   gradient: string
+  icon?: string
 }) {
   return (
     <Link href={href} className="group">
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
-        <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient}`} />
+        <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-2xl`}>
+          {icon}
+        </div>
         <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
         <p className="text-sm text-slate-400">{description}</p>
       </div>

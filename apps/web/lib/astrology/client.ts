@@ -217,11 +217,19 @@ export class AstrologyAPIClient {
    * Get chart as SVG code
    */
   async getChartSVG(request: AstrologyRequest): Promise<SVGChartResponse> {
-    return makeRequest<SVGChartResponse>(
+    const response = await makeRequest<any>(
       '/horoscope-chart-svg-code',
       request,
       'chart_svg'
     )
+
+    // 🔧 FIX: Transform API response to match our interface
+    // API returns: { statusCode: 200, output: "<svg>..." }
+    // We need: { svg_code: "<svg>...", chart_name: "Rasi Chart" }
+    return {
+      svg_code: response.output || response.svg_code || '',
+      chart_name: 'Rasi Chart' // D1 is always Rasi chart
+    }
   }
 
   /**
@@ -231,11 +239,38 @@ export class AstrologyAPIClient {
     request: AstrologyRequest,
     chartType: DivisionalChartType
   ): Promise<SVGChartResponse> {
-    return makeRequest<SVGChartResponse>(
+    const response = await makeRequest<any>(
       `/horoscope-chart-${chartType.toLowerCase()}-svg-code`,
       request,
       `chart_svg_${chartType}`
     )
+
+    // 🔧 FIX: Transform API response to match our interface
+    // API returns: { statusCode: 200, output: "<svg>..." }
+    // We need: { svg_code: "<svg>...", chart_name: "D9 Chart" }
+    const chartNames: Record<string, string> = {
+      'D1': 'Rasi Chart',
+      'D2': 'Hora Chart',
+      'D3': 'Drekkana Chart',
+      'D4': 'Chaturthamsa Chart',
+      'D7': 'Saptamsa Chart',
+      'D9': 'Navamsa Chart',
+      'D10': 'Dasamsa Chart',
+      'D12': 'Dwadasamsa Chart',
+      'D16': 'Shodasamsa Chart',
+      'D20': 'Vimsamsa Chart',
+      'D24': 'Chaturvimsamsa Chart',
+      'D27': 'Bhamsa Chart',
+      'D30': 'Trimsamsa Chart',
+      'D40': 'Khavedamsa Chart',
+      'D45': 'Akshavedamsa Chart',
+      'D60': 'Shashtiamsa Chart',
+    }
+
+    return {
+      svg_code: response.output || response.svg_code || '',
+      chart_name: chartNames[chartType] || `${chartType} Chart`
+    }
   }
 
   /**
