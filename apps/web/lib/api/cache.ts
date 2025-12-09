@@ -238,7 +238,9 @@ export function memoize<T extends (...args: any[]) => any>(
     // LRU eviction if cache is full
     if (cache.size >= maxSize) {
       const firstKey = cache.keys().next().value
-      cache.delete(firstKey)
+      if (firstKey !== undefined) {
+        cache.delete(firstKey)
+      }
     }
 
     cache.set(key, result)

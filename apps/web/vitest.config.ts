@@ -4,11 +4,21 @@ import path from "node:path";
 
 export default defineConfig({
   plugins: [react()],
+  esbuild: {
+    loader: 'tsx',
+    include: /\.(tsx?|jsx?)$/,
+    exclude: [],
+  },
   test: {
     name: 'web',
     globals: true,
     environment: "jsdom",
     setupFiles: ['./test/setup.ts'],
+    server: {
+      deps: {
+        inline: ['@testing-library/react', '@testing-library/user-event'],
+      },
+    },
     include: ['**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     exclude: [
       '**/node_modules/**',
@@ -34,10 +44,12 @@ export default defineConfig({
         '**/*.spec.*',
       ],
       all: true,
-      lines: 70,
-      functions: 70,
-      branches: 70,
-      statements: 70,
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
     },
     testTimeout: 10000,
     hookTimeout: 10000,

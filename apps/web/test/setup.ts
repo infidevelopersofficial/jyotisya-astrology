@@ -2,12 +2,6 @@ import { beforeAll, afterEach, afterAll, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 
-// Extend Vitest matchers
-import matchers from '@testing-library/jest-dom/matchers'
-import { expect } from 'vitest'
-
-expect.extend(matchers)
-
 // Setup before all tests
 beforeAll(() => {
   // Mock environment variables
@@ -51,8 +45,9 @@ vi.mock('next/navigation', () => ({
 // Mock Next.js Image component
 vi.mock('next/image', () => ({
   default: (props: any) => {
-    // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-    return <img {...props} />
+    // Return a mock img element using createElement to avoid JSX in .ts file
+    const React = require('react')
+    return React.createElement('img', props)
   },
 }))
 

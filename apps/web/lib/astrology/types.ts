@@ -54,13 +54,15 @@ export interface Planet {
  */
 export interface BirthChartResponse {
   input: AstrologyRequest
-  ascendant: number
-  planets: Planet[]
-  houses: {
+  ascendant?: number
+  planets?: Planet[]
+  houses?: {
     house: number
     sign: string
     degree: number
   }[]
+  // Raw API response format (nested structure)
+  output?: any[]
 }
 
 /**

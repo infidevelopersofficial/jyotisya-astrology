@@ -73,7 +73,8 @@ class PerformanceMonitor {
     }
 
     if (filter?.minDuration !== undefined) {
-      filtered = filtered.filter(m => m.duration >= filter.minDuration)
+      const minDuration = filter.minDuration
+      filtered = filtered.filter(m => m.duration >= minDuration)
     }
 
     return filtered
@@ -257,7 +258,7 @@ export function startTimer(name: string, metadata?: Record<string, any>) {
  * Performance mark (Web Performance API wrapper)
  */
 export function mark(name: string) {
-  if (typeof window !== 'undefined' && window.performance?.mark) {
+  if (typeof window !== 'undefined' && window.performance) {
     try {
       performance.mark(name)
     } catch (error) {
@@ -274,7 +275,7 @@ export function measure(
   startMark: string,
   endMark?: string
 ): number | null {
-  if (typeof window !== 'undefined' && window.performance?.measure) {
+  if (typeof window !== 'undefined' && window.performance) {
     try {
       const measureResult = performance.measure(name, startMark, endMark)
       const duration = measureResult.duration

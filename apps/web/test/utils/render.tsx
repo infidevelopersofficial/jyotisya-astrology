@@ -12,7 +12,7 @@ export function renderWithProviders(
       defaultOptions: {
         queries: {
           retry: false,
-          cacheTime: 0,
+          gcTime: 0, // renamed from cacheTime in React Query v5
         },
       },
     }),

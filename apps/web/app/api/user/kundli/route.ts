@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         latitude,
         longitude,
         timezone,
-        chartData,
+        chartData: chartData as any, // Cast to satisfy Prisma JSON type
         isPublic: false,
       },
     })

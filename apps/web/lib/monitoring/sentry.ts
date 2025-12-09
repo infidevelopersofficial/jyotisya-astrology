@@ -142,14 +142,16 @@ export function withErrorTracking<T extends (...args: any[]) => any>(
 /**
  * Create a performance transaction
  */
-export function startTransaction(name: string, op: string) {
-  if (process.env.NODE_ENV === 'test') {
-    return {
-      finish: () => {},
-      setStatus: () => {},
-      setData: () => {},
-    }
-  }
-
-  return Sentry.startTransaction({ name, op })
-}
+// Note: startTransaction is deprecated in Sentry v8+
+// If you need transaction tracking, use Sentry.startSpan() instead
+// export function startTransaction(name: string, op: string) {
+//   if (process.env.NODE_ENV === 'test') {
+//     return {
+//       finish: () => {},
+//       setStatus: () => {},
+//       setData: () => {},
+//     }
+//   }
+//
+//   return Sentry.startSpan({ name, op }, () => {})
+// }

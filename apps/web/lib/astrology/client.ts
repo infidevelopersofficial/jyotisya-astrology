@@ -114,7 +114,7 @@ export const rateLimitTracker = new RateLimitTracker()
  */
 async function makeRequest<T>(
   endpoint: string,
-  payload: Partial<AstrologyRequest>,
+  payload: Partial<AstrologyRequest> | Record<string, any>,
   operationName: string
 ): Promise<T> {
   // Check rate limit
