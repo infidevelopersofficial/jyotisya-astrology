@@ -92,6 +92,13 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      - name: Generate Prisma Client
+        run: |
+          cd packages/schemas
+          npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5432/digital_astrology
+
       - name: Build all packages
         run: yarn build
         env:
@@ -145,6 +152,13 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --immutable
+
+      - name: Generate Prisma Client
+        run: |
+          cd packages/schemas
+          npx prisma generate
+        env:
+          DATABASE_URL: postgresql://user:password@localhost:5432/digital_astrology
 
       - name: Run tests
         run: yarn test
