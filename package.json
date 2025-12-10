@@ -5,6 +5,7 @@
   "description": "A modern, modular astrology platform for the Indian market.",
   "license": "MIT",
   "scripts": {
+    "postinstall": "cd packages/schemas && prisma generate",
     "dev": "turbo dev",
     "build": "turbo build --filter=@digital-astrology/web",
     "build:all": "turbo build",
