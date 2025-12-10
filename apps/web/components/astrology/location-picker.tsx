@@ -61,7 +61,7 @@ const cityTimezones: { [key: string]: number } = {
 }
 
 export default function LocationPicker({ value, onChange }: LocationPickerProps) {
-  const [searchQuery, setSearchQuery] = useState(value.city)
+  const [searchQuery, setSearchQuery] = useState(value.city || '')
   const [suggestions, setSuggestions] = useState<Location[]>([])
   const [loading, setLoading] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
@@ -330,7 +330,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                 setError(null)
               }}
               className={`rounded-lg border px-3 py-1.5 text-sm transition ${
-                searchQuery.includes(city.name)
+                searchQuery?.includes(city.name)
                   ? 'border-orange-500 bg-orange-500/20 text-orange-200'
                   : 'border-white/20 bg-white/5 text-slate-300 hover:bg-white/10'
               }`}

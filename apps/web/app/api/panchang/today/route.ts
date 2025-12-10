@@ -41,11 +41,29 @@ export async function GET(request: NextRequest) {
       panchang: result.details
     });
   } catch (error) {
-    console.error("[api/panchang/today] provider failure", error);
+    // Log detailed error information to server console
+    console.error("[api/panchang/today] provider failure", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      params: { date, timezone, locale }
+    });
+
+    // Extract detailed error information
+    const errorDetails: Record<string, unknown> = {
+      type: error instanceof Error ? error.constructor.name : typeof error,
+      message: error instanceof Error ? error.message : String(error)
+    };
+
+    // Check if it's a fetch error with response
+    if (error && typeof error === 'object' && 'cause' in error) {
+      errorDetails.cause = error.cause;
+    }
+
     return NextResponse.json(
       {
-        error: "upstream_failure",
-        message: "Unable to fetch Panchang data at this time."
+        ok: false,
+        message: "Upstream astrology API error",
+        details: errorDetails
       },
       { status: 502 }
     );

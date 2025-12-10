@@ -1,19 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { supabaseAuth } from './auth'
-import { createMockSupabaseClient } from '@test/mocks/supabase'
+import { createMockSupabaseAuth } from '@test/mocks/supabase'
+import { createBrowserClient } from '@supabase/ssr'
 
-// Mock the client module
-vi.mock('./client', () => ({
-  createClient: vi.fn(),
-}))
+// Note: @supabase/ssr is globally mocked in test/setup.ts
 
 describe('supabaseAuth', () => {
-  let mockClient: ReturnType<typeof createMockSupabaseClient>
+  let mockAuth: ReturnType<typeof createMockSupabaseAuth>
 
   beforeEach(() => {
-    mockClient = createMockSupabaseClient()
-    const { createClient } = await import('./client')
-    vi.mocked(createClient).mockReturnValue(mockClient as any)
+    // Reset and reconfigure the mock for each test
+    mockAuth = createMockSupabaseAuth()
+    vi.mocked(createBrowserClient).mockReturnValue({
+      auth: mockAuth,
+      from: vi.fn().mockReturnThis(),
+      storage: {
+        from: vi.fn().mockReturnThis(),
+      },
+    } as any)
   })
 
   describe('signInWithEmail', () => {
@@ -23,7 +27,7 @@ describe('supabaseAuth', () => {
         'password123'
       )
 
-      expect(mockClient.auth.signInWithPassword).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
         password: 'password123',
       })
@@ -33,7 +37,7 @@ describe('supabaseAuth', () => {
     })
 
     it('handles sign in errors', async () => {
-      mockClient.auth.signInWithPassword.mockResolvedValue({
+      mockAuth.signInWithPassword.mockResolvedValue({
         data: { user: null, session: null },
         error: { message: 'Invalid credentials', name: 'AuthError', status: 401 },
       } as any)
@@ -52,7 +56,7 @@ describe('supabaseAuth', () => {
     it('sends OTP to email', async () => {
       const result = await supabaseAuth.signInWithOTP('test@example.com')
 
-      expect(mockClient.auth.signInWithOtp).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithOtp).toHaveBeenCalledWith({
         email: 'test@example.com',
       })
 
@@ -62,7 +66,7 @@ describe('supabaseAuth', () => {
     it('sends OTP to phone number', async () => {
       const result = await supabaseAuth.signInWithOTP('+911234567890')
 
-      expect(mockClient.auth.signInWithOtp).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithOtp).toHaveBeenCalledWith({
         phone: '+911234567890',
       })
 
@@ -78,7 +82,7 @@ describe('supabaseAuth', () => {
     it('validates phone format', async () => {
       await expect(
         supabaseAuth.signInWithOTP('1234567890')
-      ).rejects.toThrow('valid phone')
+      ).rejects.toThrow('valid email address or phone number')
     })
   })
 
@@ -90,7 +94,7 @@ describe('supabaseAuth', () => {
         'email'
       )
 
-      expect(mockClient.auth.verifyOtp).toHaveBeenCalledWith({
+      expect(mockAuth.verifyOtp).toHaveBeenCalledWith({
         email: 'test@example.com',
         token: '123456',
         type: 'email',
@@ -107,7 +111,7 @@ describe('supabaseAuth', () => {
         'sms'
       )
 
-      expect(mockClient.auth.verifyOtp).toHaveBeenCalledWith({
+      expect(mockAuth.verifyOtp).toHaveBeenCalledWith({
         phone: '+911234567890',
         token: '123456',
         type: 'sms',
@@ -127,7 +131,7 @@ describe('supabaseAuth', () => {
     it('initiates Google OAuth', async () => {
       const result = await supabaseAuth.signInWithOAuth('google')
 
-      expect(mockClient.auth.signInWithOAuth).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
         options: {
           redirectTo: expect.stringContaining('/auth/callback'),
@@ -140,7 +144,7 @@ describe('supabaseAuth', () => {
     it('supports custom redirect URL', async () => {
       await supabaseAuth.signInWithOAuth('google', '/dashboard')
 
-      expect(mockClient.auth.signInWithOAuth).toHaveBeenCalledWith({
+      expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
         provider: 'google',
         options: {
           redirectTo: '/dashboard',
@@ -153,7 +157,7 @@ describe('supabaseAuth', () => {
     it('signs out the user', async () => {
       const result = await supabaseAuth.signOut()
 
-      expect(mockClient.auth.signOut).toHaveBeenCalled()
+      expect(mockAuth.signOut).toHaveBeenCalled()
       expect(result.error).toBeNull()
     })
   })
@@ -162,13 +166,13 @@ describe('supabaseAuth', () => {
     it('retrieves current user', async () => {
       const user = await supabaseAuth.getUser()
 
-      expect(mockClient.auth.getUser).toHaveBeenCalled()
+      expect(mockAuth.getUser).toHaveBeenCalled()
       expect(user).toBeDefined()
       expect(user?.email).toBe('test@example.com')
     })
 
     it('returns null when not authenticated', async () => {
-      mockClient.auth.getUser.mockResolvedValue({
+      mockAuth.getUser.mockResolvedValue({
         data: { user: null },
         error: null,
       } as any)
@@ -183,7 +187,7 @@ describe('supabaseAuth', () => {
     it('retrieves current session', async () => {
       const session = await supabaseAuth.getSession()
 
-      expect(mockClient.auth.getSession).toHaveBeenCalled()
+      expect(mockAuth.getSession).toHaveBeenCalled()
       expect(session).toBeDefined()
       expect(session?.access_token).toBe('mock-access-token')
     })

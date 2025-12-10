@@ -10,12 +10,45 @@ function SignInContent() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams?.get("callbackUrl") || "/dashboard";
 
+  const [email, setEmail] = useState("");
   const [emailOrPhone, setEmailOrPhone] = useState("");
   const [otp, setOtp] = useState("");
-  const [step, setStep] = useState<"input" | "otp">("input");
+  const [authMode, setAuthMode] = useState<"magic-link" | "otp">("magic-link");
+  const [step, setStep] = useState<"input" | "otp" | "check-email">("input");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+
+  const handleSendMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    if (!email || !email.includes("@")) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabaseAuth.signInWithMagicLink(
+        email,
+        `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`
+      );
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setMessage("Magic link sent! Check your email inbox.");
+        setStep("check-email");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to send magic link. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,34 +145,123 @@ function SignInContent() {
             </div>
           )}
 
-          {step === "input" ? (
-            <form onSubmit={handleSendOTP} className="space-y-6">
+          {/* Auth Mode Tabs */}
+          {step === "input" && (
+            <div className="mb-6 flex gap-2 rounded-lg bg-white/5 p-1">
+              <button
+                type="button"
+                onClick={() => setAuthMode("magic-link")}
+                className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
+                  authMode === "magic-link"
+                    ? "bg-orange-500 text-white"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                Magic Link
+              </button>
+              <button
+                type="button"
+                onClick={() => setAuthMode("otp")}
+                className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition ${
+                  authMode === "otp"
+                    ? "bg-orange-500 text-white"
+                    : "text-slate-300 hover:text-white"
+                }`}
+              >
+                OTP Code
+              </button>
+            </div>
+          )}
+
+          {step === "check-email" ? (
+            <div className="space-y-6 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
+                <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
+                </svg>
+              </div>
               <div>
-                <label htmlFor="emailOrPhone" className="block text-sm font-medium text-slate-200">
-                  Email or Phone Number
-                </label>
-                <input
-                  id="emailOrPhone"
-                  type="text"
-                  value={emailOrPhone}
-                  onChange={(e) => setEmailOrPhone(e.target.value)}
-                  placeholder="you@example.com or +91XXXXXXXXXX"
-                  required
-                  className="mt-2 w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-                />
+                <h3 className="text-xl font-semibold text-white">Check your email!</h3>
+                <p className="mt-2 text-sm text-slate-300">
+                  We sent a magic link to <span className="font-medium text-white">{email}</span>
+                </p>
                 <p className="mt-2 text-xs text-slate-400">
-                  We'll send you a one-time password
+                  Click the link in the email to sign in. The link will expire in 60 minutes.
                 </p>
               </div>
-
               <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                type="button"
+                onClick={() => {
+                  setStep("input");
+                  setEmail("");
+                  setError("");
+                  setMessage("");
+                }}
+                className="text-sm text-orange-400 hover:underline"
               >
-                {isLoading ? "Sending OTP..." : "Send OTP"}
+                ← Back to sign in
               </button>
-            </form>
+            </div>
+          ) : step === "input" ? (
+            <>
+              {authMode === "magic-link" ? (
+                <form onSubmit={handleSendMagicLink} className="space-y-6">
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-slate-200">
+                      Email Address
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@example.com"
+                      required
+                      className="mt-2 w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                    />
+                    <p className="mt-2 text-xs text-slate-400">
+                      We'll send you a magic link to sign in
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                  >
+                    {isLoading ? "Sending Magic Link..." : "Send Magic Link"}
+                  </button>
+                </form>
+              ) : (
+                <form onSubmit={handleSendOTP} className="space-y-6">
+                  <div>
+                    <label htmlFor="emailOrPhone" className="block text-sm font-medium text-slate-200">
+                      Email or Phone Number
+                    </label>
+                    <input
+                      id="emailOrPhone"
+                      type="text"
+                      value={emailOrPhone}
+                      onChange={(e) => setEmailOrPhone(e.target.value)}
+                      placeholder="you@example.com or +91XXXXXXXXXX"
+                      required
+                      className="mt-2 w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                    />
+                    <p className="mt-2 text-xs text-slate-400">
+                      We'll send you a one-time password
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50"
+                  >
+                    {isLoading ? "Sending OTP..." : "Send OTP"}
+                  </button>
+                </form>
+              )}
+            </>
           ) : (
             <form onSubmit={handleVerifyOTP} className="space-y-6">
               <div>

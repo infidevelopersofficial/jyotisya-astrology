@@ -1,19 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
 import { useSupabaseAuth } from './use-supabase-auth'
-import { createMockSupabaseClient, createMockSession } from '@test/mocks/supabase'
+import { createMockSupabaseAuth, createMockSession } from '@test/mocks/supabase'
+import { createBrowserClient } from '@supabase/ssr'
 
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn(),
-}))
+// Note: @supabase/ssr is globally mocked in test/setup.ts
 
 describe('useSupabaseAuth', () => {
-  let mockClient: ReturnType<typeof createMockSupabaseClient>
+  let mockAuth: ReturnType<typeof createMockSupabaseAuth>
 
   beforeEach(() => {
-    mockClient = createMockSupabaseClient()
-    const { createClient } = await import('@/lib/supabase/client')
-    vi.mocked(createClient).mockReturnValue(mockClient as any)
+    // Reset and reconfigure the mock for each test
+    mockAuth = createMockSupabaseAuth()
+    vi.mocked(createBrowserClient).mockReturnValue({
+      auth: mockAuth,
+      from: vi.fn().mockReturnThis(),
+      storage: {
+        from: vi.fn().mockReturnThis(),
+      },
+    } as any)
   })
 
   it('initializes with loading state', () => {
@@ -27,7 +32,7 @@ describe('useSupabaseAuth', () => {
   it('loads user session on mount', async () => {
     const mockSession = createMockSession()
 
-    mockClient.auth.getSession.mockResolvedValue({
+    mockAuth.getSession.mockResolvedValue({
       data: { session: mockSession },
       error: null,
     } as any)
@@ -44,7 +49,7 @@ describe('useSupabaseAuth', () => {
   })
 
   it('handles no session on mount', async () => {
-    mockClient.auth.getSession.mockResolvedValue({
+    mockAuth.getSession.mockResolvedValue({
       data: { session: null },
       error: null,
     } as any)
@@ -64,7 +69,7 @@ describe('useSupabaseAuth', () => {
     const mockSession = createMockSession()
     let authCallback: Function
 
-    mockClient.auth.onAuthStateChange.mockImplementation((callback) => {
+    mockAuth.onAuthStateChange.mockImplementation((callback) => {
       authCallback = callback
       return {
         data: {
@@ -94,7 +99,7 @@ describe('useSupabaseAuth', () => {
   it('unsubscribes on unmount', () => {
     const unsubscribe = vi.fn()
 
-    mockClient.auth.onAuthStateChange.mockReturnValue({
+    mockAuth.onAuthStateChange.mockReturnValue({
       data: {
         subscription: {
           unsubscribe,
@@ -112,11 +117,10 @@ describe('useSupabaseAuth', () => {
   it('memoizes supabase client', () => {
     const { rerender } = renderHook(() => useSupabaseAuth())
 
-    const { createClient } = require('@/lib/supabase/client')
-    const initialCallCount = vi.mocked(createClient).mock.calls.length
+    const initialCallCount = vi.mocked(createBrowserClient).mock.calls.length
 
     rerender()
 
-    expect(vi.mocked(createClient).mock.calls.length).toBe(initialCallCount)
+    expect(vi.mocked(createBrowserClient).mock.calls.length).toBe(initialCallCount)
   })
 })

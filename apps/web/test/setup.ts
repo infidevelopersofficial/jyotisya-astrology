@@ -12,6 +12,20 @@ beforeAll(() => {
   process.env.JYOTISH_API_KEY = 'test-api-key'
 })
 
+// Mock Supabase SSR globally - use a factory function to avoid circular dependencies
+vi.mock('@supabase/ssr', () => ({
+  createBrowserClient: vi.fn(() => {
+    // Lazy-load the mock to avoid circular dependency issues
+    const { createMockSupabaseClient } = require('./mocks/supabase')
+    return createMockSupabaseClient()
+  }),
+  createServerClient: vi.fn(() => {
+    // Lazy-load the mock to avoid circular dependency issues
+    const { createMockSupabaseClient } = require('./mocks/supabase')
+    return createMockSupabaseClient()
+  }),
+}))
+
 // Cleanup after each test
 afterEach(() => {
   cleanup()

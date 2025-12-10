@@ -90,10 +90,57 @@ export class JyotishApiProvider implements AstrologyProvider {
 
       if (!response.ok) {
         const text = await response.text();
-        throw new Error(`FreeAstrology API error (${response.status}): ${text}`);
+
+        // Log detailed error to server console
+        console.error("[JyotishApiProvider] Upstream API error", {
+          url,
+          path,
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          responseBody: text,
+          requestBody: body
+        });
+
+        // Create enriched error with all details
+        const errorMessage = `FreeAstrology API error (${response.status} ${response.statusText}): ${text}`;
+        const error = new Error(errorMessage);
+
+        // Attach metadata to error object for upstream handlers
+        Object.assign(error, {
+          status: response.status,
+          statusText: response.statusText,
+          responseBody: text,
+          url,
+          path
+        });
+
+        throw error;
       }
 
       return response.json();
+    } catch (error) {
+      // Handle timeout and network errors
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error("[JyotishApiProvider] Request timeout", {
+          url,
+          path,
+          timeoutMs: this.timeoutMs,
+          requestBody: body
+        });
+
+        const timeoutError = new Error(`FreeAstrology API timeout after ${this.timeoutMs}ms`);
+        Object.assign(timeoutError, {
+          status: 504,
+          statusText: 'Gateway Timeout',
+          url,
+          path
+        });
+        throw timeoutError;
+      }
+
+      // Re-throw if already processed
+      throw error;
     } finally {
       clearTimeout(timeout);
     }
