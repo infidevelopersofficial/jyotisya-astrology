@@ -9,7 +9,7 @@ coverage
 .env.*
 .DS_Store
 package-lock.json
-yarn.lock
+# yarn.lock - MUST be committed for Yarn 4 --immutable in CI/CD
 .venv
 *.pyc
 __pycache__/
