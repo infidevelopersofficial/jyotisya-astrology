@@ -1,8 +1,35 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/db/prisma'
+import { Prisma } from '@prisma/client'
 import { logger } from '@/lib/monitoring/logger'
 import { cachedAstrologyAPI, createAstrologyRequest } from '@/lib/astrology/cached-client'
+
+/**
+ * TypeScript interfaces for Astrology API response structure
+ */
+interface PlanetData {
+  current_sign?: number
+  fullDegree?: number
+  normDegree?: number
+  isRetro?: boolean | string
+  [key: string]: unknown
+}
+
+interface AscendantData {
+  ascendant?: number
+  sign?: number
+  [key: string]: unknown
+}
+
+interface BirthChartData {
+  output?: [
+    Record<string, AscendantData> | unknown,  // output[0] contains ascendant data
+    Record<string, PlanetData> | unknown      // output[1] contains planet data
+  ]
+  ascendant?: number
+  [key: string]: unknown
+}
 
 /**
  * Helper: Compute astrological signs from birth chart data
@@ -17,7 +44,7 @@ async function computeAstrologicalSigns(
   moonSign: string | null
   risingSign: string | null
   risingDegree: number | null
-  birthDetailsJson: Record<string, unknown>
+  birthDetailsJson: Prisma.JsonValue
 }> {
   try {
     // Create astrology request
@@ -31,12 +58,13 @@ async function computeAstrologicalSigns(
     // Get birth chart from API
     const birthChartResponse = await cachedAstrologyAPI.getBirthChart(astrologyRequest)
 
-    // Extract planet data from the nested response structure
-    const chartData = birthChartResponse.data
+    // Extract planet data from the nested response structure with proper typing
+    const chartData = birthChartResponse.data as unknown as BirthChartData
 
     // The API returns data in output[1] for planets
-    const planetsData = chartData.output?.[1]
-    const ascendantData = chartData.output?.[0]?.['0']
+    const planetsData = chartData.output?.[1] as Record<string, PlanetData> | undefined
+    const ascendantDataContainer = chartData.output?.[0] as Record<string, AscendantData> | undefined
+    const ascendantData = ascendantDataContainer?.['0'] as AscendantData | undefined
 
     if (!planetsData) {
       logger.warn('No planet data in birth chart response', { chartData })
@@ -45,7 +73,7 @@ async function computeAstrologicalSigns(
         moonSign: null,
         risingSign: null,
         risingDegree: null,
-        birthDetailsJson: chartData,
+        birthDetailsJson: chartData as unknown as Prisma.JsonValue,
       }
     }
 
@@ -59,20 +87,20 @@ async function computeAstrologicalSigns(
     }
 
     // Extract Sun sign (from Sun planet)
-    const sunPlanet = planetsData['Sun']
+    const sunPlanet = planetsData?.['Sun'] as PlanetData | undefined
     const sunSign = sunPlanet?.current_sign
       ? getSignName(sunPlanet.current_sign)
       : null
 
     // Extract Moon sign (from Moon planet)
-    const moonPlanet = planetsData['Moon']
+    const moonPlanet = planetsData?.['Moon'] as PlanetData | undefined
     const moonSign = moonPlanet?.current_sign
       ? getSignName(moonPlanet.current_sign)
       : null
 
     // Extract Rising sign (Ascendant/Lagna)
-    const ascendantDegree = ascendantData?.ascendant || chartData.ascendant
-    const risingSignNumber = ascendantData?.sign || (ascendantDegree ? Math.floor(ascendantDegree / 30) + 1 : null)
+    const ascendantDegree = (ascendantData?.ascendant as number | undefined) || (chartData.ascendant as number | undefined) || null
+    const risingSignNumber = (ascendantData?.sign as number | undefined) || (ascendantDegree ? Math.floor(ascendantDegree / 30) + 1 : null)
     const risingSign = risingSignNumber ? getSignName(risingSignNumber) : null
 
     logger.info('Computed astrological signs', {
@@ -87,7 +115,7 @@ async function computeAstrologicalSigns(
       moonSign,
       risingSign,
       risingDegree: ascendantDegree || null,
-      birthDetailsJson: chartData,
+      birthDetailsJson: chartData as unknown as Prisma.JsonValue,
     }
   } catch (error) {
     logger.error('Failed to compute astrological signs', error)
@@ -97,7 +125,7 @@ async function computeAstrologicalSigns(
       moonSign: null,
       risingSign: null,
       risingDegree: null,
-      birthDetailsJson: null,
+      birthDetailsJson: null as Prisma.JsonValue,
     }
   }
 }
@@ -252,7 +280,7 @@ export async function POST(request: Request) {
       birthLatitude,
       birthLongitude,
       birthTimezone: birthTimezone.toString(),
-      birthDetailsJson,
+      birthDetailsJson: birthDetailsJson as Prisma.InputJsonValue,
       sunSign,
       moonSign,
       risingSign,
