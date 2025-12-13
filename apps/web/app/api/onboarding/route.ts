@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@/lib/db/prisma'
+import { Prisma } from '@prisma/client'
 import { logger } from '@/lib/monitoring/logger'
 import { cachedAstrologyAPI, createAstrologyRequest } from '@/lib/astrology/cached-client'
 
@@ -279,7 +280,7 @@ export async function POST(request: Request) {
       birthLatitude,
       birthLongitude,
       birthTimezone: birthTimezone.toString(),
-      birthDetailsJson: (birthDetailsJson || {}) as any,
+      birthDetailsJson: (birthDetailsJson || {}) as Prisma.InputJsonValue,
       sunSign,
       moonSign,
       risingSign,

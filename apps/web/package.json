@@ -5,6 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postinstall": "cd ../../packages/schemas && npx prisma generate",
+    "type-check": "tsc --noEmit",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run"

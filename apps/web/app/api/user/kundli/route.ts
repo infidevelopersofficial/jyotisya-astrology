@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { prisma } from '@digital-astrology/schemas'
+import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
 /**
@@ -59,8 +60,7 @@ export async function POST(request: NextRequest) {
         latitude,
         longitude,
         timezone,
-        // TODO: Replace 'any' cast with proper Prisma.InputJsonValue type handling
-        chartData: chartData as any,
+        chartData: chartData as Prisma.InputJsonValue,
         isPublic: false,
       },
     })
