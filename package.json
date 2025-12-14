@@ -15,12 +15,14 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
+    "@vitest/ui": "^4.0.15",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.2.5",
     "prisma": "7.1.0",
     "turbo": "^1.13.4",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.15"
   },
   "workspaces": [
     "apps/*",
