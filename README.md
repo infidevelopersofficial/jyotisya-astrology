@@ -243,3 +243,4 @@ MIT License - see [LICENSE](LICENSE) for details
 ---
 
 **Built with ❤️ for the Indian astrology community**
+
