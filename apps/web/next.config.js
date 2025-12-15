@@ -12,3 +12,14 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+  // Polyfill for Edge Runtime compatibility
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        __dirname: false,
+      };
+    }
+    return config;
+  },
