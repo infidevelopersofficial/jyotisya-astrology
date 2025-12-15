@@ -3,5 +3,5 @@
   "buildCommand": "turbo build --filter=@digital-astrology/web",
   "installCommand": "yarn install --immutable",
   "framework": null,
-  "outputDirectory": "apps/web/.next"
+  "outputDirectory": ".next"
 }
