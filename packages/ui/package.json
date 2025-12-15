@@ -6,7 +6,7 @@
   "types": "src/index.ts",
   "peerDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^19.2.3"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.0.2",
@@ -14,6 +14,6 @@
   },
   "devDependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^19.2.3"
   }
 }
