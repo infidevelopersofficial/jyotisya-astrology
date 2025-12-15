@@ -1,3 +1,1 @@
-import { initSentry } from './lib/monitoring/sentry'
-
-// initSentry()
+// Sentry Edge Runtime disabled to avoid Node.js compatibility issues
