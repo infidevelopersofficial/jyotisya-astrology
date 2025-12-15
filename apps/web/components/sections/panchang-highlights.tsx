@@ -1,4 +1,4 @@
- "use client";
+"use client";
 
 import Image from "next/image";
 import { Card } from "@digital-astrology/ui";
@@ -7,8 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function PanchangHighlights() {
   const { data, isLoading } = useQuery({
-    queryKey: ["panchang", "today"],
-    queryFn: () => getPanchangToday({ locale: "hi" })
+    queryKey: ["panchang", "today", "en"],
+    queryFn: () => getPanchangToday({ locale: "en" })
   });
 
   return (

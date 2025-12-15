@@ -6,26 +6,34 @@
   "license": "MIT",
   "scripts": {
     "dev": "turbo dev",
-    "build": "turbo build",
+    "build": "turbo build --filter=@digital-astrology/web",
+    "build:all": "turbo build",
     "lint": "turbo lint",
     "test": "turbo test",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "prepare": "cd packages/schemas && prisma generate || true"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
+    "@vitest/ui": "^4.0.15",
     "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.2.5",
+    "prisma": "7.1.0",
     "turbo": "^1.13.4",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.15"
   },
   "workspaces": [
     "apps/*",
-    "services/*",
     "packages/*"
   ],
   "engines": {
-    "node": ">=18.18.0",
-    "npm": ">=9.0.0"
+    "node": ">=20.0.0",
+    "npm": ">=10.0.0"
   },
-  "packageManager": "yarn@4.10.3"
+  "packageManager": "yarn@4.12.0",
+  "dependencies": {
+    "@prisma/client": "7.1.0"
+  }
 }

@@ -2,7 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "module": "CommonJS",
+    "module": "NodeNext",
     "target": "ES2021",
     "declaration": true,
     "emitDecoratorMetadata": true,

@@ -1,13 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { getPanchangToday } from "./panchang";
+import { apiClient } from "@lib/utils/api-client";
 
 vi.mock("@lib/utils/api-client", () => ({
   apiClient: vi.fn()
 }));
 
-const { apiClient } = await import("@lib/utils/api-client");
-const { getPanchangToday } = await import("./panchang");
-
-const mockApiClient = apiClient as unknown as vi.MockedFunction<typeof apiClient>;
+const mockApiClient = apiClient as unknown as ReturnType<typeof vi.fn>;
 
 const samplePanchang = {
   date: "2024-05-20",
@@ -33,10 +32,10 @@ describe("getPanchangToday", () => {
       })
     } as Response);
 
-    const result = await getPanchangToday({ locale: "hi" });
+    const result = await getPanchangToday({ locale: "en" });
 
     expect(result).toEqual(samplePanchang);
-    expect(mockApiClient).toHaveBeenCalledWith("/api/panchang/today?locale=hi");
+    expect(mockApiClient).toHaveBeenCalledWith("/api/panchang/today?locale=en");
   });
 
   it("returns flat responses unchanged", async () => {
@@ -44,7 +43,7 @@ describe("getPanchangToday", () => {
       json: async () => samplePanchang
     } as Response);
 
-    const result = await getPanchangToday({ locale: "en" });
+    const result = await getPanchangToday({ locale: "hi" });
 
     expect(result).toEqual(samplePanchang);
   });

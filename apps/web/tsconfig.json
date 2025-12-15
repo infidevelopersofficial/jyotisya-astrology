@@ -12,10 +12,14 @@
       ],
       "@components/*": [
         "./components/*"
+      ],
+      "@test/*": [
+        "./test/*"
       ]
     },
     "types": [
-      "node"
+      "node",
+      "vitest/globals"
     ],
     "incremental": true,
     "plugins": [

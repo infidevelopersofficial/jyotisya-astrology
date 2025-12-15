@@ -97,11 +97,29 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json(response);
     } catch (error) {
-      console.error("[api/horoscope/daily] batch provider failure", error);
+      // Log detailed error information to server console
+      console.error("[api/horoscope/daily] batch provider failure", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        params: { system, locale, timezone, date }
+      });
+
+      // Extract detailed error information
+      const errorDetails: Record<string, unknown> = {
+        type: error instanceof Error ? error.constructor.name : typeof error,
+        message: error instanceof Error ? error.message : String(error)
+      };
+
+      // Check if it's a fetch error with response
+      if (error && typeof error === 'object' && 'cause' in error) {
+        errorDetails.cause = error.cause;
+      }
+
       return NextResponse.json(
         {
-          error: "upstream_failure",
-          message: "Unable to fetch horoscopes at this time."
+          ok: false,
+          message: "Upstream astrology API error",
+          details: errorDetails
         },
         { status: 502 }
       );
@@ -132,11 +150,29 @@ export async function GET(request: NextRequest) {
       horoscope: result.summary
     });
   } catch (error) {
-    console.error("[api/horoscope/daily] provider failure", error);
+    // Log detailed error information to server console
+    console.error("[api/horoscope/daily] provider failure", {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+      params: { sunSign: resolvedSunSign, system, locale, timezone, date }
+    });
+
+    // Extract detailed error information
+    const errorDetails: Record<string, unknown> = {
+      type: error instanceof Error ? error.constructor.name : typeof error,
+      message: error instanceof Error ? error.message : String(error)
+    };
+
+    // Check if it's a fetch error with response
+    if (error && typeof error === 'object' && 'cause' in error) {
+      errorDetails.cause = error.cause;
+    }
+
     return NextResponse.json(
       {
-        error: "upstream_failure",
-        message: "Unable to fetch horoscope data at this time."
+        ok: false,
+        message: "Upstream astrology API error",
+        details: errorDetails
       },
       { status: 502 }
     );

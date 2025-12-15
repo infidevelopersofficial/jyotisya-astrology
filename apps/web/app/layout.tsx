@@ -5,6 +5,8 @@ import MainNav from "@components/layout/main-nav";
 import Footer from "@components/layout/footer";
 import { IntlProvider } from "@components/providers/intl-provider";
 import { QueryProvider } from "@components/providers/query-provider";
+import AuthListenerProvider from "@components/providers/auth-listener-provider";
+import "@/lib/env"; // Validate environment variables at startup
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,9 +34,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="pointer-events-none fixed inset-0 -z-10 opacity-40 mix-blend-screen" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1600&q=60')", backgroundSize: "cover", backgroundPosition: "center" }} />
           <IntlProvider>
             <QueryProvider>
-              <MainNav />
-              {children}
-              <Footer />
+              <AuthListenerProvider>
+                <MainNav />
+                {children}
+                <Footer />
+              </AuthListenerProvider>
             </QueryProvider>
           </IntlProvider>
         </div>
