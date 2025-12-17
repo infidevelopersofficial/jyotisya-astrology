@@ -364,8 +364,15 @@ export async function GET() {
         name: true,
         email: true,
         birthDate: true,
+        birthTime: true,
         birthPlace: true,
+        birthLatitude: true,
+        birthLongitude: true,
+        birthTimezone: true,
         preferredSystem: true,
+        sunSign: true,
+        moonSign: true,
+        risingSign: true,
         onboardingCompleted: true,
       }
     })

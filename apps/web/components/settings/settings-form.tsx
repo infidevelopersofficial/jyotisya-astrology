@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { User } from '@supabase/supabase-js'
+import { formatBirthTime } from '@/lib/utils/timezone'
 
 // Astrology System type (matches Prisma enum)
 type AstrologySystem = 'VEDIC' | 'WESTERN'
@@ -228,7 +229,7 @@ export default function SettingsForm({ user, supabaseUser: _supabaseUser }: Sett
 
               <div>
                 <p className="text-sm text-slate-400">Birth Time</p>
-                <p className="text-white">{user.birthTime || 'Not provided'}</p>
+                <p className="text-white">{formatBirthTime(user.birthTime, user.birthDate) || 'Not provided'}</p>
               </div>
 
               <div>

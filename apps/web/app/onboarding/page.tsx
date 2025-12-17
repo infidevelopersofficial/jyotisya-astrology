@@ -1,15 +1,31 @@
 /* eslint-disable react/no-unescaped-entities */
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import DateTimePicker from '@/components/astrology/datetime-picker'
 import LocationPicker from '@/components/astrology/location-picker'
+
+interface UserData {
+  id: string
+  name: string
+  email: string | null
+  birthDate: string | null
+  birthTime: string | null
+  birthPlace: string | null
+  birthLatitude: number | null
+  birthLongitude: number | null
+  birthTimezone: string | null
+  preferredSystem: 'VEDIC' | 'WESTERN'
+  onboardingCompleted: boolean
+}
 
 export default function OnboardingPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [dataLoaded, setDataLoaded] = useState(false)
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +37,53 @@ export default function OnboardingPage() {
     birthTimezone: 5.5,
     preferredSystem: 'VEDIC' as 'VEDIC' | 'WESTERN',
   })
+
+  // Load existing user data if editing
+  useEffect(() => {
+    const loadUserData = async () => {
+      try {
+        const response = await fetch('/api/onboarding')
+
+        if (!response.ok) {
+          // User hasn't onboarded yet - first time
+          setDataLoaded(true)
+          return
+        }
+
+        const data = await response.json()
+        const user = data.user as UserData | undefined
+
+        if (data.onboardingCompleted && user) {
+          // User is editing existing profile
+          setIsEditing(true)
+
+          // Parse and pre-fill form
+          setFormData({
+            name: user.name || '',
+            birthDate: user.birthDate
+              ? new Date(user.birthDate).toISOString().split('T')[0]
+              : '',
+            birthTime: user.birthTime || '',
+            birthPlace: user.birthPlace || 'Delhi, India',
+            birthLatitude: user.birthLatitude ?? 28.6139,
+            birthLongitude: user.birthLongitude ?? 77.2090,
+            birthTimezone: user.birthTimezone
+              ? parseFloat(user.birthTimezone)
+              : 5.5,
+            preferredSystem: user.preferredSystem || 'VEDIC',
+          })
+        }
+
+        setDataLoaded(true)
+      } catch (err) {
+        console.error('Failed to load user data:', err)
+        // Continue with defaults on error
+        setDataLoaded(true)
+      }
+    }
+
+    loadUserData()
+  }, [])
 
   const handleDateTimeChange = (dateTime: string) => {
     const [date, time] = dateTime.split('T')
@@ -76,8 +139,8 @@ export default function OnboardingPage() {
         throw new Error(data.error || 'Failed to save your astrological profile')
       }
 
-      // Success - redirect to dashboard
-      router.push('/dashboard')
+      // Success - redirect to dashboard (or profile if editing)
+      router.push(isEditing ? '/profile' : '/dashboard')
       router.refresh()
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred. Please try again.')
@@ -88,16 +151,30 @@ export default function OnboardingPage() {
 
   const isValid = formData.name && formData.birthDate && formData.birthTime && formData.birthPlace
 
+  // Loading state while fetching user data
+  if (!dataLoaded) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-cosmic-blue via-purple-900 to-cosmic-blue">
+        <div className="text-white text-center">
+          <div className="animate-spin text-4xl mb-4">⏳</div>
+          <p className="text-lg">Loading your profile...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-cosmic-blue via-purple-900 to-cosmic-blue p-6">
       <div className="w-full max-w-2xl">
         {/* Header */}
         <div className="mb-8 text-center">
           <h1 className="mb-2 text-4xl font-bold text-white">
-            ✨ Create Your Astro Profile
+            {isEditing ? '✏️ Edit Your Astro Profile' : '✨ Create Your Astro Profile'}
           </h1>
           <p className="text-slate-300">
-            Tell us about your birth details to unlock personalized insights
+            {isEditing
+              ? 'Update your birth details and preferences'
+              : 'Tell us about your birth details to unlock personalized insights'}
           </p>
         </div>
 
@@ -212,7 +289,9 @@ export default function OnboardingPage() {
               disabled={loading || !isValid}
               className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating Your Profile...' : 'Complete Setup 🎉'}
+              {loading
+                ? (isEditing ? 'Updating Your Profile...' : 'Creating Your Profile...')
+                : (isEditing ? 'Save Changes ✅' : 'Complete Setup 🎉')}
             </button>
 
             <p className="text-center text-xs text-slate-400">
@@ -229,15 +308,17 @@ export default function OnboardingPage() {
         </div>
 
         {/* Why We Need This */}
-        <div className="mt-6 rounded-lg border border-white/10 bg-white/5 p-4">
-          <h3 className="mb-2 text-sm font-semibold text-white">Why we need these details:</h3>
-          <ul className="space-y-1 text-xs text-slate-300">
-            <li>🌞 <strong>Sun Sign:</strong> Your core personality and life purpose</li>
-            <li>🌙 <strong>Moon Sign:</strong> Your emotional nature and inner self</li>
-            <li>⬆️ <strong>Rising Sign:</strong> How others see you and your life path</li>
-            <li>📅 <strong>Daily Horoscope:</strong> Personalized guidance based on your chart</li>
-          </ul>
-        </div>
+        {!isEditing && (
+          <div className="mt-6 rounded-lg border border-white/10 bg-white/5 p-4">
+            <h3 className="mb-2 text-sm font-semibold text-white">Why we need these details:</h3>
+            <ul className="space-y-1 text-xs text-slate-300">
+              <li>🌞 <strong>Sun Sign:</strong> Your core personality and life purpose</li>
+              <li>🌙 <strong>Moon Sign:</strong> Your emotional nature and inner self</li>
+              <li>⬆️ <strong>Rising Sign:</strong> How others see you and your life path</li>
+              <li>📅 <strong>Daily Horoscope:</strong> Personalized guidance based on your chart</li>
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   )

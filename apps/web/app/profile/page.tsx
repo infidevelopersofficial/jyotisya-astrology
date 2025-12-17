@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSupabaseAuth } from '@/hooks/use-supabase-auth'
+import { formatBirthTime } from '@/lib/utils/timezone'
 
 interface UserProfile {
   id: string
@@ -156,7 +157,9 @@ export default function ProfilePage() {
               </div>
               <div>
                 <label className="text-sm text-slate-400">Birth Time</label>
-                <p className="mt-1 text-lg font-medium text-white">{profile.birthTime || 'Not set'}</p>
+                <p className="mt-1 text-lg font-medium text-white">
+                  {formatBirthTime(profile.birthTime, profile.birthDate) || 'Not set'}
+                </p>
               </div>
               <div className="md:col-span-2">
                 <label className="text-sm text-slate-400">Birth Place</label>
