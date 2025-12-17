@@ -34,25 +34,53 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
   const [successConsultationId, setSuccessConsultationId] = useState<string | null>(null)
 
   useEffect(() => {
+    // Only fetch if we don't have initial data
     if (!initialAstrologers.length) {
-      fetchAstrologers()
-    }
-  }, [initialAstrologers])
+      const abortController = new AbortController()
+      fetchAstrologers(abortController.signal)
 
-  const fetchAstrologers = async () => {
+      // Cleanup: abort fetch on unmount
+      return () => {
+        abortController.abort()
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // Run only once on mount
+
+  const fetchAstrologers = async (signal?: AbortSignal) => {
     try {
       setLoading(true)
-      const response = await fetch('/api/astrologers')
+      setError('') // Clear previous errors
+
+      const response = await fetch('/api/astrologers', {
+        signal, // Pass abort signal to fetch
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch astrologers')
+        throw new Error(`Failed to fetch astrologers: ${response.status} ${response.statusText}`)
       }
 
       const data = await response.json()
       setAstrologers(data.astrologers || [])
+      setError('') // Clear error on success
     } catch (err) {
+      // Don't set error if request was aborted (component unmounted)
+      if (err instanceof Error && err.name === 'AbortError') {
+        console.log('Fetch aborted - component unmounted')
+        return
+      }
+
       console.error('Error fetching astrologers:', err)
-      setError('Failed to load astrologers. Please try again.')
+
+      // Provide more specific error messages
+      if (err instanceof TypeError && err.message === 'Failed to fetch') {
+        setError('Cannot connect to server. Please ensure the development server is running.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Failed to load astrologers. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -81,7 +109,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
     return (
       <div className="text-center py-12">
         <p className="text-red-400">{error}</p>
-        <Button onClick={fetchAstrologers} className="mt-4">
+        <Button onClick={() => fetchAstrologers()} className="mt-4">
           Try Again
         </Button>
       </div>
