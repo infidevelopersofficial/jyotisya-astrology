@@ -4,6 +4,9 @@ import { prisma } from '@/lib/db/prisma'
 import { logger } from '@/lib/monitoring/logger'
 import { getAstrologyProvider, SunSign } from '@digital-astrology/lib'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 /**
  * GET /api/horoscope/me
  *

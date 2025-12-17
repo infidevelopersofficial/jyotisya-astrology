@@ -15,6 +15,7 @@
     "@digital-astrology/lib": "workspace:*",
     "@digital-astrology/schemas": "workspace:*",
     "@digital-astrology/ui": "workspace:*",
+    "@jyotisya/fonts": "workspace:*",
     "@prisma/adapter-pg": "^7.1.0",
     "@prisma/client": "7.1.0",
     "@sentry/nextjs": "^8.0.0",

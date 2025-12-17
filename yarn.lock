@@ -382,6 +382,7 @@ __metadata:
   dependencies:
     "@digital-astrology/schemas": "workspace:*"
     "@digital-astrology/ui": "workspace:*"
+    "@jyotisya/fonts": "workspace:*"
     class-variance-authority: "npm:^0.7.1"
     lucide-react: "npm:^0.561.0"
     next: "npm:14.1.4"
@@ -440,6 +441,7 @@ __metadata:
     "@digital-astrology/lib": "workspace:*"
     "@digital-astrology/schemas": "workspace:*"
     "@digital-astrology/ui": "workspace:*"
+    "@jyotisya/fonts": "workspace:*"
     "@prisma/adapter-pg": "npm:^7.1.0"
     "@prisma/client": "npm:7.1.0"
     "@sentry/nextjs": "npm:^8.0.0"
@@ -1104,6 +1106,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fontsource/roboto@npm:^5.2.9":
+  version: 5.2.9
+  resolution: "@fontsource/roboto@npm:5.2.9"
+  checksum: 10c0/8280ab6504ab7da105c77afc1231236be86f7cd02a708e25b6cfc2871975699a44be7a42491e59934f2a84c874a8109bb2babfbc6b1986bcad9f3ac1de3980ca
+  languageName: node
+  linkType: hard
+
 "@hono/node-server@npm:1.19.6":
   version: 1.19.6
   resolution: "@hono/node-server@npm:1.19.6"
@@ -1227,6 +1236,14 @@ __metadata:
   checksum: 10c0/4b30ec8cd56c5fd9a661f088230af01e0c1a3888d11ffb6b47639700f71225be21d1f7e168048d6d4f9449207b978a235c07c8f15c07705685d16dc06280e9d9
   languageName: node
   linkType: hard
+
+"@jyotisya/fonts@workspace:*, @jyotisya/fonts@workspace:packages/fonts":
+  version: 0.0.0-use.local
+  resolution: "@jyotisya/fonts@workspace:packages/fonts"
+  dependencies:
+    "@fontsource/roboto": "npm:^5.2.9"
+  languageName: unknown
+  linkType: soft
 
 "@mrleebo/prisma-ast@npm:0.12.1":
   version: 0.12.1

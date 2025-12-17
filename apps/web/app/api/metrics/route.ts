@@ -4,6 +4,9 @@ import { cache } from '@/lib/api/cache'
 import { deduplicator } from '@/lib/api/cache'
 import { logger } from '@/lib/monitoring/logger'
 
+// Force dynamic rendering for this API route
+export const dynamic = 'force-dynamic'
+
 /**
  * Performance Metrics Endpoint
  * Exposes application performance metrics
