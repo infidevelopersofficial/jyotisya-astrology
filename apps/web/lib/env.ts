@@ -17,10 +17,19 @@ interface EnvConfig {
   JYOTISH_API_URL: string
   JYOTISH_API_KEY: string
 
+  // Python Astrology Service (Required for production)
+  ASTRO_PYTHON_SERVICE_URL?: string
+  ASTRO_PYTHON_SERVICE_TIMEOUT_MS?: string
+
+  // Internal API Security
+  API_INTERNAL_SECRET?: string
+
   // Optional
+  OPENAI_API_KEY?: string
+
+  // Deprecated (being migrated to Next.js API routes)
   ASTRO_CORE_URL?: string
   COMMERCE_SERVICE_URL?: string
-  OPENAI_API_KEY?: string
 }
 
 /**
@@ -38,12 +47,16 @@ const REQUIRED_ENV_VARS = [
  * Optional environment variables with default values
  */
 const OPTIONAL_ENV_VARS = {
-  ASTRO_CORE_URL: 'http://localhost:4001/api/astro-core',
-  COMMERCE_SERVICE_URL: 'http://localhost:4002/api/commerce',
+  ASTRO_PYTHON_SERVICE_URL: 'http://localhost:4001',
+  ASTRO_PYTHON_SERVICE_TIMEOUT_MS: '10000',
   JYOTISH_API_TIMEOUT_MS: '8000',
   OPENAI_TIMEOUT_MS: '10000',
   OPENAI_MODEL: 'gpt-4o-mini',
   OPENAI_BASE_URL: 'https://api.openai.com/v1',
+
+  // Deprecated - for backward compatibility during migration
+  ASTRO_CORE_URL: 'http://localhost:4001/api/astro-core',
+  COMMERCE_SERVICE_URL: 'http://localhost:4002/api/commerce',
 } as const
 
 /**
@@ -128,9 +141,14 @@ export function validateEnv(): EnvConfig {
     DATABASE_URL: process.env.DATABASE_URL!,
     JYOTISH_API_URL: process.env.JYOTISH_API_URL!,
     JYOTISH_API_KEY: process.env.JYOTISH_API_KEY!,
+    ASTRO_PYTHON_SERVICE_URL: process.env.ASTRO_PYTHON_SERVICE_URL,
+    ASTRO_PYTHON_SERVICE_TIMEOUT_MS: process.env.ASTRO_PYTHON_SERVICE_TIMEOUT_MS,
+    API_INTERNAL_SECRET: process.env.API_INTERNAL_SECRET,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+
+    // Deprecated
     ASTRO_CORE_URL: process.env.ASTRO_CORE_URL,
     COMMERCE_SERVICE_URL: process.env.COMMERCE_SERVICE_URL,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   }
 }
 
