@@ -2,10 +2,36 @@
 import * as Sentry from '@sentry/nextjs'
 
 /**
+ * Runtime environment types for Sentry initialization
+ */
+export type SentryRuntime = 'client' | 'server' | 'edge'
+
+/**
+ * Detect the current runtime environment
+ */
+function detectRuntime(): SentryRuntime {
+  // Browser check
+  if (typeof window !== 'undefined') {
+    return 'client'
+  }
+
+  // Edge Runtime check (middleware) - detected by absence of Node.js globals
+  // In Edge Runtime, process.versions.node is undefined
+  if (typeof process !== 'undefined' && !process.versions?.node) {
+    return 'edge'
+  }
+
+  // Node.js server
+  return 'server'
+}
+
+/**
  * Initialize Sentry for error tracking
  * Only runs in production or when NEXT_PUBLIC_SENTRY_DSN is set
+ *
+ * @param runtime - Optional runtime type (auto-detected if not provided)
  */
-export function initSentry() {
+export function initSentry(runtime?: SentryRuntime) {
   const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
   const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV
 
@@ -14,24 +40,15 @@ export function initSentry() {
     return
   }
 
-  Sentry.init({
+  const detectedRuntime = runtime || detectRuntime()
+
+  // Base configuration (compatible with all runtimes)
+  const baseConfig: Sentry.BrowserOptions = {
     dsn: SENTRY_DSN,
     environment: ENVIRONMENT,
 
     // Performance monitoring
     tracesSampleRate: ENVIRONMENT === 'production' ? 0.1 : 1.0,
-
-    // Session replay
-    replaysSessionSampleRate: 0.1,
-    replaysOnErrorSampleRate: 1.0,
-
-    // Integrations
-    integrations: [
-      Sentry.replayIntegration({
-        maskAllText: true,
-        blockAllMedia: true,
-      }),
-    ],
 
     // Error filtering
     beforeSend(event, hint) {
@@ -67,7 +84,33 @@ export function initSentry() {
       'ResizeObserver loop completed with undelivered notifications',
       'cancelled', // User navigation
     ],
-  })
+  }
+
+  // Runtime-specific configuration
+  if (detectedRuntime === 'client') {
+    // Browser-only: Session replay
+    Sentry.init({
+      ...baseConfig,
+      replaysSessionSampleRate: 0.1,
+      replaysOnErrorSampleRate: 1.0,
+      integrations: [
+        Sentry.replayIntegration({
+          maskAllText: true,
+          blockAllMedia: true,
+        }),
+      ],
+    })
+  } else if (detectedRuntime === 'edge') {
+    // Edge Runtime: Minimal configuration (no Node.js or browser-specific features)
+    Sentry.init({
+      ...baseConfig,
+      // No integrations for Edge Runtime
+      integrations: [],
+    })
+  } else {
+    // Server: Standard configuration without browser features
+    Sentry.init(baseConfig)
+  }
 }
 
 /**
