@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { logger } from '@/lib/monitoring/logger'
 import { checkDatabaseConnection } from '@/lib/db/prisma'
 
+// Force dynamic rendering to avoid DATABASE_URL requirement at build time
+export const dynamic = 'force-dynamic'
+
 /**
  * Readiness Check Endpoint
  * Returns 200 OK only if all critical dependencies are available

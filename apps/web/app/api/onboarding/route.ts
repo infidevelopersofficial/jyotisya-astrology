@@ -5,6 +5,9 @@ import { Prisma } from '@prisma/client'
 import { logger } from '@/lib/monitoring/logger'
 import { cachedAstrologyAPI, createAstrologyRequest } from '@/lib/astrology/cached-client'
 
+// Force dynamic rendering to avoid DATABASE_URL requirement at build time
+export const dynamic = 'force-dynamic'
+
 /**
  * TypeScript interfaces for Astrology API response structure
  */

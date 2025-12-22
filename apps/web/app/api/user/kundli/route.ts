@@ -4,6 +4,9 @@ import { prisma } from '@/lib/db/prisma'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 
+// Force dynamic rendering to avoid DATABASE_URL requirement at build time
+export const dynamic = 'force-dynamic'
+
 /**
  * Save Kundli (Birth Chart) to User Account
  * POST /api/user/kundli

@@ -2,6 +2,9 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
 import { verifyWebhookSignature } from '@/lib/payments/razorpay'
 
+// Force dynamic rendering to avoid DATABASE_URL requirement at build time
+export const dynamic = 'force-dynamic'
+
 /**
  * POST /api/webhooks/razorpay
  * Handle Razorpay webhook events for payment status updates
