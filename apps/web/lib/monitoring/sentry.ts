@@ -2,9 +2,22 @@
 import * as Sentry from '@sentry/nextjs'
 
 /**
- * Runtime environment types for Sentry initialization
+ * Shared Sentry configuration for client and server runtimes
+ *
+ * IMPORTANT: This file should NOT be imported by Edge Runtime (middleware).
+ * Edge Runtime uses sentry.edge.config.ts with direct initialization to avoid
+ * bundling Node.js-specific code.
+ *
+ * Used by:
+ * - sentry.client.config.ts (browser)
+ * - sentry.server.config.ts (Node.js SSR/API routes)
  */
-export type SentryRuntime = 'client' | 'server' | 'edge'
+
+/**
+ * Runtime environment types for Sentry initialization
+ * Note: 'edge' runtime is handled separately in sentry.edge.config.ts
+ */
+export type SentryRuntime = 'client' | 'server'
 
 /**
  * Detect the current runtime environment
@@ -15,18 +28,12 @@ function detectRuntime(): SentryRuntime {
     return 'client'
   }
 
-  // Edge Runtime check (middleware) - detected by absence of Node.js globals
-  // In Edge Runtime, process.versions.node is undefined
-  if (typeof process !== 'undefined' && !process.versions?.node) {
-    return 'edge'
-  }
-
   // Node.js server
   return 'server'
 }
 
 /**
- * Initialize Sentry for error tracking
+ * Initialize Sentry for error tracking (client and server only)
  * Only runs in production or when NEXT_PUBLIC_SENTRY_DSN is set
  *
  * @param runtime - Optional runtime type (auto-detected if not provided)
@@ -42,7 +49,7 @@ export function initSentry(runtime?: SentryRuntime) {
 
   const detectedRuntime = runtime || detectRuntime()
 
-  // Base configuration (compatible with all runtimes)
+  // Base configuration (compatible with client and server runtimes)
   const baseConfig: Sentry.BrowserOptions = {
     dsn: SENTRY_DSN,
     environment: ENVIRONMENT,
@@ -99,13 +106,6 @@ export function initSentry(runtime?: SentryRuntime) {
           blockAllMedia: true,
         }),
       ],
-    })
-  } else if (detectedRuntime === 'edge') {
-    // Edge Runtime: Minimal configuration (no Node.js or browser-specific features)
-    Sentry.init({
-      ...baseConfig,
-      // No integrations for Edge Runtime
-      integrations: [],
     })
   } else {
     // Server: Standard configuration without browser features
