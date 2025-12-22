@@ -145,6 +145,33 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ---
 
+### Issue 5: Middleware fails with "ReferenceError: __dirname is not defined"
+
+**Cause:** Edge Runtime (middleware) doesn't support Node.js globals like `__dirname`, `__filename`, `process.cwd()`, `fs`, `path`, etc.
+
+**Common sources:**
+- Importing `@sentry/nextjs` in middleware or edge config
+- Importing Node.js modules in files used by middleware
+- Third-party packages that use Node.js APIs
+
+**Fix:**
+1. **Sentry**: Do NOT import `@sentry/nextjs` in `sentry.edge.config.ts`
+   - The file should be empty or use edge-compatible packages like `@sentry/core`
+   - Middleware errors will still be captured by server-side Sentry
+
+2. **Check middleware imports**: Ensure all files imported by `middleware.ts` are edge-compatible
+   ```bash
+   # Search for Node.js globals in middleware-related files
+   grep -r "__dirname\|__filename\|process\.cwd\(\)\|require\(" apps/web/middleware.ts apps/web/lib/supabase/middleware.ts apps/web/lib/security/
+   ```
+
+3. **Verify edge compatibility**:
+   - Only use Web Standard APIs in middleware
+   - Avoid `fs`, `path`, `crypto` (use Web Crypto API instead)
+   - Use `console.error()` for logging (Vercel captures these)
+
+---
+
 ## 🔍 Debugging Builds
 
 ### View Build Logs

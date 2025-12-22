@@ -1,34 +1,23 @@
-// Direct Sentry initialization for Edge Runtime (middleware)
-// This file does NOT import from lib/monitoring/sentry.ts to avoid bundling Node.js-specific code
-import * as Sentry from '@sentry/nextjs'
+/**
+ * Sentry Edge Runtime Configuration
+ *
+ * IMPORTANT: We do NOT initialize Sentry in Edge Runtime (middleware) because:
+ * 1. @sentry/nextjs contains Node.js-specific code (uses __dirname, fs, path, etc.)
+ * 2. Even with minimal config, importing @sentry/nextjs causes Node.js modules to be bundled
+ * 3. Edge Runtime only supports Web Standard APIs, not Node.js APIs
+ *
+ * Alternative approaches:
+ * - Middleware errors will still be captured by server-side Sentry after they propagate
+ * - You can use console.error() in middleware which Vercel logs automatically
+ * - For critical edge errors, use try/catch and log with console.error()
+ *
+ * If you absolutely need Sentry in Edge Runtime:
+ * - Use @sentry/core or @sentry/browser (NOT @sentry/nextjs)
+ * - Manually configure with only edge-compatible integrations
+ * - Test thoroughly to ensure no Node.js globals are accessed
+ */
 
-const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
-const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV
+// Intentionally empty - no Sentry initialization for Edge Runtime
+// This prevents __dirname and other Node.js global errors
 
-if (SENTRY_DSN) {
-  Sentry.init({
-    dsn: SENTRY_DSN,
-    environment: ENVIRONMENT,
-
-    // Performance monitoring
-    tracesSampleRate: ENVIRONMENT === 'production' ? 0.1 : 1.0,
-
-    // Edge Runtime: Minimal configuration without Node.js or browser-specific features
-    // No integrations, no session replay, no Node.js-specific features
-    integrations: [],
-
-    // Error filtering - keep minimal for edge
-    beforeSend(event) {
-      // Only filter critical edge-specific errors if needed
-      return event
-    },
-
-    // Ignore common errors
-    ignoreErrors: [
-      'Non-Error promise rejection captured',
-      'cancelled',
-    ],
-  })
-} else {
-  console.warn('[Sentry Edge] DSN not configured, error tracking disabled')
-}
+console.info('[Sentry Edge] Sentry is disabled for Edge Runtime (middleware) to prevent Node.js compatibility issues')
