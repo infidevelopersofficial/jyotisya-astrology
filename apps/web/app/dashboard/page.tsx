@@ -47,6 +47,13 @@ export default async function DashboardPage() {
             icon="🌟"
           />
           <ActionCard
+            title="Saved Charts"
+            description="View and manage your saved birth charts"
+            href="/dashboard/saved-charts"
+            gradient="from-blue-500 to-cyan-500"
+            icon="📊"
+          />
+          <ActionCard
             title="View All Horoscopes"
             description="Explore daily, weekly, and monthly predictions"
             href="/#daily-horoscope"

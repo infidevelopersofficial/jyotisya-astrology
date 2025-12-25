@@ -133,7 +133,8 @@ export async function GET(_request: NextRequest) {
         latitude: true,
         longitude: true,
         timezone: true,
-        chartData: true,
+        chartData: false, // Exclude heavy data for list view
+        isFavorite: true, // Include favorite status
         isPublic: true,
         createdAt: true,
         updatedAt: true,
@@ -230,6 +231,90 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Failed to delete chart',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+/**
+ * Toggle Favorite Status for Kundli
+ * PATCH /api/user/kundli?id={kundliId}
+ */
+export async function PATCH(request: NextRequest) {
+  try {
+    // Authenticate user
+    const supabase = await createClient()
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    // Get kundli ID from query params
+    const searchParams = request.nextUrl.searchParams
+    const kundliId = searchParams.get('id')
+
+    if (!kundliId) {
+      return NextResponse.json(
+        { error: 'Kundli ID is required' },
+        { status: 400 }
+      )
+    }
+
+    // Verify ownership and get current favorite status
+    const kundli = await prisma.kundli.findUnique({
+      where: { id: kundliId },
+      select: { userId: true, isFavorite: true },
+    })
+
+    if (!kundli) {
+      return NextResponse.json(
+        { error: 'Chart not found' },
+        { status: 404 }
+      )
+    }
+
+    if (kundli.userId !== user.id) {
+      return NextResponse.json(
+        { error: 'Forbidden' },
+        { status: 403 }
+      )
+    }
+
+    // Toggle favorite status
+    const updatedKundli = await prisma.kundli.update({
+      where: { id: kundliId },
+      data: { isFavorite: !kundli.isFavorite },
+      select: {
+        id: true,
+        isFavorite: true,
+      },
+    })
+
+    console.log('[api/user/kundli] Favorite toggled successfully', {
+      kundliId,
+      userId: user.id,
+      isFavorite: updatedKundli.isFavorite,
+    })
+
+    return NextResponse.json({
+      success: true,
+      isFavorite: updatedKundli.isFavorite,
+    })
+  } catch (error) {
+    console.error('[api/user/kundli] Error toggling favorite', {
+      error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    })
+
+    return NextResponse.json(
+      {
+        error: 'Failed to toggle favorite',
         message: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }

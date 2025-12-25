@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react/no-unescaped-entities */
+/* eslint-disable react/no-unescaped-entities */
 'use client'
 
 import { useState } from 'react'
@@ -113,7 +113,7 @@ const houseMeanings: { [key: number]: { name: string; meaning: string; lifeArea:
   12: { name: '12th House', meaning: 'Expenses, losses, spirituality, and foreign lands', lifeArea: 'Liberation & Foreign' },
 }
 
-export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartGeneratorProps) {
+export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _userEmail }: BirthChartGeneratorProps) {
   const [activeTab, setActiveTab] = useState<TabType>('form')
   const [showHelp, setShowHelp] = useState(true)
   const [expandedPlanet, setExpandedPlanet] = useState<string | null>(null)
@@ -139,14 +139,14 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
   const [selectedDivisional, setSelectedDivisional] = useState<string>('D1')
 
   const divisionalCharts = [
-    { code: 'D1', name: 'Birth Chart', icon: '🌟', desc: 'Your life overview - Start here!', beginner: true },
-    { code: 'D9', name: 'Marriage Chart', icon: '💑', desc: 'Shows your marriage & relationships', beginner: true },
-    { code: 'D10', name: 'Career Chart', icon: '💼', desc: 'Reveals your profession & success', beginner: true },
-    { code: 'D2', name: 'Wealth Chart', icon: '💰', desc: 'Financial prosperity', beginner: false },
-    { code: 'D3', name: 'Siblings Chart', icon: '👨‍👩‍👧', desc: 'Brothers & sisters', beginner: false },
-    { code: 'D4', name: 'Property Chart', icon: '🏠', desc: 'Assets & property', beginner: false },
-    { code: 'D7', name: 'Children Chart', icon: '👶', desc: 'Progeny & children', beginner: false },
-    { code: 'D12', name: 'Parents Chart', icon: '👨‍👩‍👦', desc: 'Mother & father', beginner: false },
+    { code: 'D1', name: 'Birth Chart', icon: '🌟', desc: 'Your life overview', beginner: true },
+    { code: 'D9', name: 'Marriage', icon: '💑', desc: 'Relationships & spouse', beginner: true },
+    { code: 'D10', name: 'Career', icon: '💼', desc: 'Profession & success', beginner: true },
+    { code: 'D2', name: 'Wealth', icon: '💰', desc: 'Financial prosperity', beginner: false },
+    { code: 'D3', name: 'Siblings', icon: '👨‍👩‍👧', desc: 'Brothers & sisters', beginner: false },
+    { code: 'D4', name: 'Property', icon: '🏠', desc: 'Assets & property', beginner: false },
+    { code: 'D7', name: 'Children', icon: '👶', desc: 'Progeny & children', beginner: false },
+    { code: 'D12', name: 'Parents', icon: '👨‍👩‍👦', desc: 'Mother & father', beginner: false },
   ]
 
   // Transform raw API response
@@ -187,7 +187,7 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
 
   const generateBirthChart = async () => {
     if (!birthData.dateTime) {
-      setError('Please enter your birth date and time')
+      setError('Please select your birth date and time to continue')
       return
     }
 
@@ -224,7 +224,7 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
         timeZone: birthData.timezone.toString(),
       })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -267,14 +267,40 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
     return `${deg}° ${min}'`
   }
 
+  // Helper function to get the display chart name
+  const getDisplayChartName = (includeChartType = false): string => {
+    const customName = birthData.chartName?.trim()
+    const dateName = birthData.dateTime
+      ? new Date(birthData.dateTime).toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        })
+      : ''
+
+    if (customName) {
+      return includeChartType ? `${customName} – Birth Chart` : customName
+    }
+
+    return dateName ? `Birth Chart – ${dateName}` : 'Birth Chart'
+  }
+
   // Download handlers
   const handleDownloadPNG = async () => {
     setDownloadingPNG(true)
     try {
-      const chartName = divisionalCharts.find(c => c.code === selectedDivisional)?.name || 'Birth Chart'
+      const divisionalChartName = divisionalCharts.find(c => c.code === selectedDivisional)?.name || 'Birth Chart'
+      const displayName = getDisplayChartName()
+      const fullChartName = selectedDivisional !== 'D1' ? `${displayName} – ${divisionalChartName}` : displayName
+
+      // Create filename from custom name or fallback
+      const baseFilename = birthData.chartName?.trim()
+        ? birthData.chartName.trim().replace(/\s/g, '-').toLowerCase()
+        : `birth-chart-${new Date(birthData.dateTime).toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')}`
+
       await downloadChartAsPNG('rasi-chart', {
-        filename: `${chartName.replace(/\s/g, '-').toLowerCase()}-${Date.now()}.png`,
-        chartName,
+        filename: `${baseFilename}-${selectedDivisional.toLowerCase()}-${Date.now()}.png`,
+        chartName: fullChartName,
         birthDate: birthData.dateTime ? new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' }) : undefined,
         birthPlace: birthData.location,
       })
@@ -283,7 +309,7 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
       trackChartDownloadedPNG({ chartType: selectedDivisional })
     } catch (error) {
       console.error('PNG download failed:', error)
-      alert('Failed to download chart as PNG. Please try again.')
+      setError('Failed to download chart as PNG. Please try again.')
     } finally {
       setDownloadingPNG(false)
     }
@@ -292,10 +318,18 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
   const handleDownloadPDF = async () => {
     setDownloadingPDF(true)
     try {
-      const chartName = divisionalCharts.find(c => c.code === selectedDivisional)?.name || 'Birth Chart'
+      const divisionalChartName = divisionalCharts.find(c => c.code === selectedDivisional)?.name || 'Birth Chart'
+      const displayName = getDisplayChartName()
+      const fullChartName = selectedDivisional !== 'D1' ? `${displayName} – ${divisionalChartName}` : displayName
+
+      // Create filename from custom name or fallback
+      const baseFilename = birthData.chartName?.trim()
+        ? birthData.chartName.trim().replace(/\s/g, '-').toLowerCase()
+        : `birth-chart-${new Date(birthData.dateTime).toLocaleDateString('en-IN', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-')}`
+
       await downloadChartAsPDF('rasi-chart', {
-        filename: `${chartName.replace(/\s/g, '-').toLowerCase()}-${Date.now()}.pdf`,
-        chartName,
+        filename: `${baseFilename}-${selectedDivisional.toLowerCase()}-${Date.now()}.pdf`,
+        chartName: fullChartName,
         birthDate: birthData.dateTime ? new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' }) + ' at ' + new Date(birthData.dateTime).toLocaleTimeString('en-IN', { timeStyle: 'short' }) : undefined,
         birthPlace: birthData.location,
       })
@@ -304,7 +338,7 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
       trackChartDownloadedPDF({ chartType: selectedDivisional })
     } catch (error) {
       console.error('PDF download failed:', error)
-      alert('Failed to download chart as PDF. Please try again.')
+      setError('Failed to download chart as PDF. Please try again.')
     } finally {
       setDownloadingPDF(false)
     }
@@ -321,25 +355,20 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
       trackChartShared({ method: 'link' })
     } catch (error) {
       console.error('Failed to copy link:', error)
-      alert('Failed to copy share link. Please try again.')
+      setError('Failed to copy share link. Please try again.')
     }
   }
 
   const handleSaveChart = async () => {
     if (!chartData) {
-      alert('Please generate a chart first')
+      setError('Please generate a chart first before saving')
       return
     }
 
     setSavingChart(true)
     try {
-      // Generate auto name if not provided
-      const chartName = birthData.chartName?.trim() ||
-        `Birth Chart - ${new Date(birthData.dateTime).toLocaleDateString('en-IN', {
-          year: 'numeric',
-          month: 'short',
-          day: 'numeric'
-        })}`
+      // Use the display chart name (with consistent formatting)
+      const chartName = getDisplayChartName(false)
 
       const response = await fetch('/api/user/kundli', {
         method: 'POST',
@@ -374,194 +403,268 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
         autoGenerated: !birthData.chartName?.trim(),
       })
 
-      // Show success message
-      alert('✅ Chart saved successfully! View it in "My Kundlis" page.')
-
       // Reset saved message after 5 seconds
       setTimeout(() => setSavedChartId(null), 5000)
     } catch (error) {
       console.error('Failed to save chart:', error)
-      alert('Failed to save chart. Please try again.')
+      setError('Failed to save chart. Please try again.')
     } finally {
       setSavingChart(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      {/* Help Toggle */}
-      <div className="flex items-center justify-between rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">💡</span>
-          <div>
-            <p className="font-semibold text-blue-200">New to Astrology?</p>
-            <p className="text-sm text-blue-300">Enable helpful explanations to understand your chart better</p>
-          </div>
-        </div>
+    <div className="space-y-8">
+      {/* Compact Help Toggle - Top Right */}
+      <div className="flex items-center justify-end">
         <button
           onClick={() => setShowHelp(!showHelp)}
-          className={`rounded-full px-4 py-2 font-semibold transition ${
+          className={`group flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${
             showHelp
-              ? 'bg-blue-500 text-white'
-              : 'bg-white/10 text-white hover:bg-white/20'
+              ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25'
+              : 'border border-white/20 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
         >
-          {showHelp ? '✓ Help On' : 'Help Off'}
+          <span className="text-lg">💡</span>
+          <span>{showHelp ? 'Help enabled' : 'Enable help'}</span>
+          {showHelp && <span className="text-xs opacity-75">✓</span>}
         </button>
       </div>
 
-      {/* Progress Indicator */}
-      <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+      {/* Clean Progress Stepper */}
+      <div className="relative">
         <div className="flex items-center justify-between">
-          <div className={`flex items-center gap-2 ${activeTab === 'form' ? 'text-orange-400' : 'text-green-400'}`}>
-            <span className="text-2xl">{activeTab === 'form' ? '1️⃣' : '✓'}</span>
-            <span className="font-semibold">Enter Details</span>
+          {/* Step 1 */}
+          <div className="flex flex-col items-center gap-2">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
+              activeTab === 'form'
+                ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                : chartData
+                ? 'border-green-500 bg-green-500 text-white'
+                : 'border-slate-600 bg-slate-800 text-slate-400'
+            }`}>
+              {chartData ? '✓' : '1'}
+            </div>
+            <span className={`text-sm font-medium transition-colors ${
+              activeTab === 'form' || chartData ? 'text-white' : 'text-slate-500'
+            }`}>
+              Enter Details
+            </span>
           </div>
-          <div className="h-0.5 flex-1 bg-white/10 mx-4">
-            {chartData && <div className="h-full bg-gradient-to-r from-orange-500 to-green-500"></div>}
+
+          {/* Connector 1 */}
+          <div className="relative flex-1 px-6">
+            <div className="h-0.5 w-full bg-slate-700">
+              {chartData && <div className="h-full w-full bg-gradient-to-r from-green-500 to-orange-500"></div>}
+            </div>
           </div>
-          <div className={`flex items-center gap-2 ${chartData ? 'text-orange-400' : 'text-slate-500'}`}>
-            <span className="text-2xl">2️⃣</span>
-            <span className="font-semibold">View Chart</span>
+
+          {/* Step 2 */}
+          <div className="flex flex-col items-center gap-2">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
+              activeTab === 'chart' && chartData
+                ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                : chartData
+                ? 'border-green-500 bg-green-500 text-white'
+                : 'border-slate-600 bg-slate-800 text-slate-400'
+            }`}>
+              2
+            </div>
+            <span className={`text-sm font-medium transition-colors ${
+              chartData ? 'text-white' : 'text-slate-500'
+            }`}>
+              View Chart
+            </span>
           </div>
-          <div className="h-0.5 flex-1 bg-white/10 mx-4"></div>
-          <div className={`flex items-center gap-2 ${activeTab === 'divisional' && chartData ? 'text-orange-400' : 'text-slate-500'}`}>
-            <span className="text-2xl">3️⃣</span>
-            <span className="font-semibold">Explore More</span>
+
+          {/* Connector 2 */}
+          <div className="relative flex-1 px-6">
+            <div className="h-0.5 w-full bg-slate-700">
+              {activeTab === 'divisional' && chartData && (
+                <div className="h-full w-full bg-gradient-to-r from-orange-500 to-purple-500"></div>
+              )}
+            </div>
+          </div>
+
+          {/* Step 3 */}
+          <div className="flex flex-col items-center gap-2">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
+              activeTab === 'divisional' && chartData
+                ? 'border-purple-500 bg-purple-500 text-white shadow-lg shadow-purple-500/30'
+                : chartData
+                ? 'border-slate-600 bg-slate-700 text-slate-400'
+                : 'border-slate-600 bg-slate-800 text-slate-400'
+            }`}>
+              3
+            </div>
+            <span className={`text-sm font-medium transition-colors ${
+              activeTab === 'divisional' && chartData ? 'text-white' : 'text-slate-500'
+            }`}>
+              Explore More
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/10">
+      {/* Simplified Tabs */}
+      <div className="flex gap-3">
         <button
           onClick={() => setActiveTab('form')}
-          className={`flex items-center gap-2 rounded-t-lg px-6 py-3 font-semibold transition ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all ${
             activeTab === 'form'
-              ? 'bg-white text-purple-900'
-              : 'bg-white/10 text-white hover:bg-white/20'
+              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
+              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
           }`}
         >
           <span className="text-xl">📝</span>
-          <span>Your Details</span>
+          <span>Details</span>
         </button>
         <button
           onClick={() => setActiveTab('chart')}
           disabled={!chartData}
-          className={`flex items-center gap-2 rounded-t-lg px-6 py-3 font-semibold transition disabled:opacity-50 ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
             activeTab === 'chart'
-              ? 'bg-white text-purple-900'
-              : 'bg-white/10 text-white hover:bg-white/20'
+              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
+              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5'
           }`}
         >
           <span className="text-xl">🌟</span>
-          <span>Your Chart</span>
+          <span>Chart</span>
         </button>
         <button
           onClick={() => setActiveTab('divisional')}
           disabled={!chartData}
-          className={`flex items-center gap-2 rounded-t-lg px-6 py-3 font-semibold transition disabled:opacity-50 ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
             activeTab === 'divisional'
-              ? 'bg-white text-purple-900'
-              : 'bg-white/10 text-white hover:bg-white/20'
+              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
+              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5'
           }`}
         >
           <span className="text-xl">📊</span>
-          <span>Explore More</span>
+          <span>Explore</span>
         </button>
       </div>
 
       {/* Form Tab */}
       {activeTab === 'form' && (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm">
+        <div className="space-y-6">
+          {/* Contextual Help Card - Only when help is on */}
           {showHelp && (
-            <div className="mb-6 rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-              <p className="flex items-center gap-2 font-semibold text-blue-200">
-                <span className="text-xl">ℹ️</span>
-                What You'll Need
+            <div className="rounded-xl border border-blue-500/30 bg-blue-500/10 p-5 backdrop-blur-sm">
+              <p className="mb-3 flex items-center gap-2 text-sm font-semibold text-blue-100">
+                <span className="text-xl">💡</span>
+                What you'll need
               </p>
-              <ul className="mt-2 space-y-1 text-sm text-blue-300">
-                <li>• Your <strong>exact birth date</strong> (day/month/year)</li>
-                <li>• Your <strong>birth time</strong> (as accurate as possible - check birth certificate!)</li>
-                <li>• Your <strong>birth city</strong> or coordinates</li>
+              <ul className="space-y-2 text-sm text-blue-200/90">
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5">•</span>
+                  <span>Exact birth date and time (check birth certificate)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5">•</span>
+                  <span>Birth city or location coordinates</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="mt-0.5">•</span>
+                  <span>Optional: Custom name for this chart</span>
+                </li>
               </ul>
             </div>
           )}
 
-          <h2 className="mb-6 text-2xl font-bold text-white">Step 1: Enter Your Birth Information</h2>
-
-          <div className="space-y-6">
-            {/* Chart Name Field */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-white">
-                Chart Name (Optional)
-              </label>
-              <input
-                type="text"
-                value={birthData.chartName}
-                onChange={(e) => setBirthData({ ...birthData, chartName: e.target.value })}
-                placeholder="e.g., My Birth Chart, Sister's Kundli"
-                className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white placeholder:text-slate-400 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-              />
-              <p className="mt-1 text-xs text-slate-400">
-                If left blank, we'll auto-generate a name like "Birth Chart - 15 Jan 2025"
-              </p>
-            </div>
-
-            {/* Date & Time Picker Component */}
-            <DateTimePicker
-              value={birthData.dateTime}
-              onChange={(isoDatetime) => setBirthData({ ...birthData, dateTime: isoDatetime })}
-              showHelp={showHelp}
-            />
-
-            {/* Location Picker Component */}
-            <LocationPicker
-              value={{
-                city: birthData.location,
-                latitude: birthData.latitude,
-                longitude: birthData.longitude,
-                timezone: birthData.timezone,
-              }}
-              onChange={(location) => setBirthData({
-                ...birthData,
-                location: location.city,
-                latitude: location.latitude,
-                longitude: location.longitude,
-                timezone: location.timezone,
-              })}
-            />
-
-            {/* Error Display */}
-            {error && (
-              <div className="rounded-lg bg-red-500/20 p-4 text-red-200">
-                <p className="font-semibold">⚠️ Error</p>
-                <p className="text-sm">{error}</p>
+          {/* Main Form Card */}
+          <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-8 shadow-xl backdrop-blur-sm">
+            <div className="space-y-8">
+              {/* Chart Name Field - Optional */}
+              <div className="space-y-2.5">
+                <label className="flex items-center gap-2 text-sm font-medium text-slate-200">
+                  <span>Chart Name</span>
+                  <span className="rounded-full bg-slate-700 px-2 py-0.5 text-xs text-slate-400">Optional</span>
+                </label>
+                <input
+                  type="text"
+                  value={birthData.chartName}
+                  onChange={(e) => setBirthData({ ...birthData, chartName: e.target.value })}
+                  placeholder="e.g., My Birth Chart or Rahul's Kundli"
+                  className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3.5 text-white placeholder:text-slate-500 transition-all focus:border-orange-400 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-400/30"
+                />
+                {!birthData.chartName && (
+                  <p className="text-xs text-slate-400">
+                    Leave blank for auto-generated name like "Birth Chart – 15 Jan 2025"
+                  </p>
+                )}
               </div>
-            )}
 
-            {/* Generate Button */}
-            <button
-              onClick={generateBirthChart}
-              disabled={loading || !birthData.dateTime}
-              className="w-full rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-4 text-lg font-bold text-white shadow-lg transition hover:shadow-xl disabled:opacity-50"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">🔄</span>
-                  Generating Your Chart...
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <span>✨</span>
-                  Generate My Birth Chart
-                </span>
+              {/* Date & Time Picker Component */}
+              <DateTimePicker
+                value={birthData.dateTime}
+                onChange={(isoDatetime) => setBirthData({ ...birthData, dateTime: isoDatetime })}
+                showHelp={showHelp}
+              />
+
+              {/* Location Picker Component */}
+              <LocationPicker
+                value={{
+                  city: birthData.location,
+                  latitude: birthData.latitude,
+                  longitude: birthData.longitude,
+                  timezone: birthData.timezone,
+                }}
+                onChange={(location) => setBirthData({
+                  ...birthData,
+                  location: location.city,
+                  latitude: location.latitude,
+                  longitude: location.longitude,
+                  timezone: location.timezone,
+                })}
+              />
+
+              {/* Error Display - Enhanced */}
+              {error && (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl">⚠️</span>
+                    <div>
+                      <p className="font-semibold text-red-200">Error</p>
+                      <p className="mt-1 text-sm text-red-300/90">{error}</p>
+                    </div>
+                    <button
+                      onClick={() => setError(null)}
+                      className="ml-auto text-red-300 hover:text-red-200 transition"
+                      aria-label="Dismiss error"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </div>
               )}
-            </button>
 
-            <p className="text-center text-xs text-slate-400">
-              🔒 Your data is secure and cached for 24 hours to save resources
-            </p>
+              {/* Generate Button - Enhanced States */}
+              <div className="space-y-3 pt-2">
+                <button
+                  onClick={generateBirthChart}
+                  disabled={loading || !birthData.dateTime}
+                  className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-4 font-bold text-white shadow-lg shadow-orange-500/30 transition-all hover:shadow-xl hover:shadow-orange-500/40 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center gap-3">
+                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                      <span>Generating your chart...</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2.5">
+                      <span className="text-xl group-hover:scale-110 transition-transform">✨</span>
+                      <span>Generate My Birth Chart</span>
+                    </span>
+                  )}
+                </button>
+
+                <p className="flex items-center justify-center gap-2 text-xs text-slate-500">
+                  <span>🔒</span>
+                  <span>Your data is secure and cached for 24 hours</span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
@@ -569,75 +672,75 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
       {/* Chart Tab - Enhanced */}
       {activeTab === 'chart' && chartData && (
         <div className="space-y-6">
-          {/* Success Message */}
-          <div className="rounded-lg border border-green-500/30 bg-green-500/10 p-4">
-            <p className="flex items-center gap-2 font-semibold text-green-200">
+          {/* Success Banner */}
+          <div className="animate-in fade-in slide-in-from-top-4 duration-500 rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-5">
+            <p className="flex items-center gap-2.5 text-lg font-semibold text-green-100">
               <span className="text-2xl">🎉</span>
-              Your Birth Chart is Ready!
+              {getDisplayChartName(true)} is Ready!
             </p>
-            <p className="mt-1 text-sm text-green-300">
-              Born on {new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' })} at{' '}
+            <p className="mt-2 text-sm text-green-200/80">
+              Born {new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' })} at{' '}
               {new Date(birthData.dateTime).toLocaleTimeString('en-IN', { timeStyle: 'short' })} in {birthData.location}
             </p>
           </div>
 
           {/* What This Means - Beginner */}
           {showHelp && (
-            <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
+            <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
               <p className="mb-2 flex items-center gap-2 font-semibold text-blue-200">
                 <span className="text-xl">📘</span>
                 Understanding Your Chart
               </p>
-              <p className="text-sm text-blue-300">
-                Your birth chart is like a cosmic snapshot of the sky at the moment you were born. It shows where the planets were positioned, which influences different aspects of your life and personality.
+              <p className="text-sm leading-relaxed text-blue-300/90">
+                Your birth chart is a cosmic snapshot of the sky at your birth moment. It shows where planets were positioned, influencing your personality and life path.
               </p>
             </div>
           )}
 
           {/* Ascendant - Enhanced */}
           {chartData.data.ascendant !== undefined && (
-            <div className="rounded-2xl border border-orange-500/30 bg-gradient-to-r from-orange-500/20 to-pink-500/20 p-6">
-              <div className="mb-3 flex items-center justify-between">
+            <div className="rounded-2xl border border-orange-500/30 bg-gradient-to-br from-orange-500/15 to-pink-500/15 p-6 shadow-lg">
+              <div className="mb-4 flex items-start justify-between">
                 <div>
-                  <p className="flex items-center gap-2 text-sm text-orange-200">
+                  <p className="mb-1 flex items-center gap-2 text-sm font-medium text-orange-200">
                     <span className="text-xl">🌅</span>
-                    Your Rising Sign (Ascendant)
+                    Rising Sign (Ascendant)
                   </p>
-                  <p className="text-3xl font-bold text-white">
+                  <p className="text-4xl font-bold text-white">
                     {getSignName(Math.floor(chartData.data.ascendant / 30) + 1)} {formatDegree(chartData.data.ascendant % 30)}
                   </p>
                 </div>
                 {chartData.from_cache && (
-                  <span className="rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
-                    🎯 FROM CACHE
+                  <span className="rounded-full border border-green-400/30 bg-green-500/20 px-3 py-1 text-xs font-medium text-green-300">
+                    From cache
                   </span>
                 )}
               </div>
               {showHelp && (
-                <div className="mt-4 rounded-lg bg-white/10 p-3 text-sm text-white">
-                  <p className="font-semibold">What is the Ascendant?</p>
-                  <p className="mt-1 text-slate-200">
-                    This is how others see you and your approach to life. It&apos;s determined by the exact time and place of your birth.
+                <div className="mt-4 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
+                  <p className="mb-1 text-sm font-semibold text-white">What is the Ascendant?</p>
+                  <p className="text-sm leading-relaxed text-slate-200">
+                    How others perceive you and your approach to life, determined by your exact birth time and place.
                   </p>
                 </div>
               )}
             </div>
           )}
 
-          {/* Planetary Positions - Enhanced with tooltips */}
+          {/* Planetary Positions - Enhanced */}
           {chartData.data.planets && chartData.data.planets.length > 0 && (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <h3 className="mb-2 flex items-center gap-2 text-xl font-semibold text-white">
+              <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold text-white">
                 <span className="text-2xl">🪐</span>
-                Your Planetary Positions
+                Planetary Positions
               </h3>
               {showHelp && (
-                <p className="mb-4 text-sm text-slate-300">
-                  Click on any planet to learn what it means for you
+                <p className="mb-5 text-sm text-slate-400">
+                  Click any planet to see what it represents in your chart
                 </p>
               )}
 
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {chartData.data.planets.map((planet, idx) => {
                   const meaning = planetMeanings[planet.name]
                   const signInfo = signMeanings[planet.sign || '']
@@ -646,15 +749,15 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
                   return (
                     <div
                       key={idx}
-                      className="overflow-hidden rounded-lg border border-white/10 bg-white/5 transition hover:bg-white/10"
+                      className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all hover:border-white/20 hover:bg-white/10"
                     >
                       <button
                         onClick={() => setExpandedPlanet(isExpanded ? null : planet.name)}
-                        className="w-full p-4 text-left"
+                        className="w-full p-5 text-left transition-colors"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
-                            <span className="text-2xl">{meaning?.icon}</span>
+                            <span className="text-3xl">{meaning?.icon}</span>
                             <div>
                               <p className="font-semibold text-white">{planet.name}</p>
                               {meaning && <p className="text-xs text-slate-400">{meaning.area}</p>}
@@ -665,40 +768,52 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
                               <p className={`font-semibold ${signInfo?.color || 'text-white'}`}>
                                 {planet.sign}
                               </p>
-                              <p className="text-xs text-slate-400">{formatDegree(planet.normDegree)}</p>
+                              <p className="text-xs text-slate-500">{formatDegree(planet.normDegree)}</p>
                             </div>
                             {(planet.isRetro === true || planet.isRetro === 'true') && (
-                              <span className="rounded bg-red-500/20 px-2 py-1 text-xs font-semibold text-red-300">
+                              <span className="rounded-lg bg-red-500/20 px-2.5 py-1 text-xs font-semibold text-red-300">
                                 ℞ Retro
                               </span>
                             )}
-                            <span className="text-white">{isExpanded ? '▼' : '▶'}</span>
+                            <span className="text-slate-400 transition-transform group-hover:translate-x-0.5">
+                              {isExpanded ? '▼' : '▶'}
+                            </span>
                           </div>
                         </div>
                       </button>
 
                       {/* Expanded Info */}
                       {isExpanded && showHelp && meaning && (
-                        <div className="border-t border-white/10 bg-white/5 p-4">
-                          <div className="grid gap-4 md:grid-cols-2">
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-200 border-t border-white/10 bg-white/5 p-5">
+                          <div className="grid gap-5 md:grid-cols-2">
                             <div>
-                              <p className="mb-1 text-xs font-semibold text-purple-300">What {planet.name} represents:</p>
-                              <p className="text-sm text-white">{meaning.meaning}</p>
+                              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-purple-300">
+                                Meaning
+                              </p>
+                              <p className="text-sm leading-relaxed text-white">{meaning.meaning}</p>
                             </div>
                             <div>
-                              <p className="mb-1 text-xs font-semibold text-purple-300">In {planet.sign} sign:</p>
-                              <p className="text-sm text-white">
-                                {signInfo ? `${signInfo.element} element - ${signInfo.nature}` : 'Influences your ' + meaning.area}
+                              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-purple-300">
+                                In {planet.sign}
+                              </p>
+                              <p className="text-sm leading-relaxed text-white">
+                                {signInfo ? `${signInfo.element} element – ${signInfo.nature}` : 'Influences your ' + meaning.area}
                               </p>
                             </div>
                             <div>
-                              <p className="mb-1 text-xs font-semibold text-purple-300">House Position:</p>
+                              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-purple-300">
+                                House
+                              </p>
                               <p className="text-sm text-white">House {planet.house || '?'}</p>
                             </div>
                             {(planet.isRetro === true || planet.isRetro === 'true') && (
                               <div>
-                                <p className="mb-1 text-xs font-semibold text-red-300">Retrograde:</p>
-                                <p className="text-sm text-white">Planet appears to move backward - internalized energy</p>
+                                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-red-300">
+                                  Retrograde
+                                </p>
+                                <p className="text-sm leading-relaxed text-white">
+                                  Appears to move backward – internalized energy
+                                </p>
                               </div>
                             )}
                           </div>
@@ -716,26 +831,28 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <h3 className="mb-4 flex items-center gap-2 text-xl font-semibold text-white">
                 <span className="text-2xl">🏠</span>
-                Understanding the 12 Houses
+                The 12 Houses
               </h3>
-              <p className="mb-4 text-sm text-slate-300">
-                Each house represents a different area of your life. Hover over each house to learn more.
+              <p className="mb-5 text-sm text-slate-400">
+                Each house governs a different area of your life
               </p>
 
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {Object.entries(houseMeanings).map(([houseNum, house]) => (
                   <div
                     key={houseNum}
-                    className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/5 p-4 transition hover:bg-white/10 hover:shadow-lg"
+                    className="group rounded-xl border border-white/10 bg-white/5 p-4 transition-all hover:border-white/20 hover:bg-white/10"
                     title={house.meaning}
                   >
                     <div className="flex items-start justify-between">
-                      <div>
+                      <div className="flex-1">
                         <p className="text-xs font-semibold text-purple-300">{house.lifeArea}</p>
-                        <p className="mt-1 font-semibold text-white">{house.name}</p>
-                        <p className="mt-2 text-xs text-slate-300">{house.meaning}</p>
+                        <p className="mt-1 text-sm font-semibold text-white">{house.name}</p>
+                        <p className="mt-2 text-xs leading-relaxed text-slate-300">{house.meaning}</p>
                       </div>
-                      <span className="text-2xl opacity-50 group-hover:opacity-100 transition">{parseInt(houseNum) === 1 ? '👤' : parseInt(houseNum) === 7 ? '💑' : parseInt(houseNum) === 10 ? '💼' : '🏠'}</span>
+                      <span className="ml-2 text-xl opacity-40 transition-opacity group-hover:opacity-100">
+                        {parseInt(houseNum) === 1 ? '👤' : parseInt(houseNum) === 7 ? '💑' : parseInt(houseNum) === 10 ? '💼' : '🏠'}
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -746,90 +863,94 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
           {/* Chart Visualization */}
           {svgData['D1'] && (
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
                 <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
                   <span className="text-2xl">📈</span>
                   Visual Chart
                 </h3>
 
-                {/* Toolbar with Save, Download & Share Buttons */}
+                {/* Action Buttons */}
                 <div className="flex flex-wrap items-center gap-2">
+                  {/* Save Button */}
                   <button
                     onClick={handleSaveChart}
                     disabled={savingChart || !!savedChartId}
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg disabled:opacity-50"
-                    title="Save to My Kundlis"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                    title="Save to your account"
                   >
                     {savingChart ? (
                       <>
-                        <span className="animate-spin">⏳</span>
-                        Saving...
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        <span>Saving...</span>
                       </>
                     ) : savedChartId ? (
                       <>
                         <span>✅</span>
-                        Saved!
+                        <span>Saved</span>
                       </>
                     ) : (
                       <>
                         <span>💾</span>
-                        Save
+                        <span>Save</span>
                       </>
                     )}
                   </button>
 
+                  {/* PNG Download */}
                   <button
                     onClick={handleDownloadPNG}
                     disabled={downloadingPNG}
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg disabled:opacity-50"
-                    title="Download as PNG"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                    title="Download as image"
                   >
                     {downloadingPNG ? (
                       <>
-                        <span className="animate-spin">⏳</span>
-                        Downloading...
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        <span>PNG</span>
                       </>
                     ) : (
                       <>
                         <span>📥</span>
-                        PNG
+                        <span>PNG</span>
                       </>
                     )}
                   </button>
 
+                  {/* PDF Download */}
                   <button
                     onClick={handleDownloadPDF}
                     disabled={downloadingPDF}
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg disabled:opacity-50"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
                     title="Download as PDF"
                   >
                     {downloadingPDF ? (
                       <>
-                        <span className="animate-spin">⏳</span>
-                        Downloading...
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                        <span>PDF</span>
                       </>
                     ) : (
                       <>
                         <span>📄</span>
-                        PDF
+                        <span>PDF</span>
                       </>
                     )}
                   </button>
 
+                  {/* Share Link */}
                   <button
                     onClick={handleCopyShareLink}
-                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white transition hover:shadow-lg"
-                    title="Copy Share Link"
+                    className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl"
+                    title="Copy shareable link"
                   >
                     {copiedLink ? (
                       <>
                         <span>✅</span>
-                        Copied!
+                        <span>Copied</span>
                       </>
                     ) : (
                       <>
                         <span>🔗</span>
-                        Share
+                        <span>Share</span>
                       </>
                     )}
                   </button>
@@ -837,35 +958,45 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
               </div>
 
               {showHelp && (
-                <p className="mb-4 text-sm text-slate-300">
-                  This is a traditional South Indian style chart showing planetary positions in houses. Use the buttons above to download or share your chart.
+                <p className="mb-5 text-sm text-slate-400">
+                  Traditional South Indian style chart showing planetary positions
                 </p>
               )}
 
               <div
                 id="rasi-chart"
-                className="flex justify-center rounded-lg bg-white p-6"
+                className="flex justify-center rounded-xl bg-white p-8 shadow-inner"
                 dangerouslySetInnerHTML={{ __html: svgData['D1'].data.svg_code }}
               />
             </div>
           )}
 
-          {/* Next Steps */}
-          <div className="rounded-lg border border-white/10 bg-white/5 p-6">
-            <p className="mb-3 flex items-center gap-2 font-semibold text-white">
+          {/* Next Steps Card */}
+          <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6">
+            <p className="mb-4 flex items-center gap-2 text-lg font-semibold text-white">
               <span className="text-xl">🎯</span>
-              What's Next?
+              Next Steps
             </p>
-            <div className="space-y-2 text-sm text-slate-300">
-              <p>• Explore <strong>Divisional Charts</strong> to see specific areas like marriage, career, and wealth</p>
-              <p>• Consult with an astrologer for personalized readings</p>
-              <p>• Save this chart for future reference</p>
-            </div>
+            <ul className="mb-5 space-y-2.5 text-sm text-slate-300">
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 text-indigo-400">•</span>
+                <span>Explore <strong className="text-white">Divisional Charts</strong> for marriage, career, and wealth insights</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 text-indigo-400">•</span>
+                <span>Consult with an astrologer for personalized readings</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="mt-0.5 text-indigo-400">•</span>
+                <span>Save this chart for future reference and analysis</span>
+              </li>
+            </ul>
             <button
               onClick={() => setActiveTab('divisional')}
-              className="mt-4 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-3 font-semibold text-white transition hover:shadow-lg"
+              className="group flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 px-6 py-3 font-semibold text-white shadow-lg shadow-purple-500/25 transition-all hover:shadow-xl"
             >
-              Explore Divisional Charts →
+              <span>Explore Divisional Charts</span>
+              <span className="transition-transform group-hover:translate-x-1">→</span>
             </button>
           </div>
         </div>
@@ -874,25 +1005,25 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
       {/* Divisional Charts Tab - Enhanced */}
       {activeTab === 'divisional' && chartData && (
         <div className="space-y-6">
-          <div className="rounded-lg border border-blue-500/30 bg-blue-500/10 p-4">
-            <p className="mb-2 flex items-center gap-2 font-semibold text-blue-200">
+          <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
+            <p className="mb-2 flex items-center gap-2 text-lg font-semibold text-blue-100">
               <span className="text-2xl">🔍</span>
               Dive Deeper Into Your Life
             </p>
-            <p className="text-sm text-blue-300">
-              Divisional charts (Vargas) zoom into specific areas of your life for detailed analysis
+            <p className="text-sm text-blue-300/90">
+              Divisional charts (Vargas) provide focused insights into specific life areas
             </p>
           </div>
 
-          {/* Beginner vs Advanced */}
+          {/* Chart Selection Grid */}
           <div className="grid gap-6 md:grid-cols-2">
-            {/* Beginner-Friendly Charts */}
-            <div>
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
+            {/* Beginner Charts */}
+            <div className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
                 <span>⭐</span>
-                Start With These
+                <span>Start Here</span>
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {divisionalCharts.filter(c => c.beginner).map((chart) => (
                   <button
                     key={chart.code}
@@ -900,19 +1031,21 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
                       setSelectedDivisional(chart.code)
                       fetchSVG(chart.code)
                     }}
-                    className={`w-full rounded-lg border p-4 text-left transition ${
+                    className={`w-full rounded-xl border p-4 text-left transition-all ${
                       selectedDivisional === chart.code
-                        ? 'border-orange-500 bg-orange-500/20'
-                        : 'border-white/20 bg-white/5 hover:bg-white/10'
+                        ? 'border-orange-500 bg-orange-500/20 shadow-lg shadow-orange-500/20'
+                        : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <span className="text-3xl">{chart.icon}</span>
                       <div className="flex-1">
                         <p className="font-semibold text-white">{chart.name}</p>
-                        <p className="text-xs text-slate-300">{chart.desc}</p>
+                        <p className="mt-0.5 text-xs text-slate-400">{chart.desc}</p>
                       </div>
-                      {selectedDivisional === chart.code && <span className="text-orange-400">✓</span>}
+                      {selectedDivisional === chart.code && (
+                        <span className="text-lg text-orange-400">✓</span>
+                      )}
                     </div>
                   </button>
                 ))}
@@ -920,12 +1053,12 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
             </div>
 
             {/* Advanced Charts */}
-            <div>
-              <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-white">
+            <div className="space-y-3">
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
                 <span>🎓</span>
-                Advanced Charts
+                <span>Advanced</span>
               </h3>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {divisionalCharts.filter(c => !c.beginner).map((chart) => (
                   <button
                     key={chart.code}
@@ -933,19 +1066,21 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
                       setSelectedDivisional(chart.code)
                       fetchSVG(chart.code)
                     }}
-                    className={`w-full rounded-lg border p-4 text-left transition ${
+                    className={`w-full rounded-xl border p-4 text-left transition-all ${
                       selectedDivisional === chart.code
-                        ? 'border-purple-500 bg-purple-500/20'
-                        : 'border-white/20 bg-white/5 hover:bg-white/10'
+                        ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                        : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                     }`}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <span className="text-3xl">{chart.icon}</span>
                       <div className="flex-1">
                         <p className="font-semibold text-white">{chart.name}</p>
-                        <p className="text-xs text-slate-300">{chart.desc}</p>
+                        <p className="mt-0.5 text-xs text-slate-400">{chart.desc}</p>
                       </div>
-                      {selectedDivisional === chart.code && <span className="text-purple-400">✓</span>}
+                      {selectedDivisional === chart.code && (
+                        <span className="text-lg text-purple-400">✓</span>
+                      )}
                     </div>
                   </button>
                 ))}
@@ -955,21 +1090,19 @@ export default function BirthChartGeneratorV2({ userId, userEmail }: BirthChartG
 
           {/* Selected Chart Display */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-            <h3 className="mb-4 text-xl font-semibold text-white">
+            <h3 className="mb-5 text-xl font-semibold text-white">
               {divisionalCharts.find(c => c.code === selectedDivisional)?.name || selectedDivisional}
             </h3>
 
             {svgData[selectedDivisional] ? (
               <div
-                className="flex justify-center rounded-lg bg-white p-6"
+                className="flex justify-center rounded-xl bg-white p-8 shadow-inner"
                 dangerouslySetInnerHTML={{ __html: svgData[selectedDivisional].data.svg_code }}
               />
             ) : (
-              <div className="flex items-center justify-center py-12 text-slate-400">
-                <div className="text-center">
-                  <div className="mb-2 animate-pulse text-4xl">📊</div>
-                  <p>Loading {selectedDivisional} chart...</p>
-                </div>
+              <div className="flex flex-col items-center justify-center rounded-xl bg-white/5 py-20">
+                <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-600 border-t-orange-500"></div>
+                <p className="text-sm text-slate-400">Loading {selectedDivisional} chart...</p>
               </div>
             )}
           </div>
