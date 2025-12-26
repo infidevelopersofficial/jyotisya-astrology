@@ -10,7 +10,7 @@ export interface AuthClient {
 }
 
 export class MockAuthClient implements AuthClient {
-  async login(email: string) {
+  async login(_email: string, _password: string) {
     return {
       userId: "mock-user",
       token: "mock-token",

@@ -138,7 +138,7 @@ async function makePythonRequest<T>(
         })
 
         return data as T
-      } catch (error) {
+      } catch (error: unknown) {
         circuitBreaker.recordFailure()
 
         logger.error('Python service request failed', error, {
@@ -186,7 +186,7 @@ export class PythonAstrologyClient {
       circuitBreaker.recordSuccess()
 
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       circuitBreaker.recordFailure()
       logger.error('Python service health check failed', error)
       throw error

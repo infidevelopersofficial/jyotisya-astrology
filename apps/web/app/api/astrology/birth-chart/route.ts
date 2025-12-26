@@ -15,21 +15,44 @@ import { logger } from '@/lib/monitoring/logger'
  *   "timezone": 5.5
  * }
  */
-export async function POST(request: Request) {
+
+interface BirthChartRequestBody {
+  dateTime: string
+  latitude: number
+  longitude: number
+  timezone: number
+}
+
+function isBirthChartRequestBody(body: unknown): body is BirthChartRequestBody {
+  if (typeof body !== 'object' || body === null) {
+    return false
+  }
+
+  const candidate = body as Record<string, unknown>
+
+  return (
+    typeof candidate.dateTime === 'string' &&
+    typeof candidate.latitude === 'number' &&
+    typeof candidate.longitude === 'number' &&
+    typeof candidate.timezone === 'number'
+  )
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json()
+    const body: unknown = await request.json()
 
-    const { dateTime, latitude, longitude, timezone } = body
-
-    if (!dateTime || !latitude || !longitude || timezone === undefined) {
+    if (!isBirthChartRequestBody(body)) {
       return NextResponse.json(
         {
-          error: 'Missing required fields',
+          error: 'Invalid request body',
           required: ['dateTime', 'latitude', 'longitude', 'timezone'],
         },
         { status: 400 }
       )
     }
+
+    const { dateTime, latitude, longitude, timezone } = body
 
     // Create astrology request
     const astrologyRequest = createAstrologyRequest({
@@ -43,7 +66,7 @@ export async function POST(request: Request) {
     const result = await cachedAstrologyAPI.getBirthChart(astrologyRequest)
 
     return NextResponse.json(result, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Birth chart API error', error)
 
     return NextResponse.json(

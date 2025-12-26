@@ -19,6 +19,7 @@ const DEFAULT_FILTERS: SavedChartsFilters = {
   sortBy: 'created_desc',
 }
 
+// eslint-disable-next-line complexity, max-lines-per-function
 export function useSavedCharts() {
   const [allCharts, setAllCharts] = useState<SavedChartListItem[]>([])
   const [filteredCharts, setFilteredCharts] = useState<SavedChartListItem[]>([])

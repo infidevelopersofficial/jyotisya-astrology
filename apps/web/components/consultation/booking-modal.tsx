@@ -97,7 +97,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
             } else {
               setError('Payment verification failed. Please contact support.')
             }
-          } catch (error) {
+          } catch (error: unknown) {
             console.error('Verification error:', error)
             setError('Payment verification failed. Please contact support.')
           } finally {
@@ -117,7 +117,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
 
       const razorpay = new window.Razorpay(options)
       razorpay.open()
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Booking error:', error)
       setError(error instanceof Error ? error.message : 'Failed to create booking')
       setLoading(false)

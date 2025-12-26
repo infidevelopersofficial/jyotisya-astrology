@@ -36,7 +36,8 @@ function getSafeRedirect(path: string | null): string {
   return isSafe ? cleanPath : '/'
 }
 
-export async function GET(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const next = searchParams.get('next')
@@ -51,7 +52,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {
-      console.error('OAuth callback error:', error.message)
+      console.error('OAuth callback error:', (error instanceof Error ? error.message : String(error)))
       return NextResponse.redirect(`${origin}/auth/error?message=auth_failed`)
     }
 
@@ -79,7 +80,7 @@ export async function GET(request: Request) {
 
         // If user doesn't exist in Prisma, create minimal user record
         if (!dbUser) {
-          console.log('Creating new user in database...', {
+          console.error('Creating new user in database...', {
             email: data.user.email,
             phone: data.user.phone,
           })
@@ -105,7 +106,7 @@ export async function GET(request: Request) {
             }
           })
 
-          console.log('New user created:', {
+          console.error('New user created:', {
             id: dbUser.id,
             email: dbUser.email,
             onboardingCompleted: dbUser.onboardingCompleted,
@@ -115,7 +116,7 @@ export async function GET(request: Request) {
         // Redirect based on onboarding status
         // UNLESS they're already trying to go to onboarding or dashboard
         if (!dbUser.onboardingCompleted && redirectPath !== '/onboarding') {
-          console.log('User needs onboarding, redirecting...', {
+          console.error('User needs onboarding, redirecting...', {
             email: dbUser.email,
             onboardingCompleted: dbUser.onboardingCompleted,
           })
@@ -125,7 +126,7 @@ export async function GET(request: Request) {
           redirectPath = '/dashboard'
         }
 
-        console.log('Auth callback complete:', {
+        console.error('Auth callback complete:', {
           userId: dbUser.id,
           email: dbUser.email,
           onboardingCompleted: dbUser.onboardingCompleted,

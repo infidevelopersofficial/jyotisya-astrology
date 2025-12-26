@@ -8,7 +8,6 @@ interface DailyHoroscopePanelProps {
 }
 
 export const DailyHoroscopePanel: React.FC<DailyHoroscopePanelProps> = ({
-  kundliId,
   data,
   className = '',
 }) => {

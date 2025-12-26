@@ -38,6 +38,7 @@ function detectRuntime(): SentryRuntime {
  *
  * @param runtime - Optional runtime type (auto-detected if not provided)
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export function initSentry(runtime?: SentryRuntime) {
   const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
   const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV
@@ -63,7 +64,7 @@ export function initSentry(runtime?: SentryRuntime) {
 
       // Filter out expected errors
       if (error && typeof error === 'object' && 'message' in error) {
-        const message = String(error.message)
+        const message = String((error instanceof Error ? error.message : String(error)))
 
         // Ignore common browser errors
         if (message.includes('ResizeObserver loop limit exceeded')) {
@@ -176,7 +177,7 @@ export function withErrorTracking<T extends (...args: unknown[]) => any>(
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       captureException(error, context)
       throw error
     }

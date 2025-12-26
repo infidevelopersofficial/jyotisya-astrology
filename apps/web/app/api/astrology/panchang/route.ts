@@ -15,11 +15,14 @@ import { logger } from '@/lib/monitoring/logger'
  *   "timezone": 5.5
  * }
  */
-export async function POST(request: Request) {
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json()
+    const body = await request.json() as Record<string, unknown>
 
-    const { date, latitude, longitude, timezone } = body
+    const date = body.date
+    const latitude = body.latitude
+    const longitude = body.longitude
+    const timezone = body.timezone
 
     if (!date || !latitude || !longitude || timezone === undefined) {
       return NextResponse.json(
@@ -32,22 +35,22 @@ export async function POST(request: Request) {
     }
 
     // Parse date and set time to sunrise (6:00 AM) for panchang calculation
-    const dateTime = new Date(date)
+    const dateTime = new Date(date as string)
     dateTime.setHours(6, 0, 0, 0)
 
     // Create astrology request
     const astrologyRequest = createAstrologyRequest({
       dateTime,
-      latitude,
-      longitude,
-      timezone,
+      latitude: latitude as number,
+      longitude: longitude as number,
+      timezone: timezone as number,
     })
 
     // Get panchang (will be cached for 6 hours)
     const result = await cachedAstrologyAPI.getPanchang(astrologyRequest)
 
     return NextResponse.json(result, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Panchang API error', error)
 
     return NextResponse.json(

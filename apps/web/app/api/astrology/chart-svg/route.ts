@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { cachedAstrologyAPI, createAstrologyRequest } from '@/lib/astrology/cached-client'
 import { logger } from '@/lib/monitoring/logger'
+import type { DivisionalChartType } from '@/lib/astrology/types'
 
 /**
  * POST /api/astrology/chart-svg
@@ -16,21 +17,46 @@ import { logger } from '@/lib/monitoring/logger'
  *   "chartType": "D1" // Optional: D1, D9, D10, etc. (default: D1)
  * }
  */
-export async function POST(request: Request) {
+
+interface ChartSVGRequestBody {
+  dateTime: string
+  latitude: number
+  longitude: number
+  timezone: number
+  chartType?: string
+}
+
+function isChartSVGRequestBody(body: unknown): body is ChartSVGRequestBody {
+  if (typeof body !== 'object' || body === null) {
+    return false
+  }
+
+  const candidate = body as Record<string, unknown>
+
+  return (
+    typeof candidate.dateTime === 'string' &&
+    typeof candidate.latitude === 'number' &&
+    typeof candidate.longitude === 'number' &&
+    typeof candidate.timezone === 'number' &&
+    (candidate.chartType === undefined || typeof candidate.chartType === 'string')
+  )
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json()
+    const body: unknown = await request.json()
 
-    const { dateTime, latitude, longitude, timezone, chartType = 'D1' } = body
-
-    if (!dateTime || !latitude || !longitude || timezone === undefined) {
+    if (!isChartSVGRequestBody(body)) {
       return NextResponse.json(
         {
-          error: 'Missing required fields',
+          error: 'Invalid request body',
           required: ['dateTime', 'latitude', 'longitude', 'timezone'],
         },
         { status: 400 }
       )
     }
+
+    const { dateTime, latitude, longitude, timezone, chartType = 'D1' } = body
 
     // Create astrology request
     const astrologyRequest = createAstrologyRequest({
@@ -46,11 +72,11 @@ export async function POST(request: Request) {
         ? await cachedAstrologyAPI.getChartSVG(astrologyRequest)
         : await cachedAstrologyAPI.getDivisionalChartSVG(
             astrologyRequest,
-            chartType
+            chartType as DivisionalChartType
           )
 
     return NextResponse.json(result, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Chart SVG API error', error)
 
     return NextResponse.json(

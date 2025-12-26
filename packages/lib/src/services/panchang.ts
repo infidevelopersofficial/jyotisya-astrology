@@ -14,7 +14,7 @@ export interface PanchangClient {
 }
 
 export class MockPanchangClient implements PanchangClient {
-  async getToday(locale: string) {
+  async getToday(_locale: string) {
     return {
       date: new Date().toISOString(),
       tithi: "Shukla Paksha Pratipada",
@@ -26,7 +26,7 @@ export class MockPanchangClient implements PanchangClient {
     };
   }
 
-  async getMonth(month: number, year: number, locale: string) {
+  async getMonth(month: number, year: number, _locale: string) {
     const days = Array.from({ length: 5 }).map((_, index) => ({
       date: new Date(year, month - 1, index + 1).toISOString(),
       tithi: "Sample Tithi",

@@ -37,7 +37,7 @@ export default function AuthListenerProvider({ children }: AuthListenerProviderP
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      console.log('[AuthListener] Auth event:', event, 'Session exists:', !!session)
+      console.error('[AuthListener] Auth event:', event, 'Session exists:', !!session)
 
       // Only redirect on actual sign-in events
       if (event === 'SIGNED_IN' && session) {
@@ -48,31 +48,31 @@ export default function AuthListenerProvider({ children }: AuthListenerProviderP
           currentPath.startsWith('/onboarding')
 
         if (!isOnProtectedRoute) {
-          console.log('[AuthListener] User signed in, redirecting to /dashboard')
+          console.error('[AuthListener] User signed in, redirecting to /dashboard')
           router.push('/dashboard')
           router.refresh()
         } else {
-          console.log('[AuthListener] Already on protected route, skipping redirect')
+          console.error('[AuthListener] Already on protected route, skipping redirect')
         }
       }
 
       // Optional: Handle sign out
       if (event === 'SIGNED_OUT') {
-        console.log('[AuthListener] User signed out')
+        console.error('[AuthListener] User signed out')
         // You could redirect to home page or signin page here if desired
         // router.push('/auth/signin')
       }
 
       // Optional: Handle token refresh
       if (event === 'TOKEN_REFRESHED') {
-        console.log('[AuthListener] Token refreshed')
+        console.error('[AuthListener] Token refreshed')
         // Session is still valid, no action needed
       }
     })
 
     // Cleanup subscription on unmount
     return () => {
-      console.log('[AuthListener] Cleaning up auth subscription')
+      console.error('[AuthListener] Cleaning up auth subscription')
       subscription.unsubscribe()
     }
   }, [router, pathname])

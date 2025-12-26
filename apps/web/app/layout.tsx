@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: React.ReactNode }): React.ReactElement {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} bg-cosmic-blue text-slate-100`}>

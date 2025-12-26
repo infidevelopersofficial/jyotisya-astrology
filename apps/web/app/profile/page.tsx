@@ -20,7 +20,7 @@ interface UserProfile {
   onboardingCompleted: boolean
 }
 
-export default function ProfilePage() {
+export default function ProfilePage(): React.ReactElement {
   const router = useRouter()
   const { loading: authLoading, isAuthenticated } = useSupabaseAuth()
   const [profile, setProfile] = useState<UserProfile | null>(null)

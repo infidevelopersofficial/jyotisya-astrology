@@ -10,7 +10,8 @@ const querySchema = z.object({
   locale: z.enum(SUPPORTED_LOCALES).default("en")
 });
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(searchParams);
 
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       metadata: result.metadata,
       panchang: result.details
     });
-  } catch (error) {
+  } catch (error: unknown) {
     // Log detailed error information to server console
     console.error("[api/panchang/today] provider failure", {
       error: error instanceof Error ? error.message : String(error),

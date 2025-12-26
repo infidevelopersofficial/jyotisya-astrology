@@ -3,11 +3,6 @@
 
 import { useState} from 'react'
 
-interface BirthChartGeneratorProps {
-  userId: string
-  userEmail: string
-}
-
 interface BirthData {
   dateTime: string
   latitude: number
@@ -52,7 +47,7 @@ interface ChartSVGResponse {
 
 type TabType = 'form' | 'chart' | 'divisional'
 
-export default function BirthChartGenerator() {
+export default function BirthChartGenerator(): React.ReactElement {
   const [activeTab, setActiveTab] = useState<TabType>('form')
   const [birthData, setBirthData] = useState<BirthData>({
     dateTime: '',
@@ -102,7 +97,7 @@ export default function BirthChartGenerator() {
 
       planetNames.forEach(name => {
         if (planetData[name]) {
-          const p = planetData[name] as Record<string, unknown>
+          const p = planetData[name]
           planetsArray.push({
             name,
             fullDegree: (p.fullDegree as number) || 0,

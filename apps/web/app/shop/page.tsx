@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Astro Marketplace | Jyotishya"
 };
 
-export default function ShopPage() {
+export default function ShopPage(): React.ReactElement {
   return (
     <main className="px-6 pb-24 pt-16 lg:px-16">
       <div className="mx-auto max-w-4xl">

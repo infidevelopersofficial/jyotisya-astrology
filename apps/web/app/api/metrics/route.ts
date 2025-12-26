@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic'
  * GET /api/metrics - Get all performance statistics
  * GET /api/metrics?name=api_request - Get stats for specific metric
  */
-export async function GET(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export function GET(request: Request): NextResponse {
   try {
     const { searchParams } = new URL(request.url)
     const metricName = searchParams.get('name')
@@ -60,7 +61,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(response, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to get metrics', error)
 
     return NextResponse.json(

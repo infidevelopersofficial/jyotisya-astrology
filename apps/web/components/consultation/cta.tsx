@@ -5,7 +5,7 @@ import { Button } from "@digital-astrology/ui";
 import Link from "next/link";
 import { useLocaleContext } from "@components/providers/intl-provider";
 
-export default function ConsultationCTA() {
+export default function ConsultationCTA(): React.ReactElement {
   const { copy } = useLocaleContext();
   const { consultation } = copy;
 

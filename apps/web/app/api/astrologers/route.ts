@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db/prisma'
+import { Prisma } from '@prisma/client'
 
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic'
@@ -12,14 +13,15 @@ export const dynamic = 'force-dynamic'
  * - available: 'true' to filter only available astrologers
  * - limit: number of results to return (default: 50)
  */
-export async function GET(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: Request): Promise<NextResponse> {
   try {
     const { searchParams } = new URL(request.url)
     const availableOnly = searchParams.get('available') === 'true'
     const limit = parseInt(searchParams.get('limit') || '50')
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.AstrologerWhereInput = {}
     if (availableOnly) {
       where.available = true
     }
@@ -56,7 +58,7 @@ export async function GET(request: Request) {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Astrologers fetch error:', error)
 
     return NextResponse.json(

@@ -47,7 +47,7 @@ class ServiceHealthTracker {
       this.pythonHealthy = true
       logger.info('Python service health check: OK')
       return true
-    } catch (error) {
+    } catch (error: unknown) {
       this.pythonHealthy = false
       logger.warn('Python service health check: FAILED', { error: error instanceof Error ? error.message : String(error) })
       return false
@@ -108,7 +108,7 @@ export class AstrologyOrchestrator {
       }
 
       throw new Error('No astrology service available')
-    } catch (error) {
+    } catch (error: unknown) {
       // If Python service fails, try FreeAstrologyAPI as fallback
       if (backend === 'python' && rateLimitTracker.canMakeRequest()) {
         logger.warn('Python service failed, falling back to FreeAstrologyAPI', { error: error instanceof Error ? error.message : String(error) })
@@ -149,7 +149,7 @@ export class AstrologyOrchestrator {
       }
 
       throw new Error('No astrology service available')
-    } catch (error) {
+    } catch (error: unknown) {
       if (backend === 'python' && rateLimitTracker.canMakeRequest()) {
         logger.warn('Python service failed, falling back to FreeAstrologyAPI', { error: error instanceof Error ? error.message : String(error) })
 

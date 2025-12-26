@@ -10,7 +10,7 @@ const OPTIONS = [
   { code: "ta", label: "தமிழ்", icon: "🇮🇳" }
 ] as const;
 
-export default function LocaleSwitcher() {
+export default function LocaleSwitcher(): React.ReactElement {
   const { locale, setLocale } = useLocaleContext();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -29,6 +29,7 @@ export default function LocaleSwitcher() {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
+    return undefined
   }, [isOpen]);
 
   const handleSelect = (code: "en" | "hi" | "ta") => {

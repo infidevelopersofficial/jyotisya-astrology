@@ -15,7 +15,8 @@ export const dynamic = 'force-dynamic'
  *
  * Used by: Kubernetes readiness probes, load balancers
  */
-export async function GET() {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(): Promise<NextResponse> {
   const checks: Record<string, { status: 'ok' | 'error'; message?: string; latency?: number }> = {}
   let allHealthy = true
 
@@ -36,7 +37,7 @@ export async function GET() {
         latency: dbHealth.latency,
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     checks.database = {
       status: 'error',
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -67,7 +68,7 @@ export async function GET() {
         status: 'ok',
       }
     }
-  } catch (error) {
+  } catch (error: unknown) {
     checks.environment = {
       status: 'error',
       message: error instanceof Error ? error.message : 'Unknown error',

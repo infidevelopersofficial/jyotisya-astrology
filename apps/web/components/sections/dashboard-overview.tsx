@@ -16,7 +16,7 @@ const CONSULTATIONS = [
   { id: "CONS-301", astrologer: "Acharya Aarti", date: "14 May 2024", mode: "Video" }
 ];
 
-export default function DashboardOverview() {
+export default function DashboardOverview(): React.ReactElement {
   return (
     <section className="grid gap-6 lg:grid-cols-2">
       <Card title="Saved Kundli" subtitle={`${KUNDLI.rashi} • ${KUNDLI.nakshatra}`}>

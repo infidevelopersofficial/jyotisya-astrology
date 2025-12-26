@@ -33,7 +33,7 @@ const ASTROLOGERS = [
 
 type Filter = "all" | "available";
 
-export default function AstrologerDirectory() {
+export default function AstrologerDirectory(): React.ReactElement {
   const [filter, setFilter] = useState<Filter>("all");
 
   const filtered = useMemo(() => {

@@ -29,7 +29,8 @@ const querySchema = z.object({
 
 const DEFAULT_SUN_SIGN: SunSign = "aries";
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(searchParams);
 
@@ -96,7 +97,7 @@ export async function GET(request: NextRequest) {
       );
 
       return NextResponse.json(response);
-    } catch (error) {
+    } catch (error: unknown) {
       // Log detailed error information to server console
       console.error("[api/horoscope/daily] batch provider failure", {
         error: error instanceof Error ? error.message : String(error),
@@ -149,7 +150,7 @@ export async function GET(request: NextRequest) {
       metadata: result.metadata,
       horoscope: result.summary
     });
-  } catch (error) {
+  } catch (error: unknown) {
     // Log detailed error information to server console
     console.error("[api/horoscope/daily] provider failure", {
       error: error instanceof Error ? error.message : String(error),

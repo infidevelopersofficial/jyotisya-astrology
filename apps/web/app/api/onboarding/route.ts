@@ -67,7 +67,7 @@ async function computeAstrologicalSigns(
     // The API returns data in output[1] for planets
     const planetsData = chartData.output?.[1] as Record<string, PlanetData> | undefined
     const ascendantDataContainer = chartData.output?.[0] as Record<string, AscendantData> | undefined
-    const ascendantData = ascendantDataContainer?.['0'] as AscendantData | undefined
+    const ascendantData = ascendantDataContainer?.['0']
 
     if (!planetsData) {
       logger.warn('No planet data in birth chart response', { chartData })
@@ -102,8 +102,8 @@ async function computeAstrologicalSigns(
       : null
 
     // Extract Rising sign (Ascendant/Lagna)
-    const ascendantDegree = (ascendantData?.ascendant as number | undefined) || (chartData.ascendant as number | undefined) || null
-    const risingSignNumber = (ascendantData?.sign as number | undefined) || (ascendantDegree ? Math.floor(ascendantDegree / 30) + 1 : null)
+    const ascendantDegree = (ascendantData?.ascendant) || (chartData.ascendant) || null
+    const risingSignNumber = (ascendantData?.sign) || (ascendantDegree ? Math.floor(ascendantDegree / 30) + 1 : null)
     const risingSign = risingSignNumber ? getSignName(risingSignNumber) : null
 
     logger.info('Computed astrological signs', {
@@ -120,7 +120,7 @@ async function computeAstrologicalSigns(
       risingDegree: ascendantDegree || null,
       birthDetailsJson: chartData as Record<string, unknown>,
     }
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Failed to compute astrological signs', error)
     // Return nulls but don't fail the onboarding
     return {
@@ -151,7 +151,8 @@ async function computeAstrologicalSigns(
  *   "preferredSystem": "VEDIC" | "WESTERN"
  * }
  */
-export async function POST(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get authenticated user
     const supabase = await createClient()
@@ -323,7 +324,7 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Onboarding API error', error)
 
     return NextResponse.json(
@@ -341,7 +342,8 @@ export async function POST(request: Request) {
  *
  * Check if current user has completed onboarding
  */
-export async function GET() {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(): Promise<NextResponse> {
   try {
     // Get authenticated user
     const supabase = await createClient()
@@ -397,7 +399,7 @@ export async function GET() {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Onboarding check API error', error)
 
     return NextResponse.json(

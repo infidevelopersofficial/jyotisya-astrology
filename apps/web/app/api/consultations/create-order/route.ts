@@ -6,6 +6,66 @@ import { createRazorpayOrder } from '@/lib/payments/razorpay'
 // Force dynamic rendering for this API route
 export const dynamic = 'force-dynamic'
 
+interface RequestBody {
+  astrologerId: string
+  scheduledAt: string
+  duration: number
+}
+
+function isValidRequestBody(body: unknown): body is RequestBody {
+  if (typeof body !== 'object' || body === null) return false
+  const candidate = body as Record<string, unknown>
+  return (
+    typeof candidate.astrologerId === 'string' &&
+    typeof candidate.scheduledAt === 'string' &&
+    typeof candidate.duration === 'number' &&
+    candidate.duration > 0
+  )
+}
+
+async function validateUser(email?: string, phone?: string): Promise<{
+  id: string
+  name: string | null
+  email: string | null
+  phone: string | null
+} | null> {
+  return await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: email || undefined },
+        { phone: phone || undefined },
+      ]
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+    }
+  })
+}
+
+async function getAstrologer(astrologerId: string): Promise<{
+  id: string
+  name: string
+  hourlyRate: number
+  available: boolean
+} | null> {
+  return await prisma.astrologer.findUnique({
+    where: { id: astrologerId },
+    select: {
+      id: true,
+      name: true,
+      hourlyRate: true,
+      available: true,
+    }
+  })
+}
+
+function calculateAmount(hourlyRate: number, duration: number): number {
+  return Math.ceil((hourlyRate / 60) * duration)
+}
+
 /**
  * POST /api/consultations/create-order
  * Create a consultation booking with Razorpay payment order
@@ -15,7 +75,8 @@ export const dynamic = 'force-dynamic'
  * - scheduledAt: string (ISO datetime, required)
  * - duration: number (minutes, required)
  */
-export async function POST(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get authenticated user
     const supabase = await createClient()
@@ -29,14 +90,7 @@ export async function POST(request: Request) {
     }
 
     // Find user in database
-    const dbUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { email: user.email || undefined },
-          { phone: user.phone || undefined },
-        ]
-      }
-    })
+    const dbUser = await validateUser(user.email, user.phone)
 
     if (!dbUser) {
       return NextResponse.json(
@@ -46,29 +100,23 @@ export async function POST(request: Request) {
     }
 
     // Parse and validate request body
-    const body = await request.json()
+    const body: unknown = await request.json()
+
+    if (!isValidRequestBody(body)) {
+      return NextResponse.json(
+        {
+          error: 'Invalid request body',
+          required: {
+            astrologerId: 'string',
+            scheduledAt: 'ISO datetime string',
+            duration: 'positive number (minutes)'
+          }
+        },
+        { status: 400 }
+      )
+    }
+
     const { astrologerId, scheduledAt, duration } = body
-
-    if (!astrologerId || typeof astrologerId !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid astrologerId. Must be a string.' },
-        { status: 400 }
-      )
-    }
-
-    if (!scheduledAt || typeof scheduledAt !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid scheduledAt. Must be an ISO datetime string.' },
-        { status: 400 }
-      )
-    }
-
-    if (!duration || typeof duration !== 'number' || duration <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid duration. Must be a positive number (minutes).' },
-        { status: 400 }
-      )
-    }
 
     // Validate datetime format
     const scheduledDate = new Date(scheduledAt)
@@ -88,15 +136,7 @@ export async function POST(request: Request) {
     }
 
     // Fetch astrologer details
-    const astrologer = await prisma.astrologer.findUnique({
-      where: { id: astrologerId },
-      select: {
-        id: true,
-        name: true,
-        hourlyRate: true,
-        available: true,
-      }
-    })
+    const astrologer = await getAstrologer(astrologerId)
 
     if (!astrologer) {
       return NextResponse.json(
@@ -113,8 +153,7 @@ export async function POST(request: Request) {
     }
 
     // Calculate amount based on hourly rate and duration
-    // Formula: (hourlyRate / 60 minutes) * duration
-    const amountInRupees = Math.ceil((astrologer.hourlyRate / 60) * duration)
+    const amountInRupees = calculateAmount(astrologer.hourlyRate, duration)
 
     // Create Razorpay order
     const razorpayOrder = await createRazorpayOrder({
@@ -168,13 +207,13 @@ export async function POST(request: Request) {
         },
         razorpayOrder: {
           orderId: razorpayOrder.id,
-          amount: razorpayOrder.amount, // Amount in paise
+          amount: razorpayOrder.amount,
           currency: razorpayOrder.currency,
         }
       },
       { status: 201 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Consultation order creation error:', error)
 
     return NextResponse.json(

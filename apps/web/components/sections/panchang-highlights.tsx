@@ -5,7 +5,7 @@ import { Card } from "@digital-astrology/ui";
 import { getPanchangToday } from "@lib/api/panchang";
 import { useQuery } from "@tanstack/react-query";
 
-export default function PanchangHighlights() {
+export default function PanchangHighlights(): React.ReactElement {
   const { data, isLoading } = useQuery({
     queryKey: ["panchang", "today", "en"],
     queryFn: () => getPanchangToday({ locale: "en" })

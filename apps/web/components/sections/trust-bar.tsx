@@ -5,7 +5,7 @@ const STATS = [
   { label: "Gemstones Certified", value: "10K" }
 ];
 
-export default function TrustBar() {
+export default function TrustBar(): React.ReactElement {
   return (
     <section className="relative z-10 px-6 lg:px-16">
       <div className="mx-auto flex max-w-5xl flex-wrap justify-between gap-6 rounded-3xl border border-white/10 bg-white/5 px-8 py-6 text-center text-sm text-slate-200 backdrop-blur-xl">

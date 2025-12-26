@@ -18,6 +18,7 @@ import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
  * @param timezone - Target timezone (default: "Asia/Kolkata" for IST)
  * @returns Formatted time string (e.g., "01:10 AM") or null
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export function formatBirthTime(
   birthTime: string | Date | null | undefined,
   birthDate?: string | Date | null,
@@ -30,9 +31,11 @@ export function formatBirthTime(
     if (typeof birthTime === 'string' && /^\d{1,2}:\d{2}$/.test(birthTime)) {
       // Parse HH:MM and format to 12-hour with AM/PM
       const [hours, minutes] = birthTime.split(':').map(Number)
-      const date = new Date()
-      date.setHours(hours, minutes, 0, 0)
-      return format(date, 'hh:mm a') // e.g., "01:10 AM"
+      if (hours !== undefined && minutes !== undefined) {
+        const date = new Date()
+        date.setHours(hours, minutes, 0, 0)
+        return format(date, 'hh:mm a') // e.g., "01:10 AM"
+      }
     }
 
     // Case 2: birthTime contains UTC timestamp (e.g., "19:40:00.000Z")
@@ -44,7 +47,7 @@ export function formatBirthTime(
       if (/^\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(birthTime)) {
         // Use provided birthDate or today's date
         const datePrefix = birthDate
-          ? (typeof birthDate === 'string' ? birthDate.split('T')[0] : format(birthDate, 'yyyy-MM-dd'))
+          ? (typeof birthDate === 'string' ? birthDate.split('T')[0] ?? '' : format(birthDate, 'yyyy-MM-dd'))
           : format(new Date(), 'yyyy-MM-dd')
         dateTimeStr = `${datePrefix}T${birthTime}`
       }
@@ -75,7 +78,7 @@ export function formatBirthTime(
     }
 
     return null
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error formatting birth time:', error, { birthTime, timezone })
     return null
   }
@@ -108,7 +111,7 @@ export function formatBirthDateTime(
     }
 
     return formattedDate
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error formatting birth date time:', error)
     return null
   }
@@ -151,14 +154,14 @@ export function parseTimeTo24Hour(timeString: string | null | undefined): string
     // Already in 24-hour format (HH:MM or H:MM)
     if (/^\d{1,2}:\d{2}$/.test(timeString)) {
       const [hours, minutes] = timeString.split(':').map(Number)
-      if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+      if (hours !== undefined && minutes !== undefined && hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
         return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
       }
     }
 
     // 12-hour format with AM/PM
     const match = timeString.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i)
-    if (match) {
+    if (match && match[1] && match[2] && match[3]) {
       let hours = parseInt(match[1], 10)
       const minutes = parseInt(match[2], 10)
       const meridiem = match[3].toLowerCase()
@@ -173,7 +176,7 @@ export function parseTimeTo24Hour(timeString: string | null | undefined): string
     }
 
     return null
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error parsing time to 24-hour format:', error, { timeString })
     return null
   }
@@ -202,7 +205,7 @@ export function convertLocalTimeToUTC(
 
     // Return as ISO string (UTC)
     return zonedDate.toISOString()
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error converting local time to UTC:', error)
     throw error
   }
@@ -223,7 +226,7 @@ export function extractTimeFromUTC(
   try {
     const date = typeof utcDateTime === 'string' ? parseISO(utcDateTime) : utcDateTime
     return formatInTimeZone(date, timezone, 'HH:mm')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error extracting time from UTC:', error)
     return null
   }

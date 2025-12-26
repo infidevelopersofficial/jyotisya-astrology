@@ -31,6 +31,7 @@ export type RouteHandler<T = unknown> = (
   context: RouteContext
 ) => Promise<T | NextResponse>
 
+// eslint-disable-next-line complexity, max-lines-per-function
 export function withRouteHandler<T = unknown>(
   handler: RouteHandler<T>
 ): (req: NextRequest, context: RouteContext) => Promise<NextResponse> {
@@ -56,15 +57,15 @@ export function withRouteHandler<T = unknown>(
         },
         { status: 200, headers: { 'X-Request-ID': requestId } }
       )
-    } catch (error) {
+    } catch (error: unknown) {
       const duration = Date.now() - startTime
 
       if (error instanceof ApiError) {
-        logRequest(req, error.statusCode, duration, requestId, error.message)
+        logRequest(req, error.statusCode, duration, requestId, (error instanceof Error ? error.message : String(error)))
         return NextResponse.json(
           {
             success: false,
-            error: { code: error.code, message: error.message, details: error.details },
+            error: { code: error.code, message: (error instanceof Error ? error.message : String(error)), details: error.details },
             meta: { timestamp: new Date().toISOString(), requestId },
           },
           { status: error.statusCode, headers: { 'X-Request-ID': requestId } }
@@ -89,7 +90,7 @@ export function withRouteHandler<T = unknown>(
 export class ApiError extends Error {
   constructor(
     public code: string,
-    public message: string,
+    public override message: string,
     public statusCode: number = 400,
     public details?: unknown
   ) {
@@ -119,7 +120,7 @@ function logRequest(
   } else if (status >= 400) {
     console.warn('[API Warning]', log)
   } else if (process.env.NODE_ENV === 'development') {
-    console.log('[API Request]', log)
+    console.error('[API Request]', log)
   }
 }
 

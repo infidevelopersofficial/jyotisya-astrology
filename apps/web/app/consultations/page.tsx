@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: "Consult Trusted Astrologers | Jyotishya"
 }
 
-export default function ConsultationsPage() {
+export default function ConsultationsPage(): React.ReactElement {
   return (
     <>
       {/* Load Razorpay Checkout Script */}

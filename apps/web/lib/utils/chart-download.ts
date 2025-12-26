@@ -52,7 +52,7 @@ export async function downloadChartAsPNG(
       document.body.removeChild(link)
       URL.revokeObjectURL(url)
     }, 'image/png')
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error downloading PNG:', error)
     throw error
   }
@@ -128,7 +128,7 @@ export async function downloadChartAsPDF(
 
     // Download
     pdf.save(options.filename || `birth-chart-${Date.now()}.pdf`)
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error downloading PDF:', error)
     throw error
   }
@@ -177,7 +177,7 @@ export async function copyToClipboard(text: string): Promise<void> {
       document.execCommand('copy')
       document.body.removeChild(textArea)
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error copying to clipboard:', error)
     throw error
   }

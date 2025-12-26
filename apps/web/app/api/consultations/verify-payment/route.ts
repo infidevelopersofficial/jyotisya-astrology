@@ -15,7 +15,8 @@ export const dynamic = 'force-dynamic'
  * - razorpay_payment_id: string (required)
  * - razorpay_signature: string (required)
  */
-export async function POST(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get authenticated user
     const supabase = await createClient()
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     // Parse and validate request body
-    const body = await request.json()
+    const body = await request.json() as Record<string, unknown>
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body
 
     if (!razorpay_order_id || typeof razorpay_order_id !== 'string') {
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
     let paymentDetails
     try {
       paymentDetails = await fetchPaymentDetails(razorpay_payment_id)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching payment details:', error)
       // Continue even if fetch fails - signature verification is sufficient
     }
@@ -179,12 +180,17 @@ export async function POST(request: Request) {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Payment verification error:', error)
 
     // If verification failed, mark payment as failed
-    const body = await request.json().catch(() => ({}))
-    const { razorpay_order_id } = body
+    let razorpay_order_id: string | undefined
+    try {
+      const bodyRetry = await request.json() as Record<string, unknown>
+      razorpay_order_id = bodyRetry.razorpay_order_id as string | undefined
+    } catch {
+      razorpay_order_id = undefined
+    }
 
     if (razorpay_order_id) {
       try {

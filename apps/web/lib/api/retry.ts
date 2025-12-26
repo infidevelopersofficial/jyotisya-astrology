@@ -116,7 +116,7 @@ export async function retry<T>(
   for (let attempt = 1; attempt <= opts.maxRetries + 1; attempt++) {
     try {
       return await fn()
-    } catch (error) {
+    } catch (error: unknown) {
       lastError = error
 
       // Don't retry on last attempt
@@ -172,6 +172,7 @@ export async function retry<T>(
 /**
  * Retry specifically for fetch requests
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export async function retryFetch(
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -271,7 +272,7 @@ export class CircuitBreaker {
       }
 
       return result
-    } catch (error) {
+    } catch (error: unknown) {
       this.recordFailure()
       throw error
     }

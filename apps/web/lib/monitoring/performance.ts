@@ -152,7 +152,7 @@ export async function measureAsync<T>(
     })
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = performance.now() - start
 
     performanceMonitor.record({
@@ -198,7 +198,7 @@ export function measureSync<T>(
     })
 
     return result
-  } catch (error) {
+  } catch (error: unknown) {
     const duration = performance.now() - start
 
     performanceMonitor.record({
@@ -261,7 +261,7 @@ export function mark(name: string) {
   if (typeof window !== 'undefined' && window.performance) {
     try {
       performance.mark(name)
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to create performance mark', { name, error })
     }
   }
@@ -287,7 +287,7 @@ export function measure(
       })
 
       return duration
-    } catch (error) {
+    } catch (error: unknown) {
       logger.warn('Failed to measure performance', {
         name,
         startMark,
@@ -359,7 +359,7 @@ export function reportWebVitals(metric: {
 }) {
   // Log to console in development
   if (process.env.NODE_ENV === 'development') {
-    console.log('[Web Vitals]', metric)
+    console.error('[Web Vitals]', metric)
   }
 
   // Send to monitoring service

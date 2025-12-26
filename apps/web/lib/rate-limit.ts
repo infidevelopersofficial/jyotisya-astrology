@@ -20,7 +20,8 @@ const store: RateLimitStore = {}
 setInterval(() => {
   const now = Date.now()
   Object.keys(store).forEach((key) => {
-    if (store[key].resetAt < now) {
+    const entry = store[key]
+    if (entry && entry.resetAt < now) {
       delete store[key]
     }
   })
@@ -50,7 +51,7 @@ export interface RateLimitConfig {
  *
  * @example
  * ```typescript
- * export async function GET(request: NextRequest) {
+ * export async function GET(request: NextRequest): Promise<NextResponse> {
  *   const rateLimitResponse = await rateLimit(request, {
  *     limit: 10,
  *     window: 60000,
@@ -62,6 +63,7 @@ export interface RateLimitConfig {
  * }
  * ```
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export async function rateLimit(
   request: NextRequest,
   config: RateLimitConfig
@@ -138,7 +140,7 @@ export async function rateLimit(
  * ```typescript
  * const limiter = createRateLimiter({ limit: 10, window: 60000 })
  *
- * export async function GET(request: NextRequest) {
+ * export async function GET(request: NextRequest): Promise<NextResponse> {
  *   const rateLimitResponse = await limiter(request)
  *   if (rateLimitResponse) return rateLimitResponse
  *

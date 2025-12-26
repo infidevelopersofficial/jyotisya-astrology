@@ -29,7 +29,7 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
   const [deleting, setDeleting] = useState(false)
   const [copiedLink, setCopiedLink] = useState(false)
 
-  const chartData = kundli.chartData as Record<string, unknown>
+  const chartData = kundli.chartData
   const dataObj = chartData?.data as Record<string, unknown> | undefined
   const outputArray = chartData?.output as Array<Record<string, Record<string, unknown>>> | undefined
   const hasAscendant = (dataObj?.ascendant as number | undefined) || (outputArray?.[0]?.['0']?.ascendant as number | undefined)
@@ -53,7 +53,7 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
       trackChartDeleted({ chartId: kundli.id })
 
       onDelete(kundli.id)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to delete chart:', error)
       alert('Failed to delete chart. Please try again.')
     } finally {
@@ -65,7 +65,7 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
     try {
       // Generate share link using birth data
       const shareLink = generateShareLink({
-        dateTime: new Date(kundli.birthDate).toISOString().split('.')[0],
+        dateTime: new Date(kundli.birthDate).toISOString().split('.')[0] ?? '',
         latitude: kundli.latitude,
         longitude: kundli.longitude,
         timezone: parseFloat(kundli.timezone),
@@ -78,7 +78,7 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
 
       // Track analytics
       trackChartShared({ method: 'link' })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to copy link:', error)
       alert('Failed to copy share link. Please try again.')
     }

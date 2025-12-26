@@ -13,7 +13,7 @@ interface AstrologyAPIResponse {
   [key: string]: unknown
 }
 
-export default function AstrologyTestPage() {
+export default function AstrologyTestPage(): React.ReactElement {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<AstrologyAPIResponse | null>(null)
   const [error, setError] = useState<string | null>(null)

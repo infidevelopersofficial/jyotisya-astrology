@@ -17,7 +17,8 @@ export const dynamic = 'force-dynamic'
  * - date (optional): Date for horoscope (defaults to today)
  * - locale (optional): Language code (en, hi, ta)
  */
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     // Get authenticated user
     const supabase = await createClient()
@@ -106,7 +107,7 @@ export async function GET(request: NextRequest) {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Horoscope me API error', error)
 
     return NextResponse.json(

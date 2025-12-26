@@ -3,7 +3,7 @@
 import { useSupabaseAuth } from '@/hooks/use-supabase-auth'
 import Link from 'next/link'
 
-export default function AuthTestPage() {
+export default function AuthTestPage(): React.ReactElement {
   const { user, session, loading, isAuthenticated } = useSupabaseAuth()
 
   return (
@@ -122,7 +122,7 @@ export default function AuthTestPage() {
                     try {
                       const response = await fetch('/api/onboarding')
                       const data = await response.json()
-                      console.log('API Response:', data)
+                      console.error('API Response:', data)
                       alert(`Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`)
                     } catch (err) {
                       console.error('API Error:', err)

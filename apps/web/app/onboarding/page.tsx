@@ -20,7 +20,7 @@ interface UserData {
   onboardingCompleted: boolean
 }
 
-export default function OnboardingPage() {
+export default function OnboardingPage(): React.ReactElement {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +61,7 @@ export default function OnboardingPage() {
           setFormData({
             name: user.name || '',
             birthDate: user.birthDate
-              ? new Date(user.birthDate).toISOString().split('T')[0]
+              ? new Date(user.birthDate).toISOString().split('T')[0] ?? ''
               : '',
             birthTime: user.birthTime || '',
             birthPlace: user.birthPlace || 'Delhi, India',
@@ -87,7 +87,7 @@ export default function OnboardingPage() {
 
   const handleDateTimeChange = (dateTime: string) => {
     const [date, time] = dateTime.split('T')
-    setFormData(prev => ({ ...prev, birthDate: date, birthTime: time }))
+    setFormData(prev => ({ ...prev, birthDate: date ?? '', birthTime: time ?? '' }))
   }
 
   const handleLocationChange = (location: {

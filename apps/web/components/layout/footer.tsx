@@ -7,7 +7,7 @@ const QUICK_LINKS = [
   { href: "/contact", label: "Contact" }
 ];
 
-export default function Footer() {
+export default function Footer(): React.ReactElement {
   return (
     <footer className="mt-24 border-t border-white/10 bg-[#070c1d]">
       <div className="mx-auto grid max-w-6xl gap-10 px-6 py-14 lg:grid-cols-[2fr,1fr,1fr] lg:px-16">

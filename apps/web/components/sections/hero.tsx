@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Button } from "@digital-astrology/ui";
 import { useLocaleContext } from "@components/providers/intl-provider";
 
-export default function Hero() {
+export default function Hero(): React.ReactElement {
   const { copy } = useLocaleContext();
   const { hero } = copy;
 

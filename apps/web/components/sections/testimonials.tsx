@@ -25,7 +25,7 @@ const TESTIMONIALS = [
   }
 ];
 
-export default function TestimonialsSection() {
+export default function TestimonialsSection(): React.ReactElement {
   return (
     <section className="px-6 lg:px-16">
       <div className="mx-auto max-w-3xl text-center">

@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { captureException, addBreadcrumb } from '@/lib/monitoring/sentry'
 import { logger } from '@/lib/monitoring/logger'
 
-export default function SentryTestPage() {
+export default function SentryTestPage(): React.ReactElement {
   const [result, setResult] = useState<string>('')
 
   const testClientError = () => {
     try {
       logger.info('Testing client-side error')
       throw new Error('🧪 Test Client Error - This is a test error from the browser')
-    } catch (error) {
+    } catch (error: unknown) {
       captureException(error, {
         context: 'sentry-test-page',
         type: 'client-error',
@@ -35,7 +35,7 @@ export default function SentryTestPage() {
 
     try {
       throw new Error('🧪 Test Error with Breadcrumbs - Check breadcrumbs in Sentry')
-    } catch (error) {
+    } catch (error: unknown) {
       captureException(error, {
         userId: 'test-user-123',
         page: 'sentry-test',

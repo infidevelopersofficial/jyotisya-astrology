@@ -15,12 +15,12 @@ import { cachedAstrologyAPI } from '@/lib/astrology/cached-client'
  *   "last_request_at": "2025-12-03T15:30:00.000Z"
  * }
  */
-export async function GET() {
+export function GET(): NextResponse {
   try {
     const rateLimitInfo = cachedAstrologyAPI.getRateLimitInfo()
 
     return NextResponse.json(rateLimitInfo, { status: 200 })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       {
         error: 'Failed to fetch rate limit info',

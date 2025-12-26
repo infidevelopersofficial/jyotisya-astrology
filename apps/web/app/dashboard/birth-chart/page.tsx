@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import BirthChartGeneratorV2 from '@components/astrology/birth-chart/BirthChartGeneratorV2'
+import BirthChartGeneratorV2 from '@/components/astrology/birth-chart/BirthChartGeneratorV2'
 
 export const metadata = {
   title: 'Birth Chart | Jyotishya',

@@ -207,7 +207,7 @@ export function cached<T extends (...args: unknown[]) => Promise<unknown>>(
       const data = await fn(...args)
       cache.set(key, data, false)
       return data
-    } catch (error) {
+    } catch (error: unknown) {
       if (options.cacheErrors) {
         cache.set(key, error, true)
       }
@@ -356,9 +356,12 @@ export class RequestBatcher<T, K = string> {
 
       // Resolve all promises
       batch.forEach((item, index) => {
-        item.resolve(results[index])
+        const result = results[index]
+        if (result !== undefined) {
+          item.resolve(result)
+        }
       })
-    } catch (error) {
+    } catch (error: unknown) {
       // Reject all promises
       batch.forEach(item => {
         item.reject(error)

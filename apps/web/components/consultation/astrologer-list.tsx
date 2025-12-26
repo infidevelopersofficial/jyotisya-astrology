@@ -44,6 +44,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
         abortController.abort()
       }
     }
+    return undefined
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []) // Run only once on mount
 
@@ -69,7 +70,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
     } catch (err) {
       // Don't set error if request was aborted (component unmounted)
       if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Fetch aborted - component unmounted')
+        console.error('Fetch aborted - component unmounted')
         return
       }
 

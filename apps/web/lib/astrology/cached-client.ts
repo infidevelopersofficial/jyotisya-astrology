@@ -4,7 +4,6 @@ import { logger } from '@/lib/monitoring/logger'
 import {
   astrologyAPI,
   createAstrologyRequest,
-  type AstrologyAPIClient,
 } from './client'
 import type {
   AstrologyRequest,
@@ -247,7 +246,7 @@ export class CachedAstrologyAPIClient {
   async getBirthChart(
     request: AstrologyRequest
   ): Promise<CachedResponse<BirthChartResponse>> {
-    const result = await getBirthChartCached(request) as CachedResponse<BirthChartResponse>
+    const result = await getBirthChartCached(request)
     result.from_cache = true
     return result
   }
@@ -256,7 +255,7 @@ export class CachedAstrologyAPIClient {
     request: AstrologyRequest,
     chartType: DivisionalChartType
   ): Promise<CachedResponse<BirthChartResponse>> {
-    const result = await getDivisionalChartCached(request, chartType) as CachedResponse<BirthChartResponse>
+    const result = await getDivisionalChartCached(request, chartType)
     result.from_cache = true
     return result
   }
@@ -264,7 +263,7 @@ export class CachedAstrologyAPIClient {
   async getChartSVG(
     request: AstrologyRequest
   ): Promise<CachedResponse<SVGChartResponse>> {
-    const result = await getChartSVGCached(request) as CachedResponse<SVGChartResponse>
+    const result = await getChartSVGCached(request)
     result.from_cache = true
     return result
   }
@@ -273,7 +272,7 @@ export class CachedAstrologyAPIClient {
     request: AstrologyRequest,
     chartType: DivisionalChartType
   ): Promise<CachedResponse<SVGChartResponse>> {
-    const result = await getDivisionalChartSVGCached(request, chartType) as CachedResponse<SVGChartResponse>
+    const result = await getDivisionalChartSVGCached(request, chartType)
     result.from_cache = true
     return result
   }
@@ -281,7 +280,7 @@ export class CachedAstrologyAPIClient {
   async getPanchang(
     request: AstrologyRequest
   ): Promise<CachedResponse<PanchangResponse>> {
-    const result = await getPanchangCached(request) as CachedResponse<PanchangResponse>
+    const result = await getPanchangCached(request)
     result.from_cache = true
     return result
   }
@@ -290,7 +289,7 @@ export class CachedAstrologyAPIClient {
     person1: AstrologyRequest,
     person2: AstrologyRequest
   ): Promise<CachedResponse<CompatibilityResponse>> {
-    const result = await getCompatibilityCached(person1, person2) as CachedResponse<CompatibilityResponse>
+    const result = await getCompatibilityCached(person1, person2)
     result.from_cache = true
     return result
   }
@@ -298,7 +297,7 @@ export class CachedAstrologyAPIClient {
   async getDasa(
     request: AstrologyRequest
   ): Promise<CachedResponse<DasaResponse>> {
-    const result = await getDasaCached(request) as CachedResponse<DasaResponse>
+    const result = await getDasaCached(request)
     result.from_cache = true
     return result
   }
@@ -306,7 +305,7 @@ export class CachedAstrologyAPIClient {
   async getPlanetaryStrength(
     request: AstrologyRequest
   ): Promise<CachedResponse<PlanetaryStrengthResponse>> {
-    const result = await getPlanetaryStrengthCached(request) as CachedResponse<PlanetaryStrengthResponse>
+    const result = await getPlanetaryStrengthCached(request)
     result.from_cache = true
     return result
   }
@@ -314,7 +313,7 @@ export class CachedAstrologyAPIClient {
   async getWesternNatal(
     request: AstrologyRequest
   ): Promise<CachedResponse<WesternNatalResponse>> {
-    const result = await getWesternNatalCached(request) as CachedResponse<WesternNatalResponse>
+    const result = await getWesternNatalCached(request)
     result.from_cache = true
     return result
   }

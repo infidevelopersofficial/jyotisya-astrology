@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from './server'
 
@@ -65,7 +65,7 @@ function serverErrorResponse(message = 'Authentication failed') {
  *
  * Usage:
  * ```typescript
- * export async function GET(request: NextRequest) {
+ * export async function GET(request: NextRequest): Promise<NextResponse> {
  *   const user = await requireAuth(request)
  *   if (user instanceof NextResponse) return user // Auth failed, return error
  *
@@ -80,7 +80,7 @@ export async function requireAuth(_request: NextRequest) {
     const { data: { user }, error } = await supabase.auth.getUser()
 
     if (error) {
-      console.error('[requireAuth] Supabase auth error:', error.message)
+      console.error('[requireAuth] Supabase auth error:', (error instanceof Error ? error.message : String(error)))
       return unauthorizedResponse('Invalid or expired session')
     }
 
@@ -89,7 +89,7 @@ export async function requireAuth(_request: NextRequest) {
     }
 
     return user
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[requireAuth] Unexpected error:', error)
     return serverErrorResponse()
   }
@@ -101,7 +101,7 @@ export async function requireAuth(_request: NextRequest) {
  *
  * Usage:
  * ```typescript
- * export async function GET(request: NextRequest) {
+ * export async function GET(request: NextRequest): Promise<NextResponse> {
  *   const user = await optionalAuth(request)
  *
  *   if (user) {
@@ -118,7 +118,7 @@ export async function optionalAuth(_request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     return user
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[optionalAuth] Error:', error)
     return null
   }

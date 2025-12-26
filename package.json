@@ -9,15 +9,24 @@
     "build": "turbo build --filter=@digital-astrology/web",
     "build:all": "turbo build",
     "lint": "turbo lint",
+    "lint:fix": "turbo lint -- --fix",
+    "type-check": "turbo type-check",
     "test": "turbo test",
     "format": "prettier --write .",
-    "prepare": "cd packages/schemas && prisma generate || true"
+    "format:check": "prettier --check .",
+    "validate": "npm run type-check && npm run lint && npm run format:check",
+    "validate:fix": "npm run type-check && npm run lint:fix && npm run format",
+    "prepare": "husky install && cd packages/schemas && prisma generate || true",
+    "pre-commit": "lint-staged",
+    "pre-push": "npm run validate"
   },
   "devDependencies": {
     "@types/node": "^20.11.30",
     "@vitest/ui": "^4.0.15",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
     "prettier": "^3.2.5",
     "prisma": "7.1.0",
     "turbo": "^1.13.4",
@@ -35,5 +44,14 @@
   "packageManager": "yarn@4.12.0",
   "dependencies": {
     "@prisma/client": "7.1.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --max-warnings=0",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

@@ -161,7 +161,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
 
       planetNames.forEach(name => {
         if (planetData[name]) {
-          const p = planetData[name] as Record<string, unknown>
+          const p = planetData[name]
           planetsArray.push({
             name,
             fullDegree: (p.fullDegree as number) || 0,
@@ -307,7 +307,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
 
       // Track analytics
       trackChartDownloadedPNG({ chartType: selectedDivisional })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('PNG download failed:', error)
       setError('Failed to download chart as PNG. Please try again.')
     } finally {
@@ -330,13 +330,13 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
       await downloadChartAsPDF('rasi-chart', {
         filename: `${baseFilename}-${selectedDivisional.toLowerCase()}-${Date.now()}.pdf`,
         chartName: fullChartName,
-        birthDate: birthData.dateTime ? new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' }) + ' at ' + new Date(birthData.dateTime).toLocaleTimeString('en-IN', { timeStyle: 'short' }) : undefined,
+        birthDate: birthData.dateTime ? `${new Date(birthData.dateTime).toLocaleDateString('en-IN', { dateStyle: 'long' })  } at ${  new Date(birthData.dateTime).toLocaleTimeString('en-IN', { timeStyle: 'short' })}` : undefined,
         birthPlace: birthData.location,
       })
 
       // Track analytics
       trackChartDownloadedPDF({ chartType: selectedDivisional })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('PDF download failed:', error)
       setError('Failed to download chart as PDF. Please try again.')
     } finally {
@@ -353,7 +353,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
 
       // Track analytics
       trackChartShared({ method: 'link' })
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to copy link:', error)
       setError('Failed to copy share link. Please try again.')
     }
@@ -385,7 +385,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
           latitude: birthData.latitude,
           longitude: birthData.longitude,
           timezone: birthData.timezone.toString(),
-          chartData: chartData,
+          chartData,
         }),
       })
 
@@ -405,7 +405,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
 
       // Reset saved message after 5 seconds
       setTimeout(() => setSavedChartId(null), 5000)
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Failed to save chart:', error)
       setError('Failed to save chart. Please try again.')
     } finally {
@@ -797,7 +797,7 @@ export default function BirthChartGeneratorV2({ userId: _userId, userEmail: _use
                                 In {planet.sign}
                               </p>
                               <p className="text-sm leading-relaxed text-white">
-                                {signInfo ? `${signInfo.element} element – ${signInfo.nature}` : 'Influences your ' + meaning.area}
+                                {signInfo ? `${signInfo.element} element – ${signInfo.nature}` : `Influences your ${  meaning.area}`}
                               </p>
                             </div>
                             <div>

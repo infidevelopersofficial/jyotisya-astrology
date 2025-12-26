@@ -24,7 +24,8 @@ export const dynamic = 'force-dynamic'
  * 3. Select events: payment.captured, payment.failed, refund.created, refund.processed
  * 4. Use RAZORPAY_KEY_SECRET as webhook secret
  */
-export async function POST(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get raw body for signature verification
     const rawBody = await request.text()
@@ -57,7 +58,7 @@ export async function POST(request: Request) {
     const paymentEntity = payload.payload?.payment?.entity
     const refundEntity = payload.payload?.refund?.entity
 
-    console.log(`Received Razorpay webhook: ${event}`)
+    console.error(`Received Razorpay webhook: ${event}`)
 
     // Handle different webhook events
     switch (event) {
@@ -75,14 +76,14 @@ export async function POST(request: Request) {
         break
 
       default:
-        console.log(`Unhandled webhook event: ${event}`)
+        console.error(`Unhandled webhook event: ${event}`)
     }
 
     return NextResponse.json(
       { success: true, message: 'Webhook processed' },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Webhook processing error:', error)
 
     return NextResponse.json(
@@ -99,7 +100,7 @@ export async function POST(request: Request) {
  * Handle payment.captured event
  * Updates consultation payment status to PAID
  */
-async function handlePaymentCaptured(paymentEntity: any) {
+async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
     console.error('Invalid payment entity:', paymentEntity)
     return
@@ -130,8 +131,8 @@ async function handlePaymentCaptured(paymentEntity: any) {
       }
     })
 
-    console.log(`Payment captured for consultation ${consultation.id}, payment ID: ${paymentId}`)
-  } catch (error) {
+    console.error(`Payment captured for consultation ${consultation.id}, payment ID: ${paymentId}`)
+  } catch (error: unknown) {
     console.error('Error handling payment.captured:', error)
     throw error
   }
@@ -141,7 +142,7 @@ async function handlePaymentCaptured(paymentEntity: any) {
  * Handle payment.failed event
  * Updates consultation payment status to FAILED
  */
-async function handlePaymentFailed(paymentEntity: any) {
+async function handlePaymentFailed(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
     console.error('Invalid payment entity:', paymentEntity)
     return
@@ -173,8 +174,8 @@ async function handlePaymentFailed(paymentEntity: any) {
       }
     })
 
-    console.log(`Payment failed for consultation ${consultation.id}, payment ID: ${paymentId}, reason: ${errorReason}`)
-  } catch (error) {
+    console.error(`Payment failed for consultation ${consultation.id}, payment ID: ${paymentId}, reason: ${errorReason}`)
+  } catch (error: unknown) {
     console.error('Error handling payment.failed:', error)
     throw error
   }
@@ -184,7 +185,7 @@ async function handlePaymentFailed(paymentEntity: any) {
  * Handle refund.created and refund.processed events
  * Updates consultation payment status to REFUNDED
  */
-async function handleRefund(refundEntity: any) {
+async function handleRefund(refundEntity: any): Promise<void> {
   if (!refundEntity || !refundEntity.payment_id) {
     console.error('Invalid refund entity:', refundEntity)
     return
@@ -217,7 +218,7 @@ async function handleRefund(refundEntity: any) {
 
     // TODO: Add razorpayPaymentId field to Consultation model and update this logic
 
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error handling refund:', error)
     throw error
   }

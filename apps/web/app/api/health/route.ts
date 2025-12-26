@@ -7,7 +7,7 @@ import { logger } from '@/lib/monitoring/logger'
  *
  * Used by: Load balancers, monitoring systems, uptime checks
  */
-export async function GET() {
+export function GET(): NextResponse {
   try {
     return NextResponse.json(
       {
@@ -18,7 +18,7 @@ export async function GET() {
       },
       { status: 200 }
     )
-  } catch (error) {
+  } catch (error: unknown) {
     logger.error('Health check failed', error)
 
     return NextResponse.json(

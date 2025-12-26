@@ -52,10 +52,10 @@ function getAPIKey(): string {
  */
 class RateLimitTracker {
   private requestsToday = 0
-  private resetDate: string = new Date().toISOString().split('T')[0]
+  private resetDate: string = new Date().toISOString().split('T')[0] ?? ''
 
   private checkReset() {
-    const today = new Date().toISOString().split('T')[0]
+    const today = new Date().toISOString().split('T')[0] ?? ''
     if (today !== this.resetDate) {
       this.requestsToday = 0
       this.resetDate = today
@@ -167,7 +167,7 @@ async function makeRequest<T>(
         })
 
         return data as T
-      } catch (error) {
+      } catch (error: unknown) {
         logger.error('API request failed', error, {
           endpoint,
           operation: operationName,

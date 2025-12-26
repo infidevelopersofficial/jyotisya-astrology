@@ -7,7 +7,7 @@ import { useSavedCharts } from '@/hooks/useSavedCharts'
 import { useRecentlyViewedCharts } from '@/hooks/useRecentlyViewedCharts'
 import type { SortOption } from '@/types/savedChart.types'
 
-export default function SavedChartsList() {
+export default function SavedChartsList(): React.ReactElement {
   const {
     charts,
     totalCount,

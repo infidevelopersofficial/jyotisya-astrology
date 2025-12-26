@@ -55,7 +55,7 @@ export default function DateTimePicker({ value, onChange, showHelp = true }: Dat
 
     if (timeValue) {
       const [hours, minutes] = timeValue.split(':').map(Number)
-      if (hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
+      if (hours === undefined || minutes === undefined || hours < 0 || hours > 23 || minutes < 0 || minutes > 59) {
         newErrors.time = 'Invalid time format'
       }
     }

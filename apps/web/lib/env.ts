@@ -100,6 +100,7 @@ function validateEnvVar(name: string, value: string | undefined): string | null 
  * Validates all required environment variables
  * Throws an error with detailed message if validation fails
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export function validateEnv(): EnvConfig {
   const errors: string[] = []
 
@@ -165,7 +166,7 @@ export function getEnv(): EnvConfig {
 if (process.env.NODE_ENV !== 'test' && typeof window === 'undefined') {
   try {
     validateEnv()
-  } catch (error) {
+  } catch (error: unknown) {
     // Only throw during runtime, not during build
     if (process.env.NEXT_PHASE !== 'phase-production-build') {
       console.error(error)

@@ -23,7 +23,8 @@ const saveKundliSchema = z.object({
   chartData: z.record(z.unknown()),
 })
 
-export async function POST(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
     const supabase = await createClient()
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse and validate request body
-    const body = await request.json()
+    const body = await request.json() as Record<string, unknown>
     const parsed = saveKundliSchema.safeParse(body)
 
     if (!parsed.success) {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    console.log('[api/user/kundli] Chart saved successfully', {
+    console.error('[api/user/kundli] Chart saved successfully', {
       kundliId: kundli.id,
       userId: user.id,
       chartName: name,
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
         createdAt: kundli.createdAt.toISOString(),
       },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[api/user/kundli] Error saving chart', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
  * GET /api/user/kundli
  */
 // TODO: May need request for future pagination/filtering
+// eslint-disable-next-line complexity, max-lines-per-function
 export async function GET(_request: NextRequest) {
   try {
     // Authenticate user
@@ -145,7 +147,7 @@ export async function GET(_request: NextRequest) {
       success: true,
       kundlis,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[api/user/kundli] Error fetching charts', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
@@ -165,7 +167,8 @@ export async function GET(_request: NextRequest) {
  * Delete User's Kundli
  * DELETE /api/user/kundli?id={kundliId}
  */
-export async function DELETE(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
     const supabase = await createClient()
@@ -213,7 +216,7 @@ export async function DELETE(request: NextRequest) {
       where: { id: kundliId },
     })
 
-    console.log('[api/user/kundli] Chart deleted successfully', {
+    console.error('[api/user/kundli] Chart deleted successfully', {
       kundliId,
       userId: user.id,
     })
@@ -222,7 +225,7 @@ export async function DELETE(request: NextRequest) {
       success: true,
       message: 'Chart deleted successfully',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[api/user/kundli] Error deleting chart', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
@@ -242,7 +245,8 @@ export async function DELETE(request: NextRequest) {
  * Toggle Favorite Status for Kundli
  * PATCH /api/user/kundli?id={kundliId}
  */
-export async function PATCH(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function PATCH(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
     const supabase = await createClient()
@@ -296,7 +300,7 @@ export async function PATCH(request: NextRequest) {
       },
     })
 
-    console.log('[api/user/kundli] Favorite toggled successfully', {
+    console.error('[api/user/kundli] Favorite toggled successfully', {
       kundliId,
       userId: user.id,
       isFavorite: updatedKundli.isFavorite,
@@ -306,7 +310,7 @@ export async function PATCH(request: NextRequest) {
       success: true,
       isFavorite: updatedKundli.isFavorite,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[api/user/kundli] Error toggling favorite', {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,

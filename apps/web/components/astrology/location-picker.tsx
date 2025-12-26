@@ -115,13 +115,13 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
 
       // Log cache status for debugging
       if (result.from_cache) {
-        console.log('📦 Geocode results from cache')
+        console.error('📦 Geocode results from cache')
       } else {
-        console.log('🌐 Geocode results from API')
+        console.error('🌐 Geocode results from API')
       }
 
       setSuggestions(result.data || [])
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Geocoding error:', error)
       setError(error instanceof Error ? error.message : 'Failed to search location')
       setSuggestions([])
@@ -148,10 +148,10 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                      location.address?.town ||
                      location.address?.village ||
                      location.address?.state ||
-                     location.display_name.split(',')[0]
+                     location.display_name.split(',')[0] || ''
 
     // Try to get timezone from known cities, otherwise estimate
-    let timezone = cityTimezones[cityName] || estimateTimezone(lon)
+    let timezone = (cityName && cityTimezones[cityName]) || estimateTimezone(lon)
 
     // Special handling for India
     if (location.address?.country?.toLowerCase().includes('india') ||
@@ -166,7 +166,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
       timezone,
     }
 
-    console.log('📍 Location selected:', newLocation)
+    console.error('📍 Location selected:', newLocation)
 
     // Update parent component
     onChange(newLocation)

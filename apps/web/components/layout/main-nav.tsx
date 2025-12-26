@@ -17,7 +17,7 @@ const LINKS = [
   { href: "/shop", key: "shop" }
 ] as const;
 
-export default function MainNav() {
+export default function MainNav(): React.ReactElement {
   const pathname = usePathname();
   const { copy } = useLocaleContext();
   const { nav } = copy;
@@ -38,7 +38,7 @@ export default function MainNav() {
               : "text-slate-300 hover:bg-white/5 hover:text-white"
           )}
         >
-          {nav.links[link.key as keyof typeof nav.links]}
+          {nav.links[link.key]}
         </Link>
       ))}
     </nav>

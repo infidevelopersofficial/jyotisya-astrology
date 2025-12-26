@@ -8,8 +8,15 @@
     "postinstall": "cd ../../packages/schemas && npx prisma generate",
     "type-check": "tsc --noEmit",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest run"
+    "lint": "next lint --max-warnings=0",
+    "lint:fix": "next lint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "validate": "npm run type-check && npm run lint && npm run build",
+    "clean": "rm -rf .next out node_modules/.cache"
   },
   "dependencies": {
     "@digital-astrology/lib": "workspace:*",

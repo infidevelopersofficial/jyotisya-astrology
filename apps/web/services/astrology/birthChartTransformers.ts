@@ -61,7 +61,7 @@ function transformPlanets(
 
   planetNames.forEach((name) => {
     if (planetData[name]) {
-      const p = planetData[name] as Record<string, unknown>
+      const p = planetData[name]
       planetsArray.push({
         name,
         fullDegree: (p.fullDegree as number) || 0,

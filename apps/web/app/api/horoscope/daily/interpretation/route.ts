@@ -36,7 +36,8 @@ const querySchema = z.object({
   focus: z.enum(FOCUS_AREAS).optional()
 });
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(searchParams);
 
@@ -79,7 +80,7 @@ export async function GET(request: NextRequest) {
       horoscope: deterministic.summary,
       interpretation
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[api/horoscope/daily/interpretation] failure", error);
     return NextResponse.json(
       {

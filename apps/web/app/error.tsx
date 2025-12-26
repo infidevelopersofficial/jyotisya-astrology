@@ -99,7 +99,7 @@ export default function Error({
                 <span className="text-xs font-semibold text-red-400">
                   Error Message:
                 </span>
-                <p className="mt-1 text-sm text-slate-300">{error.message}</p>
+                <p className="mt-1 text-sm text-slate-300">{(error instanceof Error ? error.message : String(error))}</p>
               </div>
               {error.stack && (
                 <div>

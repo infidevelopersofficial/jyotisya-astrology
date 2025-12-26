@@ -44,7 +44,8 @@ interface NominatimLocation {
   }
 }
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const searchParams = request.nextUrl.searchParams
     const query = searchParams.get('q')
@@ -61,7 +62,7 @@ export async function GET(request: NextRequest) {
     const cacheKey = query.toLowerCase().trim()
     const cached = cache.get(cacheKey)
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-      console.log(`[Geocode] Cache hit for: ${query}`)
+      console.error(`[Geocode] Cache hit for: ${query}`)
       return NextResponse.json({
         data: cached.data,
         from_cache: true,
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
     const timeSinceLastRequest = now - lastRequestTime
     if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
       const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest
-      console.log(`[Geocode] Rate limiting: waiting ${waitTime}ms`)
+      console.error(`[Geocode] Rate limiting: waiting ${waitTime}ms`)
       await new Promise(resolve => setTimeout(resolve, waitTime))
     }
 
@@ -88,7 +89,7 @@ export async function GET(request: NextRequest) {
     nominatimUrl.searchParams.set('addressdetails', '1')
     nominatimUrl.searchParams.set('limit', '5')
 
-    console.log(`[Geocode] Fetching from Nominatim: ${query}`)
+    console.error(`[Geocode] Fetching from Nominatim: ${query}`)
 
     const response = await fetch(nominatimUrl.toString(), {
       headers: {
@@ -124,13 +125,13 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log(`[Geocode] Success: ${data.length} results for "${query}"`)
+    console.error(`[Geocode] Success: ${data.length} results for "${query}"`)
 
     return NextResponse.json({
       data,
       from_cache: false,
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Geocode] Error:', error)
 
     // Handle timeout

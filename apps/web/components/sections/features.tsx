@@ -23,7 +23,7 @@ const FEATURES = [
   }
 ];
 
-export default function FeaturesSection() {
+export default function FeaturesSection(): React.ReactElement {
   return (
     <section className="px-6 lg:px-16">
       <div className="mx-auto max-w-4xl text-center">

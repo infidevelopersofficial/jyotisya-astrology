@@ -36,7 +36,7 @@ export function trackEvent(eventName: EventName, properties?: EventProperties) {
   try {
     // Console log in development
     if (process.env.NODE_ENV === 'development') {
-      console.log(`[Analytics] ${eventName}`, properties)
+      console.error(`[Analytics] ${eventName}`, properties)
     }
 
     // Send to Posthog if available
@@ -64,7 +64,7 @@ export function trackEvent(eventName: EventName, properties?: EventProperties) {
         console.error('[Analytics] Failed to send event:', error)
       })
     }
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('[Analytics] Error tracking event:', error)
   }
 }

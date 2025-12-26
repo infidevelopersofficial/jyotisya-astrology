@@ -38,7 +38,7 @@ function SignInContent() {
       );
 
       if (error) {
-        setError(error.message);
+        setError((error instanceof Error ? error.message : String(error)));
       } else {
         setMessage("Magic link sent! Check your email inbox.");
         setStep("check-email");
@@ -68,7 +68,7 @@ function SignInContent() {
       const { error } = await supabaseAuth.signInWithOTP(emailOrPhone);
 
       if (error) {
-        setError(error.message);
+        setError((error instanceof Error ? error.message : String(error)));
       } else {
         const inputType = detectInputType(emailOrPhone);
         setMessage(`OTP sent to your ${inputType === 'email' ? 'email' : 'phone'}!`);
@@ -103,7 +103,7 @@ function SignInContent() {
       );
 
       if (error) {
-        setError(error.message);
+        setError((error instanceof Error ? error.message : String(error)));
       } else if (data.session) {
         setMessage("Successfully signed in!");
         router.push(callbackUrl);
@@ -367,7 +367,7 @@ function SignInContent() {
   );
 }
 
-export default function SignInPage() {
+export default function SignInPage(): React.ReactElement {
   return (
     <Suspense
       fallback={
