@@ -5,10 +5,10 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, Button } from "@digital-astrology/ui";
 import { getProducts } from "@lib/api/products";
 
-export default function MarketplaceGrid() {
+export default function MarketplaceGrid(): React.ReactElement {
   const { data, isLoading } = useQuery({
     queryKey: ["products", "all"],
-    queryFn: getProducts
+    queryFn: getProducts,
   });
 
   if (isLoading) {

@@ -10,7 +10,7 @@ const FALLBACK_PRODUCTS = [
     currency: "INR",
     image:
       "https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&w=400&q=80",
-    stock: "In Stock"
+    stock: "In Stock",
   },
   {
     sku: "YAN-SHREE-02",
@@ -21,7 +21,7 @@ const FALLBACK_PRODUCTS = [
     currency: "INR",
     image:
       "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=400&q=80",
-    stock: "Low Stock"
+    stock: "Low Stock",
   },
   {
     sku: "KIT-LAKSHMI-01",
@@ -32,7 +32,7 @@ const FALLBACK_PRODUCTS = [
     currency: "INR",
     image:
       "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=400&q=80",
-    stock: "In Stock"
+    stock: "In Stock",
   },
   {
     sku: "BOOK-VASTU-01",
@@ -43,8 +43,8 @@ const FALLBACK_PRODUCTS = [
     currency: "INR",
     image:
       "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=400&q=80",
-    stock: "Preorder"
-  }
+    stock: "Preorder",
+  },
 ];
 
 export default async function handler(_req: NextApiRequest, res: NextApiResponse) {

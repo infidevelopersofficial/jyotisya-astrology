@@ -135,6 +135,7 @@ model Kundli {
   chartData  Json
 
   // Metadata
+  isFavorite Boolean  @default(false)
   isPublic   Boolean  @default(false)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt

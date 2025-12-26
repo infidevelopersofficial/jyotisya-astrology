@@ -12,7 +12,7 @@ export function Card({ title, subtitle, className, children }: CardProps) {
     <article
       className={clsx(
         "rounded-3xl border border-white/10 bg-white/5 p-6 shadow-astro backdrop-blur-xl",
-        className
+        className,
       )}
     >
       {(title || subtitle) && (

@@ -12,8 +12,8 @@ const MOCK_SLOTS: ConsultationSlot[] = [
     astrologerId: "astro-aarti",
     startTime: "2024-05-12T14:00:00+05:30",
     endTime: "2024-05-12T14:30:00+05:30",
-    mode: "video"
-  }
+    mode: "video",
+  },
 ];
 
 export class ConsultationScheduler {

@@ -6,7 +6,7 @@ import { PanchangService } from "../panchang/panchang.service";
 export class HoroscopeService {
   constructor(
     private readonly ephemeris: EphemerisClient,
-    private readonly panchang: PanchangService
+    private readonly panchang: PanchangService,
   ) {}
 
   async getDaily(system: "vedic" | "western") {

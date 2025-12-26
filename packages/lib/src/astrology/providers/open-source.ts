@@ -1,14 +1,11 @@
-import {
-  MockHoroscopeClient,
-  type HoroscopeEntry
-} from "../../services/horoscope";
+import { MockHoroscopeClient, type HoroscopeEntry } from "../../services/horoscope";
 import { MockPanchangClient } from "../../services/panchang";
 import {
   AstrologyProvider,
   DailyHoroscopeRequest,
   DailyHoroscopeResult,
   PanchangRequest,
-  PanchangResult
+  PanchangResult,
 } from "../types";
 
 const horoscopeClient = new MockHoroscopeClient();
@@ -44,7 +41,7 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
         provider: metadataSource,
         generatedAt: new Date().toISOString(),
         timezone,
-        raw: remote?.raw ?? entry
+        raw: remote?.raw ?? entry,
       },
       summary: {
         date: date ?? new Date().toISOString(),
@@ -52,8 +49,8 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
         guidance: entry?.summary ?? `No guidance available for ${key}`,
         mood: entry?.mood,
         luckyNumber: entry?.luckyNumber,
-        luckyColor: entry?.luckyColor
-      }
+        luckyColor: entry?.luckyColor,
+      },
     };
   }
 
@@ -69,7 +66,7 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
         provider: providerSource,
         generatedAt: new Date().toISOString(),
         timezone,
-        raw: today
+        raw: today,
       },
       details: {
         date: date ?? today.date,
@@ -78,8 +75,8 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
         yoga: today.yoga,
         karana: today.karana,
         sunrise: today.sunrise,
-        sunset: today.sunset
-      }
+        sunset: today.sunset,
+      },
     };
   }
 
@@ -106,7 +103,7 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
   private async getRemoteHoroscopeEntry(
     sign: string,
     locale: string,
-    system?: "vedic" | "western"
+    system?: "vedic" | "western",
   ): Promise<{
     entry: HoroscopeEntry | null;
     raw: unknown;
@@ -144,12 +141,12 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
     sign: string,
     locale: string,
     cacheKey: string,
-    system?: "vedic" | "western"
+    system?: "vedic" | "western",
   ) {
     try {
       const params = new URLSearchParams({
         sunSign: sign,
-        locale
+        locale,
       });
       if (system) {
         params.set("system", system);
@@ -164,20 +161,24 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
       const summary = payload?.horoscope;
       if (!summary || typeof summary !== "object") {
         console.warn("[astrology] ASTRO_CORE_URL horoscope payload missing summary for", sign);
-        return this.cacheAndReturn(cacheKey, { entry: null, raw: payload, source: payload?.source });
+        return this.cacheAndReturn(cacheKey, {
+          entry: null,
+          raw: payload,
+          source: payload?.source,
+        });
       }
 
       const entry: HoroscopeEntry = {
         summary: String(summary.summary ?? summary.guidance ?? ""),
         mood: summary.mood ?? "Balanced",
         luckyNumber: summary.luckyNumber ?? "--",
-        luckyColor: summary.luckyColor ?? "--"
+        luckyColor: summary.luckyColor ?? "--",
       };
 
       return this.cacheAndReturn(cacheKey, {
         entry,
         raw: payload,
-        source: payload?.source
+        source: payload?.source,
       });
     } catch (error) {
       console.warn("[astrology] ASTRO_CORE_URL horoscope fetch failed", error);
@@ -185,7 +186,10 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
     }
   }
 
-  private cacheAndReturn(key: string, value: { entry: HoroscopeEntry | null; raw: unknown; source?: string }) {
+  private cacheAndReturn(
+    key: string,
+    value: { entry: HoroscopeEntry | null; raw: unknown; source?: string },
+  ) {
     remoteHoroscopeCache.set(key, { value, fetchedAt: Date.now() });
     return value;
   }

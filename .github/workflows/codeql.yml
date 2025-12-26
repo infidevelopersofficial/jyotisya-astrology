@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
   schedule:
     # Run every Monday at 00:00 UTC
-    - cron: '0 0 * * 1'
+    - cron: "0 0 * * 1"
 
 jobs:
   analyze:
@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['javascript', 'typescript']
+        language: ["javascript", "typescript"]
 
     steps:
       - name: Checkout repository

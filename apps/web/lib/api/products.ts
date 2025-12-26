@@ -9,7 +9,7 @@ const productSchema = z.object({
   price: z.number(),
   currency: z.string(),
   image: z.string().url(),
-  stock: z.string()
+  stock: z.string(),
 });
 
 export type Product = z.infer<typeof productSchema>;

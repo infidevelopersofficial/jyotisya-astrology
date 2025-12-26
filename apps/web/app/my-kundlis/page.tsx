@@ -1,53 +1,51 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/db/prisma'
-import Link from 'next/link'
-import KundlisGrid from '@components/kundli/kundlis-grid'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db/prisma";
+import Link from "next/link";
+import KundlisGrid from "@components/kundli/kundlis-grid";
 
 export default async function MyKundlisPage() {
   // Server-side authentication check
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/auth/signin?callbackUrl=/my-kundlis')
+    redirect("/auth/signin?callbackUrl=/my-kundlis");
   }
 
   // Fetch user's kundlis from database
   const dbUser = await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: user.email || undefined },
-        { phone: user.phone || undefined },
-      ]
+      OR: [{ email: user.email || undefined }, { phone: user.phone || undefined }],
     },
     include: {
       kundlis: {
         orderBy: {
-          createdAt: 'desc',
-        }
-      }
-    }
-  })
+          createdAt: "desc",
+        },
+      },
+    },
+  });
 
   if (!dbUser) {
-    redirect('/onboarding')
+    redirect("/onboarding");
   }
 
   // Transform kundlis to match the expected type
-  const kundlis = dbUser.kundlis.map(k => ({
+  const kundlis = dbUser.kundlis.map((k) => ({
     ...k,
-    chartData: (k.chartData || {}) as Record<string, unknown>
-  }))
+    chartData: (k.chartData || {}) as Record<string, unknown>,
+  }));
 
   return (
     <div className="mx-auto min-h-screen max-w-6xl px-6 py-12 lg:px-16">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-white">My Kundlis</h1>
-        <p className="mt-2 text-slate-300">
-          View and manage your saved birth charts
-        </p>
+        <p className="mt-2 text-slate-300">View and manage your saved birth charts</p>
       </div>
 
       {/* Create New Kundli Button */}
@@ -67,8 +65,18 @@ export default async function MyKundlisPage() {
       {kundlis.length === 0 ? (
         <div className="rounded-2xl border border-white/10 bg-white/5 p-12 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-orange-500/10">
-            <svg className="h-8 w-8 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            <svg
+              className="h-8 w-8 text-orange-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
             </svg>
           </div>
           <h3 className="mb-2 text-xl font-semibold text-white">No Kundlis Yet</h3>
@@ -86,5 +94,5 @@ export default async function MyKundlisPage() {
         <KundlisGrid initialKundlis={kundlis} />
       )}
     </div>
-  )
+  );
 }

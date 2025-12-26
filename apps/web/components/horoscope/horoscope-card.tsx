@@ -22,7 +22,7 @@ export default function HoroscopeCard({ sign, sunSign, locale, data, loading }: 
     refetch,
     isFetching,
     isFetched,
-    status
+    status,
   } = useQuery({
     queryKey: ["horoscope", "interpretation", sunSign, locale],
     queryFn: () =>
@@ -30,10 +30,10 @@ export default function HoroscopeCard({ sign, sunSign, locale, data, loading }: 
         sunSign,
         locale,
         tone: "uplifting",
-        focus: "career"
+        focus: "career",
       }),
     enabled: false,
-    staleTime: 1000 * 60 * 60 // cache for an hour per sign/locale combo
+    staleTime: 1000 * 60 * 60, // cache for an hour per sign/locale combo
   });
 
   const handleToggleInterpretation = async () => {
@@ -76,7 +76,11 @@ export default function HoroscopeCard({ sign, sunSign, locale, data, loading }: 
           onClick={handleToggleInterpretation}
           disabled={loading || isFetching}
         >
-          {isFetching ? "Asking our astrologer..." : showInterpretation ? "Hide AI insight" : "View AI insight"}
+          {isFetching
+            ? "Asking our astrologer..."
+            : showInterpretation
+              ? "Hide AI insight"
+              : "View AI insight"}
         </Button>
         {interpretationError && (
           <p className="text-xs text-red-300">
@@ -85,7 +89,9 @@ export default function HoroscopeCard({ sign, sunSign, locale, data, loading }: 
         )}
         {showInterpretation && interpretation && (
           <div className="rounded-lg border border-white/10 bg-black/40 p-3 text-sm text-slate-200">
-            <p className="leading-6 whitespace-pre-line">{interpretation.interpretation.narrative}</p>
+            <p className="leading-6 whitespace-pre-line">
+              {interpretation.interpretation.narrative}
+            </p>
             <p className="mt-3 text-xs text-slate-500">
               Source: {interpretation.interpretation.provider === "openai" ? "OpenAI" : "Mock"}
             </p>

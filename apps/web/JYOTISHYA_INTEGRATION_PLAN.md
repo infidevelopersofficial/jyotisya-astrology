@@ -5,6 +5,7 @@
 FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic and Western astrology calculations. This plan outlines a phased integration approach optimized for the Jyotishya platform, prioritizing features by business value and user demand while respecting rate limits.
 
 **API Characteristics**:
+
 - **Total Endpoints**: 100+ (Indian Vedic + Western + Panchang)
 - **Free Tier**: Daily rate limit (exact limit TBD - typically 50-100 requests/day)
 - **Format**: JSON (POST requests)
@@ -16,14 +17,14 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 ### 1.1 Essential Endpoints (Highest Priority)
 
-| Feature | Endpoint | Cache TTL | Business Value | User Demand |
-|---------|----------|-----------|----------------|-------------|
-| **Birth Chart** | `/planets` | 24h | ⭐⭐⭐⭐⭐ | Very High |
-| **Chart Visualization** | `/horoscope-chart-svg-code` | 24h | ⭐⭐⭐⭐⭐ | Very High |
-| **Navamsa (D9)** | `/navamsa-chart-info` | 24h | ⭐⭐⭐⭐ | High |
-| **Navamsa SVG** | `/navamsa-chart-svg-code` | 24h | ⭐⭐⭐⭐ | High |
-| **Daily Panchang** | Multiple endpoints | 6h | ⭐⭐⭐⭐⭐ | Very High |
-| **Compatibility** | `/match-making/ashtakoot-score` | 24h | ⭐⭐⭐⭐⭐ | Very High |
+| Feature                 | Endpoint                        | Cache TTL | Business Value | User Demand |
+| ----------------------- | ------------------------------- | --------- | -------------- | ----------- |
+| **Birth Chart**         | `/planets`                      | 24h       | ⭐⭐⭐⭐⭐     | Very High   |
+| **Chart Visualization** | `/horoscope-chart-svg-code`     | 24h       | ⭐⭐⭐⭐⭐     | Very High   |
+| **Navamsa (D9)**        | `/navamsa-chart-info`           | 24h       | ⭐⭐⭐⭐       | High        |
+| **Navamsa SVG**         | `/navamsa-chart-svg-code`       | 24h       | ⭐⭐⭐⭐       | High        |
+| **Daily Panchang**      | Multiple endpoints              | 6h        | ⭐⭐⭐⭐⭐     | Very High   |
+| **Compatibility**       | `/match-making/ashtakoot-score` | 24h       | ⭐⭐⭐⭐⭐     | Very High   |
 
 **Estimated Daily API Usage**: 10-20 requests (with caching)
 
@@ -32,6 +33,7 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 **Challenge**: Panchang has **15+ individual endpoints** instead of one combined endpoint (deprecated).
 
 **Solution**: Create a **smart aggregator** that:
+
 1. Caches individual panchang components separately
 2. Combines them on-demand
 3. Only fetches missing components
@@ -74,13 +76,13 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 ### 2.1 Career & Life Analysis
 
-| Feature | Endpoint | Cache TTL | Priority |
-|---------|----------|-----------|----------|
-| **D10 Chart (Career)** | `/d10-chart-info` + `/d10-chart-svg-code` | 24h | High |
-| **Vimsottari Dasa** | `/vimsottari-maha-dasa` | 24h | High |
-| **Dasa Periods** | `/vimsottari-antar-dasa` | 24h | Medium |
-| **Current Dasa** | `/date-wise-dasa` | 1h | Medium |
-| **Planetary Strength** | `/shad-bala-summary` | 24h | Medium |
+| Feature                | Endpoint                                  | Cache TTL | Priority |
+| ---------------------- | ----------------------------------------- | --------- | -------- |
+| **D10 Chart (Career)** | `/d10-chart-info` + `/d10-chart-svg-code` | 24h       | High     |
+| **Vimsottari Dasa**    | `/vimsottari-maha-dasa`                   | 24h       | High     |
+| **Dasa Periods**       | `/vimsottari-antar-dasa`                  | 24h       | Medium   |
+| **Current Dasa**       | `/date-wise-dasa`                         | 1h        | Medium   |
+| **Planetary Strength** | `/shad-bala-summary`                      | 24h       | Medium   |
 
 **Business Value**: Enables astrologer consultations and detailed life predictions.
 
@@ -88,7 +90,7 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 **Priority Order** (based on user demand):
 
-1. **D9 (Navamsa)** - Marriage/Dharma ✅ *Already in Phase 1*
+1. **D9 (Navamsa)** - Marriage/Dharma ✅ _Already in Phase 1_
 2. **D10 (Dasamsa)** - Career
 3. **D7 (Saptamsa)** - Children
 4. **D12 (Dwadasamsa)** - Parents
@@ -99,11 +101,13 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 9. **D30 (Trimsamsa)** - Misfortunes
 
 **Each divisional chart has 3 endpoints**:
+
 - `/{chart}-chart-info` - Data
 - `/{chart}-chart-svg-code` - Visualization
 - `/{chart}-chart-url` - Pre-generated image URL
 
 **Implementation Strategy**:
+
 - Create **generic divisional chart component**
 - Support on-demand loading
 - Cache all charts for 24 hours
@@ -115,12 +119,12 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 ### 3.1 Western Astrology Integration
 
-| Feature | Endpoint | Cache TTL | Target Audience |
-|---------|----------|-----------|-----------------|
-| **Tropical Planets** | `/western/planets` | 24h | Western users |
-| **Houses** | `/western/houses` | 24h | Western users |
-| **Aspects** | `/western/aspects` | 24h | Western users |
-| **Natal Wheel** | `/western/natal-wheel-chart` | 24h | Western users |
+| Feature              | Endpoint                     | Cache TTL | Target Audience |
+| -------------------- | ---------------------------- | --------- | --------------- |
+| **Tropical Planets** | `/western/planets`           | 24h       | Western users   |
+| **Houses**           | `/western/houses`            | 24h       | Western users   |
+| **Aspects**          | `/western/aspects`           | 24h       | Western users   |
+| **Natal Wheel**      | `/western/natal-wheel-chart` | 24h       | Western users   |
 
 **Market Opportunity**: Expand to international markets (US, Europe).
 
@@ -128,20 +132,20 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 ### 3.2 Advanced Timing Analysis
 
-| Feature | Endpoint | Cache TTL | Use Case |
-|---------|----------|-----------|----------|
-| **Hora Timings** | `/hora-timings` | 6h | Detailed muhurat selection |
-| **Choghadiya** | `/choghadiya-timings` | 6h | Travel timing |
-| **Amrit Kaal** | `/amrit-kaal` | 6h | Auspicious ceremonies |
+| Feature          | Endpoint              | Cache TTL | Use Case                   |
+| ---------------- | --------------------- | --------- | -------------------------- |
+| **Hora Timings** | `/hora-timings`       | 6h        | Detailed muhurat selection |
+| **Choghadiya**   | `/choghadiya-timings` | 6h        | Travel timing              |
+| **Amrit Kaal**   | `/amrit-kaal`         | 6h        | Auspicious ceremonies      |
 
 ### 3.3 Detailed Strength Analysis
 
-| Feature | Endpoint | Cache TTL | For Whom |
-|---------|----------|-----------|----------|
-| **Shad Bala Breakup** | `/shad-bala-breakup` | 24h | Professional astrologers |
-| **Sthana Bala** | `/sthana-bala` | 24h | Advanced users |
-| **Kaala Bala** | `/kaala-bala` | 24h | Advanced users |
-| **Dig Bala** | `/dig-bala` | 24h | Advanced users |
+| Feature               | Endpoint             | Cache TTL | For Whom                 |
+| --------------------- | -------------------- | --------- | ------------------------ |
+| **Shad Bala Breakup** | `/shad-bala-breakup` | 24h       | Professional astrologers |
+| **Sthana Bala**       | `/sthana-bala`       | 24h       | Advanced users           |
+| **Kaala Bala**        | `/kaala-bala`        | 24h       | Advanced users           |
+| **Dig Bala**          | `/dig-bala`          | 24h       | Advanced users           |
 
 ---
 
@@ -194,20 +198,21 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 
 ### Caching Strategy by Data Type
 
-| Data Type | PostgreSQL | Redis | API Call | Rationale |
-|-----------|-----------|-------|----------|-----------|
-| **User's Birth Chart** | ✅ Forever | ✅ 24h | Once | User data - store permanently |
-| **Divisional Charts** | ✅ Forever | ✅ 24h | Once per chart | Static calculation |
-| **Today's Panchang** | ❌ | ✅ 6h | 4x/day | Changes daily |
-| **Compatibility Report** | ✅ Forever | ✅ 24h | Once per pair | Static calculation |
-| **Dasa Periods** | ✅ Forever | ✅ 24h | Once | Birth-based, static |
-| **Current Dasa** | ❌ | ✅ 1h | 24x/day | Changes with time |
+| Data Type                | PostgreSQL | Redis  | API Call       | Rationale                     |
+| ------------------------ | ---------- | ------ | -------------- | ----------------------------- |
+| **User's Birth Chart**   | ✅ Forever | ✅ 24h | Once           | User data - store permanently |
+| **Divisional Charts**    | ✅ Forever | ✅ 24h | Once per chart | Static calculation            |
+| **Today's Panchang**     | ❌         | ✅ 6h  | 4x/day         | Changes daily                 |
+| **Compatibility Report** | ✅ Forever | ✅ 24h | Once per pair  | Static calculation            |
+| **Dasa Periods**         | ✅ Forever | ✅ 24h | Once           | Birth-based, static           |
+| **Current Dasa**         | ❌         | ✅ 1h  | 24x/day        | Changes with time             |
 
 ---
 
 ## Rate Limit Handling Strategy
 
 ### Problem
+
 - **Free Tier**: Limited daily requests (likely 50-100/day)
 - **100+ endpoints** available
 - **Multiple users** accessing simultaneously
@@ -220,32 +225,32 @@ FreeAstrologyAPI.com provides **100+ endpoints** covering comprehensive Vedic an
 async function getBirthChart(userId: string, birthData: BirthDetails) {
   // Layer 1: Check PostgreSQL (user's saved charts)
   const savedChart = await db.birthChart.findUnique({
-    where: { userId_birthDateTime: { userId, birthDateTime } }
-  })
+    where: { userId_birthDateTime: { userId, birthDateTime } },
+  });
 
   if (savedChart) {
-    return { ...savedChart, from_database: true }
+    return { ...savedChart, from_database: true };
   }
 
   // Layer 2: Check Redis cache (24hr)
-  const cachedChart = await redis.get(cacheKey)
+  const cachedChart = await redis.get(cacheKey);
 
   if (cachedChart) {
     // Save to database for future
-    await db.birthChart.create({ data: chartData })
-    return { ...cachedChart, from_cache: true }
+    await db.birthChart.create({ data: chartData });
+    return { ...cachedChart, from_cache: true };
   }
 
   // Layer 3: API call (only if not in DB or cache)
-  const apiChart = await astrologyAPI.getBirthChart(birthData)
+  const apiChart = await astrologyAPI.getBirthChart(birthData);
 
   // Save to both database and cache
   await Promise.all([
     db.birthChart.create({ data: apiChart }),
-    redis.setex(cacheKey, 86400, apiChart)
-  ])
+    redis.setex(cacheKey, 86400, apiChart),
+  ]);
 
-  return { ...apiChart, from_api: true }
+  return { ...apiChart, from_api: true };
 }
 ```
 
@@ -258,49 +263,43 @@ async function getBirthChart(userId: string, birthData: BirthDetails) {
 ```typescript
 async function getCompletePanchang(date: Date, location: Location) {
   const components = [
-    'sun-rise-set',
-    'tithi-timings',
-    'nakshatra-timings',
-    'yoga-timings',
-    'karana-timings',
-    'vedic-weekday',
-    'lunar-month',
-    'abhijit-muhurat',
-    'brahma-muhurat',
-    'rahu-kalam',
-    'hora-timings',
-    'choghadiya-timings',
-  ]
+    "sun-rise-set",
+    "tithi-timings",
+    "nakshatra-timings",
+    "yoga-timings",
+    "karana-timings",
+    "vedic-weekday",
+    "lunar-month",
+    "abhijit-muhurat",
+    "brahma-muhurat",
+    "rahu-kalam",
+    "hora-timings",
+    "choghadiya-timings",
+  ];
 
   // Fetch all components in parallel (12 simultaneous requests)
   const results = await Promise.allSettled(
-    components.map(component =>
-      getCachedPanchangComponent(component, date, location)
-    )
-  )
+    components.map((component) => getCachedPanchangComponent(component, date, location)),
+  );
 
   // Combine results
-  return combinePanchangData(results)
+  return combinePanchangData(results);
 }
 
-async function getCachedPanchangComponent(
-  component: string,
-  date: Date,
-  location: Location
-) {
-  const cacheKey = `panchang:${component}:${date}:${location}`
+async function getCachedPanchangComponent(component: string, date: Date, location: Location) {
+  const cacheKey = `panchang:${component}:${date}:${location}`;
 
   // Check Redis (6 hour cache)
-  const cached = await redis.get(cacheKey)
-  if (cached) return cached
+  const cached = await redis.get(cacheKey);
+  if (cached) return cached;
 
   // API call
-  const data = await astrologyAPI.call(`/${component}`, { date, location })
+  const data = await astrologyAPI.call(`/${component}`, { date, location });
 
   // Cache for 6 hours
-  await redis.setex(cacheKey, 21600, data)
+  await redis.setex(cacheKey, 21600, data);
 
-  return data
+  return data;
 }
 ```
 
@@ -310,39 +309,40 @@ async function getCachedPanchangComponent(
 
 ```typescript
 class SmartRateLimiter {
-  private readonly DAILY_LIMIT = 50 // Adjust based on actual limit
-  private readonly RESERVE_QUOTA = 10 // Emergency reserve
+  private readonly DAILY_LIMIT = 50; // Adjust based on actual limit
+  private readonly RESERVE_QUOTA = 10; // Emergency reserve
 
-  async canMakeRequest(priority: 'high' | 'medium' | 'low'): Promise<boolean> {
-    const used = await this.getUsedToday()
-    const remaining = this.DAILY_LIMIT - used
+  async canMakeRequest(priority: "high" | "medium" | "low"): Promise<boolean> {
+    const used = await this.getUsedToday();
+    const remaining = this.DAILY_LIMIT - used;
 
     // Always allow high priority (user's first chart)
-    if (priority === 'high') return remaining > 0
+    if (priority === "high") return remaining > 0;
 
     // Allow medium priority if enough quota
-    if (priority === 'medium') return remaining > this.RESERVE_QUOTA
+    if (priority === "medium") return remaining > this.RESERVE_QUOTA;
 
     // Allow low priority only if plenty of quota
-    if (priority === 'low') return remaining > (this.RESERVE_QUOTA * 2)
+    if (priority === "low") return remaining > this.RESERVE_QUOTA * 2;
 
-    return false
+    return false;
   }
 
   async requestWithPriority<T>(
     operation: () => Promise<T>,
-    priority: 'high' | 'medium' | 'low'
+    priority: "high" | "medium" | "low",
   ): Promise<T> {
-    if (!await this.canMakeRequest(priority)) {
-      throw new Error(`Rate limit: Cannot make ${priority} priority request`)
+    if (!(await this.canMakeRequest(priority))) {
+      throw new Error(`Rate limit: Cannot make ${priority} priority request`);
     }
 
-    return await operation()
+    return await operation();
   }
 }
 ```
 
 **Priority Levels**:
+
 - **High**: User's first birth chart, paid consultations
 - **Medium**: Divisional charts, compatibility for logged-in users
 - **Low**: Free panchang for anonymous users
@@ -352,17 +352,17 @@ class SmartRateLimiter {
 ```typescript
 // Pre-fetch popular data during low-traffic hours
 async function prefetchPopularCharts() {
-  const hour = new Date().getHours()
+  const hour = new Date().getHours();
 
   // Run between 2 AM - 5 AM when traffic is low
   if (hour >= 2 && hour < 5) {
-    const popularLocations = await getPopularLocations()
+    const popularLocations = await getPopularLocations();
 
     for (const location of popularLocations) {
-      const today = new Date()
+      const today = new Date();
 
       // Pre-fetch today's panchang for popular cities
-      await getCompletePanchang(today, location)
+      await getCompletePanchang(today, location);
 
       // This uses API quota but ensures cache is warm for users
     }
@@ -465,23 +465,22 @@ const CACHE_KEYS = {
     `astro:div:${chartType}:${CACHE_KEYS.birthChart(birthData)}`,
 
   panchangComponent: (component, date, location) =>
-    `astro:panchang:${component}:${date.toISOString().split('T')[0]}:${location.latitude.toFixed(2)}:${location.longitude.toFixed(2)}`,
+    `astro:panchang:${component}:${date.toISOString().split("T")[0]}:${location.latitude.toFixed(2)}:${location.longitude.toFixed(2)}`,
 
   compatibility: (person1, person2) =>
     `astro:compat:${CACHE_KEYS.birthChart(person1)}:${CACHE_KEYS.birthChart(person2)}`,
 
-  rateLimit: (date) =>
-    `astro:ratelimit:${date.toISOString().split('T')[0]}`,
-}
+  rateLimit: (date) => `astro:ratelimit:${date.toISOString().split("T")[0]}`,
+};
 
 // Cache TTLs (in seconds)
 const CACHE_TTL = {
-  birthChart: 86400,        // 24 hours
-  divisionalChart: 86400,   // 24 hours
+  birthChart: 86400, // 24 hours
+  divisionalChart: 86400, // 24 hours
   panchangComponent: 21600, // 6 hours
-  compatibility: 86400,     // 24 hours
-  currentDasa: 3600,        // 1 hour
-}
+  compatibility: 86400, // 24 hours
+  currentDasa: 3600, // 1 hour
+};
 ```
 
 ---
@@ -490,17 +489,18 @@ const CACHE_TTL = {
 
 ### Expected Daily API Calls by Feature
 
-| Feature | Calls per User | Cache Hit Rate | Net API Calls | Priority |
-|---------|----------------|----------------|---------------|----------|
-| **Birth Chart (first time)** | 1 | 0% | 1 | High |
-| **Birth Chart (repeat)** | 0 | 100% | 0 | - |
-| **D9 Chart** | 1 | 95% | 0.05 | Medium |
-| **Other Div Charts** | 5 | 95% | 0.25 | Low |
-| **Panchang (Today)** | 12 components | 80% | 2.4 | High |
-| **Compatibility** | 1 | 90% | 0.1 | High |
-| **Dasa Periods** | 1 | 95% | 0.05 | Medium |
+| Feature                      | Calls per User | Cache Hit Rate | Net API Calls | Priority |
+| ---------------------------- | -------------- | -------------- | ------------- | -------- |
+| **Birth Chart (first time)** | 1              | 0%             | 1             | High     |
+| **Birth Chart (repeat)**     | 0              | 100%           | 0             | -        |
+| **D9 Chart**                 | 1              | 95%            | 0.05          | Medium   |
+| **Other Div Charts**         | 5              | 95%            | 0.25          | Low      |
+| **Panchang (Today)**         | 12 components  | 80%            | 2.4           | High     |
+| **Compatibility**            | 1              | 90%            | 0.1           | High     |
+| **Dasa Periods**             | 1              | 95%            | 0.05          | Medium   |
 
 **Per 100 Active Users/Day**:
+
 - New users (20): 20 birth charts + 20 D9 + 20 compatibility = **60 calls**
 - Returning users (80): 80 × 2.4 (panchang) = **192 calls**
 - **Total**: 252 calls ❌ **EXCEEDS LIMIT**
@@ -508,19 +508,23 @@ const CACHE_TTL = {
 ### Optimization to Stay Within Limits
 
 **Strategy 1: Location-Based Panchang Sharing**
+
 - Cache panchang by **city** (not precise coordinates)
 - Round coordinates to 0.1 degree (~11km precision)
 - **Result**: 192 calls → **20 calls** (10 major cities)
 
 **Strategy 2: Pre-fetch During Off-Hours**
+
 - Fetch panchang for top 10 cities at 3 AM daily
 - **Result**: 10 cities × 12 components = **120 calls** (off-peak)
 
 **Strategy 3: Database-First for Charts**
+
 - Store all user charts permanently
 - **Result**: Only 20 new user charts/day = **20 calls**
 
 **Revised Daily Usage**:
+
 - New user birth charts: 20 calls
 - New user compatibility: 10 calls
 - Panchang (pre-fetched): 120 calls (off-peak)
@@ -584,12 +588,14 @@ const CACHE_TTL = {
 ### Monetization Strategy
 
 **Free Tier** (Anonymous/Basic Users):
+
 - Basic birth chart (D1)
 - Today's panchang (limited cities)
 - Basic compatibility
 - **API Usage**: ~5 calls/user
 
 **Premium Tier** ($9.99/month):
+
 - All divisional charts (D2-D60)
 - Unlimited compatibility checks
 - Dasa period analysis
@@ -598,6 +604,7 @@ const CACHE_TTL = {
 - **API Usage**: ~20 calls/user
 
 **Professional Tier** ($49.99/month - Astrologers):
+
 - Everything in Premium
 - Western astrology
 - Bulk chart generation
@@ -606,6 +613,7 @@ const CACHE_TTL = {
 - **API Usage**: ~50 calls/user
 
 **API Usage Allocation**:
+
 - Free users: 60% of quota (30 calls)
 - Premium users: 30% of quota (15 calls)
 - Professional users: 10% of quota (5 calls)
@@ -618,6 +626,7 @@ const CACHE_TTL = {
 ### Key Metrics to Track
 
 **API Usage**:
+
 - Daily API calls by endpoint
 - Cache hit rate by feature
 - Average response time
@@ -625,12 +634,14 @@ const CACHE_TTL = {
 - Quota remaining (alert at < 20%)
 
 **User Behavior**:
+
 - Most requested divisional charts
 - Popular panchang timings
 - Compatibility check frequency
 - Chart generation patterns
 
 **Performance**:
+
 - Database query time
 - Redis cache latency
 - API request duration
@@ -664,6 +675,7 @@ const CACHE_TTL = {
 **Impact**: Service degradation, blocked API
 
 **Mitigation**:
+
 1. Multi-layer caching (DB + Redis)
 2. Smart quota management
 3. Priority-based request handling
@@ -677,6 +689,7 @@ const CACHE_TTL = {
 **Impact**: Cannot generate new charts
 
 **Mitigation**:
+
 1. Serve from database/cache
 2. Show "temporarily unavailable" for new requests
 3. Queue requests for retry
@@ -689,6 +702,7 @@ const CACHE_TTL = {
 **Impact**: Increased API usage
 
 **Mitigation**:
+
 1. Fallback to database
 2. Reduce cache TTL temporarily
 3. Implement cache warming
@@ -699,6 +713,7 @@ const CACHE_TTL = {
 **Impact**: Increased costs
 
 **Mitigation**:
+
 1. Archive old charts (> 1 year inactive)
 2. Compress JSONB data
 3. Implement data retention policy
@@ -709,6 +724,7 @@ const CACHE_TTL = {
 ## Success Criteria
 
 ### Phase 1 (Month 1)
+
 - [ ] 90%+ cache hit rate for birth charts
 - [ ] < 40 API calls/day during peak
 - [ ] < 500ms response time (cached)
@@ -716,6 +732,7 @@ const CACHE_TTL = {
 - [ ] 100 active users supported
 
 ### Phase 2 (Month 3)
+
 - [ ] 95%+ cache hit rate overall
 - [ ] Support 500 active users
 - [ ] All divisional charts integrated
@@ -723,6 +740,7 @@ const CACHE_TTL = {
 - [ ] < 2s response time for new charts
 
 ### Phase 3 (Month 6)
+
 - [ ] Support 2000 active users
 - [ ] Western astrology integrated
 - [ ] Multi-language support
@@ -736,6 +754,7 @@ const CACHE_TTL = {
 This integration plan provides a strategic, phased approach to leveraging FreeAstrologyAPI.com's comprehensive features while respecting rate limits through intelligent caching, database storage, and smart quota management.
 
 **Key Success Factors**:
+
 1. **Database-first architecture** for permanent chart storage
 2. **Multi-layer caching** (PostgreSQL + Redis)
 3. **Smart panchang aggregation** with component-level caching

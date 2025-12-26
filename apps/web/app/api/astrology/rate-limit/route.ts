@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { cachedAstrologyAPI } from '@/lib/astrology/cached-client'
+import { NextResponse } from "next/server";
+import { cachedAstrologyAPI } from "@/lib/astrology/cached-client";
 
 /**
  * GET /api/astrology/rate-limit
@@ -15,18 +15,18 @@ import { cachedAstrologyAPI } from '@/lib/astrology/cached-client'
  *   "last_request_at": "2025-12-03T15:30:00.000Z"
  * }
  */
-export async function GET() {
+export function GET(): NextResponse {
   try {
-    const rateLimitInfo = cachedAstrologyAPI.getRateLimitInfo()
+    const rateLimitInfo = cachedAstrologyAPI.getRateLimitInfo();
 
-    return NextResponse.json(rateLimitInfo, { status: 200 })
-  } catch (error) {
+    return NextResponse.json(rateLimitInfo, { status: 200 });
+  } catch (error: unknown) {
     return NextResponse.json(
       {
-        error: 'Failed to fetch rate limit info',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch rate limit info",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

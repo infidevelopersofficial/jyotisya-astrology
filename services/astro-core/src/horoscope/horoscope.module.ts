@@ -7,6 +7,6 @@ import { HoroscopeController } from "./horoscope.controller";
 @Module({
   imports: [PanchangModule],
   providers: [HoroscopeService, EphemerisClient],
-  controllers: [HoroscopeController]
+  controllers: [HoroscopeController],
 })
 export class HoroscopeModule {}

@@ -1,46 +1,46 @@
-import { vi } from 'vitest'
-import type { User, Session } from '@supabase/supabase-js'
+import { vi } from "vitest";
+import type { User, Session } from "@supabase/supabase-js";
 
 /**
  * Mock Supabase User
  */
 export function createMockUser(overrides: Partial<User> = {}): User {
   return {
-    id: 'user-123',
-    aud: 'authenticated',
-    role: 'authenticated',
-    email: 'test@example.com',
+    id: "user-123",
+    aud: "authenticated",
+    role: "authenticated",
+    email: "test@example.com",
     email_confirmed_at: new Date().toISOString(),
-    phone: '+911234567890',
+    phone: "+911234567890",
     confirmed_at: new Date().toISOString(),
     last_sign_in_at: new Date().toISOString(),
     app_metadata: {},
     user_metadata: {
-      name: 'Test User',
+      name: "Test User",
       ...overrides.user_metadata,
     },
     identities: [],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     ...overrides,
-  }
+  };
 }
 
 /**
  * Mock Supabase Session
  */
 export function createMockSession(overrides: Partial<Session> = {}): Session {
-  const user = createMockUser(overrides.user)
+  const user = createMockUser(overrides.user);
 
   return {
-    access_token: 'mock-access-token',
-    refresh_token: 'mock-refresh-token',
+    access_token: "mock-access-token",
+    refresh_token: "mock-refresh-token",
     expires_in: 3600,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
-    token_type: 'bearer',
+    token_type: "bearer",
     user,
     ...overrides,
-  }
+  };
 }
 
 /**
@@ -68,7 +68,7 @@ export function createMockSupabaseAuth() {
       error: null,
     }),
     signInWithOAuth: vi.fn().mockResolvedValue({
-      data: { url: 'https://oauth.example.com', provider: 'google' },
+      data: { url: "https://oauth.example.com", provider: "google" },
       error: null,
     }),
     verifyOtp: vi.fn().mockResolvedValue({
@@ -96,7 +96,7 @@ export function createMockSupabaseAuth() {
         },
       },
     }),
-  }
+  };
 }
 
 /**
@@ -118,38 +118,38 @@ export function createMockSupabaseClient() {
     storage: {
       from: vi.fn().mockReturnThis(),
       upload: vi.fn().mockResolvedValue({
-        data: { path: 'test-path' },
+        data: { path: "test-path" },
         error: null,
       }),
       getPublicUrl: vi.fn().mockReturnValue({
-        data: { publicUrl: 'https://storage.example.com/test' },
+        data: { publicUrl: "https://storage.example.com/test" },
       }),
     },
-  }
+  };
 }
 
 /**
  * Mock createClient from @/lib/supabase/client
  */
 export function mockSupabaseClient() {
-  const mockClient = createMockSupabaseClient()
+  const mockClient = createMockSupabaseClient();
 
-  vi.mock('@/lib/supabase/client', () => ({
+  vi.mock("@/lib/supabase/client", () => ({
     createClient: vi.fn(() => mockClient),
-  }))
+  }));
 
-  return mockClient
+  return mockClient;
 }
 
 /**
  * Mock createClient from @/lib/supabase/server
  */
 export function mockSupabaseServer() {
-  const mockClient = createMockSupabaseClient()
+  const mockClient = createMockSupabaseClient();
 
-  vi.mock('@/lib/supabase/server', () => ({
+  vi.mock("@/lib/supabase/server", () => ({
     createClient: vi.fn(async () => mockClient),
-  }))
+  }));
 
-  return mockClient
+  return mockClient;
 }

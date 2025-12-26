@@ -1,10 +1,10 @@
 from datetime import datetime
-from typing import Any, Mapping, Sequence
+from typing import Any, Mapping, Sequence, Union, Optional
 
 from .models import DailyHoroscopeResult, HoroscopeSummary, PanchangDetails, PanchangResult, ProviderMetadata
 
 
-def normalize_daily(sign: str, payload: Mapping[str, Any] | Sequence[Any], timezone: str | None = None) -> DailyHoroscopeResult:
+def normalize_daily(sign: str, payload: Union[Mapping[str, Any], Sequence[Any]], timezone: Optional[str] = None) -> DailyHoroscopeResult:
   envelope = _extract_envelope(payload)
   summary_text = _build_guidance(envelope, sign)
 
@@ -33,7 +33,7 @@ def normalize_daily(sign: str, payload: Mapping[str, Any] | Sequence[Any], timez
   return DailyHoroscopeResult(metadata=metadata, horoscope=summary)
 
 
-def normalize_panchang(payload: Mapping[str, Any] | Sequence[Any], timezone: str | None = None) -> PanchangResult:
+def normalize_panchang(payload: Union[Mapping[str, Any], Sequence[Any]], timezone: Optional[str] = None) -> PanchangResult:
   envelope = _extract_envelope(payload)
 
   details = PanchangDetails(
@@ -80,7 +80,7 @@ def _build_guidance(envelope: Mapping[str, Any], sign: str) -> str:
   return " ".join(components)
 
 
-def _parse_datetime(value: Any) -> datetime | None:
+def _parse_datetime(value: Any) -> Optional[datetime]:
   if not value:
     return None
   if isinstance(value, datetime):
@@ -94,13 +94,13 @@ def _parse_datetime(value: Any) -> datetime | None:
   return None
 
 
-def _string(value: Any) -> str | None:
+def _string(value: Any) -> Optional[str]:
   if value in (None, ""):
     return None
   return str(value)
 
 
-def _extract_envelope(payload: Mapping[str, Any] | Sequence[Any]) -> Mapping[str, Any]:
+def _extract_envelope(payload: Union[Mapping[str, Any], Sequence[Any]]) -> Mapping[str, Any]:
   if isinstance(payload, Mapping):
     data = payload.get("data")
     if isinstance(data, Mapping):

@@ -1,6 +1,6 @@
-import Link from 'next/link'
+import Link from "next/link";
 
-export default function NotFound() {
+export default function NotFound(): React.ReactElement {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-cosmic-blue to-gray-900 px-4">
       <div className="mx-auto max-w-md text-center">
@@ -25,12 +25,10 @@ export default function NotFound() {
 
         {/* Error Message */}
         <h1 className="mb-3 text-6xl font-bold text-white">404</h1>
-        <h2 className="mb-4 text-2xl font-semibold text-orange-200">
-          Page Not Found
-        </h2>
+        <h2 className="mb-4 text-2xl font-semibold text-orange-200">Page Not Found</h2>
         <p className="mb-8 text-slate-300">
-          The cosmic path you&apos;re seeking doesn&apos;t exist in our constellation.
-          Perhaps the stars have guided you elsewhere?
+          The cosmic path you&apos;re seeking doesn&apos;t exist in our constellation. Perhaps the
+          stars have guided you elsewhere?
         </p>
 
         {/* Action Buttons */}
@@ -39,12 +37,7 @@ export default function NotFound() {
             href="/"
             className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl"
           >
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -88,5 +81,5 @@ export default function NotFound() {
         </div>
       </div>
     </div>
-  )
+  );
 }

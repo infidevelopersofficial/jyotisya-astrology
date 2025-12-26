@@ -14,10 +14,10 @@ const LINKS = [
   { href: "/", key: "home" },
   { href: "/consultations", key: "consult" },
   { href: "/dashboard", key: "dashboard" },
-  { href: "/shop", key: "shop" }
+  { href: "/shop", key: "shop" },
 ] as const;
 
-export default function MainNav() {
+export default function MainNav(): React.ReactElement {
   const pathname = usePathname();
   const { copy } = useLocaleContext();
   const { nav } = copy;
@@ -35,10 +35,10 @@ export default function MainNav() {
             "rounded-full px-4 py-2 transition",
             pathname === link.href
               ? "bg-white/10 text-white"
-              : "text-slate-300 hover:bg-white/5 hover:text-white"
+              : "text-slate-300 hover:bg-white/5 hover:text-white",
           )}
         >
-          {nav.links[link.key as keyof typeof nav.links]}
+          {nav.links[link.key]}
         </Link>
       ))}
     </nav>
@@ -128,7 +128,6 @@ export default function MainNav() {
                 )}
               </div>
             )}
-
           </div>
         </div>
       )}

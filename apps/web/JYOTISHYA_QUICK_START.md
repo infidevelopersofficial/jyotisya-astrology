@@ -76,6 +76,7 @@ CREATE INDEX idx_birth_charts_user ON birth_charts(user_id);
 ### 3. Install Redis (Production-Ready Caching)
 
 **Local Development**:
+
 ```bash
 # macOS
 brew install redis
@@ -90,12 +91,14 @@ docker run -d -p 6379:6379 redis:alpine
 ```
 
 **Add Redis Client**:
+
 ```bash
 cd apps/web
 yarn add ioredis
 ```
 
 **Update .env.local**:
+
 ```bash
 REDIS_URL=redis://localhost:6379
 ```
@@ -104,13 +107,13 @@ REDIS_URL=redis://localhost:6379
 
 ## Current API Endpoints (Ready to Use)
 
-| Endpoint | Method | Purpose | Cache | Status |
-|----------|--------|---------|-------|--------|
-| `/api/astrology/birth-chart` | POST | Birth chart | 24h | ✅ |
-| `/api/astrology/chart-svg` | POST | SVG visualization | 24h | ✅ |
-| `/api/astrology/panchang` | POST | Vedic calendar | 6h | ✅ |
-| `/api/astrology/compatibility` | POST | Match-making | 24h | ✅ |
-| `/api/astrology/rate-limit` | GET | Quota status | - | ✅ |
+| Endpoint                       | Method | Purpose           | Cache | Status |
+| ------------------------------ | ------ | ----------------- | ----- | ------ |
+| `/api/astrology/birth-chart`   | POST   | Birth chart       | 24h   | ✅     |
+| `/api/astrology/chart-svg`     | POST   | SVG visualization | 24h   | ✅     |
+| `/api/astrology/panchang`      | POST   | Vedic calendar    | 6h    | ✅     |
+| `/api/astrology/compatibility` | POST   | Match-making      | 24h   | ✅     |
+| `/api/astrology/rate-limit`    | GET    | Quota status      | -     | ✅     |
 
 ---
 
@@ -124,22 +127,22 @@ Add these 12 individual endpoints (currently we only have combined panchang):
 // apps/web/app/api/astrology/panchang-components/route.ts
 
 export async function POST(request: Request) {
-  const { component, date, latitude, longitude, timezone } = await request.json()
+  const { component, date, latitude, longitude, timezone } = await request.json();
 
   const components = {
-    'sun-rise-set': '/sun-rise-set',
-    'tithi': '/tithi-timings',
-    'nakshatra': '/nakshatra-timings',
-    'yoga': '/yoga-timings',
-    'karana': '/karana-timings',
-    'abhijit': '/abhijit-muhurat',
-    'brahma-muhurat': '/brahma-muhurat',
-    'rahu-kalam': '/rahu-kalam',
-    'hora': '/hora-timings',
-    'choghadiya': '/choghadiya-timings',
-  }
+    "sun-rise-set": "/sun-rise-set",
+    tithi: "/tithi-timings",
+    nakshatra: "/nakshatra-timings",
+    yoga: "/yoga-timings",
+    karana: "/karana-timings",
+    abhijit: "/abhijit-muhurat",
+    "brahma-muhurat": "/brahma-muhurat",
+    "rahu-kalam": "/rahu-kalam",
+    hora: "/hora-timings",
+    choghadiya: "/choghadiya-timings",
+  };
 
-  const endpoint = components[component]
+  const endpoint = components[component];
   // Make API call to specific component
   // Cache for 6 hours
   // Return data
@@ -189,39 +192,39 @@ export async function POST(request: Request) {
 ### React Component: Birth Chart Viewer
 
 ```tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 export function BirthChartViewer({ userId }: { userId: string }) {
-  const [chart, setChart] = useState(null)
-  const [loading, setLoading] = useState(false)
+  const [chart, setChart] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const generateChart = async (birthData) => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch('/api/astrology/birth-chart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/birth-chart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(birthData),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       // Show if from cache or fresh API call
       if (data.from_cache) {
-        console.log('Served from cache - no API quota used ✅')
+        console.log("Served from cache - no API quota used ✅");
       } else {
-        console.log('Fresh API call - quota used ⚠️')
+        console.log("Fresh API call - quota used ⚠️");
       }
 
-      setChart(data.data)
+      setChart(data.data);
     } catch (error) {
-      console.error('Failed to generate chart:', error)
+      console.error("Failed to generate chart:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -230,7 +233,7 @@ export function BirthChartViewer({ userId }: { userId: string }) {
       {chart && (
         <div>
           <h3>Your Birth Chart</h3>
-          {chart.planets.map(planet => (
+          {chart.planets.map((planet) => (
             <div key={planet.name}>
               {planet.name}: {planet.sign} at {planet.normDegree}°
             </div>
@@ -238,7 +241,7 @@ export function BirthChartViewer({ userId }: { userId: string }) {
         </div>
       )}
     </div>
-  )
+  );
 }
 ```
 
@@ -246,22 +249,22 @@ export function BirthChartViewer({ userId }: { userId: string }) {
 
 ```typescript
 // app/actions/astrology.ts
-'use server'
+"use server";
 
-import { prisma } from '@/lib/db/prisma'
+import { prisma } from "@/lib/db/prisma";
 
-export async function saveUserChart(
-  userId: string,
-  birthData: BirthDetails,
-  chartData: any
-) {
+export async function saveUserChart(userId: string, birthData: BirthDetails, chartData: any) {
   // Save to database for permanent storage
   const chart = await prisma.birthChart.create({
     data: {
       userId,
       birthDateTime: new Date(
-        birthData.year, birthData.month - 1, birthData.date,
-        birthData.hours, birthData.minutes, birthData.seconds
+        birthData.year,
+        birthData.month - 1,
+        birthData.date,
+        birthData.hours,
+        birthData.minutes,
+        birthData.seconds,
       ),
       latitude: birthData.latitude,
       longitude: birthData.longitude,
@@ -270,17 +273,17 @@ export async function saveUserChart(
       houses: chartData.houses,
       ascendant: chartData.ascendant,
     },
-  })
+  });
 
-  return chart
+  return chart;
 }
 
 export async function getUserChart(userId: string) {
   // Retrieve from database (no API quota used!)
   return await prisma.birthChart.findFirst({
     where: { userId },
-    orderBy: { createdAt: 'desc' },
-  })
+    orderBy: { createdAt: "desc" },
+  });
 }
 ```
 
@@ -308,19 +311,17 @@ curl http://localhost:3000/api/astrology/rate-limit
 ```typescript
 // Add to cron job or monitoring script
 async function checkQuota() {
-  const response = await fetch('/api/astrology/rate-limit')
-  const { remaining_today } = await response.json()
+  const response = await fetch("/api/astrology/rate-limit");
+  const { remaining_today } = await response.json();
 
   if (remaining_today < 10) {
     // Send alert to Slack/Email
-    await sendAlert(
-      `⚠️ Low API quota: ${remaining_today} requests remaining`
-    )
+    await sendAlert(`⚠️ Low API quota: ${remaining_today} requests remaining`);
   }
 }
 
 // Run every hour
-setInterval(checkQuota, 3600000)
+setInterval(checkQuota, 3600000);
 ```
 
 ---
@@ -328,24 +329,28 @@ setInterval(checkQuota, 3600000)
 ## Optimization Checklist
 
 **Immediate (This Week)**:
+
 - [ ] Verify API key works
 - [ ] Add PostgreSQL storage for charts
 - [ ] Install and configure Redis
 - [ ] Update cache to use Redis instead of memory
 
 **Next Week**:
+
 - [ ] Implement database-first lookup
 - [ ] Add panchang component endpoints
 - [ ] Create location-based panchang caching (round coordinates)
 - [ ] Test with 10 concurrent users
 
 **Month 1**:
+
 - [ ] Add Navamsa (D9) chart endpoint
 - [ ] Add Dasamsa (D10) chart endpoint
 - [ ] Implement Vimsottari Dasa endpoint
 - [ ] Create pre-fetching cron job for popular cities
 
 **Month 2-3**:
+
 - [ ] Add remaining divisional charts
 - [ ] Western astrology endpoints
 - [ ] Multi-language support
@@ -360,6 +365,7 @@ setInterval(checkQuota, 3600000)
 **Cause**: API key not activated or incorrect
 
 **Solution**:
+
 1. Verify key in .env.local matches exactly
 2. Test key directly with curl (see above)
 3. Contact FreeAstrologyAPI.com support
@@ -370,6 +376,7 @@ setInterval(checkQuota, 3600000)
 **Cause**: First API call, not cached
 
 **Solution**:
+
 1. Normal for first request
 2. Subsequent requests should be <100ms (cached)
 3. Check cache is working: `curl /api/metrics | jq '.cache'`
@@ -379,6 +386,7 @@ setInterval(checkQuota, 3600000)
 **Cause**: Too many API calls
 
 **Solution**:
+
 1. Check cache hit rate (should be >90%)
 2. Verify database storage is working
 3. Implement location-based caching for panchang
@@ -407,14 +415,14 @@ redis-cli INFO stats
 
 ## Performance Targets
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Cache Hit Rate | >90% | TBD |
-| Response Time (Cached) | <100ms | TBD |
-| Response Time (API) | <2s | TBD |
-| Daily API Calls | <40 | 0 |
-| Database Charts | Growing | 0 |
-| Error Rate | <0.1% | 0% |
+| Metric                 | Target  | Current |
+| ---------------------- | ------- | ------- |
+| Cache Hit Rate         | >90%    | TBD     |
+| Response Time (Cached) | <100ms  | TBD     |
+| Response Time (API)    | <2s     | TBD     |
+| Daily API Calls        | <40     | 0       |
+| Database Charts        | Growing | 0       |
+| Error Rate             | <0.1%   | 0%      |
 
 ---
 

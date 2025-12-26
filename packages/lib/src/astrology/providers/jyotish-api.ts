@@ -4,7 +4,7 @@ import {
   DailyHoroscopeResult,
   PanchangRequest,
   PanchangResult,
-  SunSign
+  SunSign,
 } from "../types";
 
 interface JyotishApiConfig {
@@ -34,7 +34,7 @@ export class JyotishApiProvider implements AstrologyProvider {
     const payload = createBasePayload({
       date: input.date,
       locale: input.locale,
-      timezone
+      timezone,
     });
     payload["sun_sign"] = input.sunSign;
     payload["sunSign"] = input.sunSign;
@@ -48,7 +48,7 @@ export class JyotishApiProvider implements AstrologyProvider {
     return {
       source: "freeastrologyapi",
       metadata: normalized.metadata,
-      summary: normalized.summary
+      summary: normalized.summary,
     };
   }
 
@@ -57,7 +57,7 @@ export class JyotishApiProvider implements AstrologyProvider {
     const payload = createBasePayload({
       date: input.date,
       locale: input.locale,
-      timezone
+      timezone,
     });
 
     const response = await this.request("/complete-panchang", payload);
@@ -66,7 +66,7 @@ export class JyotishApiProvider implements AstrologyProvider {
     return {
       source: "freeastrologyapi",
       metadata: normalized.metadata,
-      details: normalized.details
+      details: normalized.details,
     };
   }
 
@@ -82,10 +82,10 @@ export class JyotishApiProvider implements AstrologyProvider {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-          "x-api-key": this.apiKey
+          "x-api-key": this.apiKey,
         },
         body: JSON.stringify(body),
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       if (!response.ok) {
@@ -99,7 +99,7 @@ export class JyotishApiProvider implements AstrologyProvider {
           statusText: response.statusText,
           headers: Object.fromEntries(response.headers.entries()),
           responseBody: text,
-          requestBody: body
+          requestBody: body,
         });
 
         // Create enriched error with all details
@@ -112,7 +112,7 @@ export class JyotishApiProvider implements AstrologyProvider {
           statusText: response.statusText,
           responseBody: text,
           url,
-          path
+          path,
         });
 
         throw error;
@@ -121,20 +121,20 @@ export class JyotishApiProvider implements AstrologyProvider {
       return response.json();
     } catch (error) {
       // Handle timeout and network errors
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && error.name === "AbortError") {
         console.error("[JyotishApiProvider] Request timeout", {
           url,
           path,
           timeoutMs: this.timeoutMs,
-          requestBody: body
+          requestBody: body,
         });
 
         const timeoutError = new Error(`FreeAstrology API timeout after ${this.timeoutMs}ms`);
         Object.assign(timeoutError, {
           status: 504,
-          statusText: 'Gateway Timeout',
+          statusText: "Gateway Timeout",
           url,
-          path
+          path,
         });
         throw timeoutError;
       }
@@ -150,7 +150,7 @@ export class JyotishApiProvider implements AstrologyProvider {
 function createBasePayload({
   date,
   locale,
-  timezone
+  timezone,
 }: {
   date?: string;
   locale: string;
@@ -176,8 +176,8 @@ function createBasePayload({
     ayanamsha: "lahiri",
     config: {
       observation_point: "topocentric",
-      ayanamsha: "lahiri"
-    }
+      ayanamsha: "lahiri",
+    },
   } as Record<string, unknown>;
 }
 
@@ -202,7 +202,7 @@ function normalizeDaily(payload: unknown, sunSign: SunSign, timezone?: string) {
       provider: "freeastrologyapi",
       generatedAt: (generatedAt ?? new Date()).toISOString(),
       timezone,
-      raw: payload
+      raw: payload,
     },
     summary: {
       date: (summaryDate ?? new Date()).toISOString(),
@@ -211,8 +211,8 @@ function normalizeDaily(payload: unknown, sunSign: SunSign, timezone?: string) {
       mood: stringOrUndefined(envelope.mood),
       luckyNumber: stringOrUndefined(envelope.lucky_number ?? envelope.luckyNumber),
       luckyColor: stringOrUndefined(envelope.lucky_color ?? envelope.luckyColor),
-      snapshot: Object.keys(snapshot).length > 0 ? snapshot : undefined
-    }
+      snapshot: Object.keys(snapshot).length > 0 ? snapshot : undefined,
+    },
   };
 }
 
@@ -226,26 +226,26 @@ function normalizePanchang(payload: unknown, timezone?: string) {
       provider: "freeastrologyapi",
       generatedAt: (generatedAt ?? new Date()).toISOString(),
       timezone,
-      raw: payload
+      raw: payload,
     },
     details: {
       date: (detailsDate ?? new Date()).toISOString(),
       tithi: stringOrFallback(
         envelope.tithi ?? envelope.tithi_name ?? envelope.tithiName,
-        "Unknown"
+        "Unknown",
       ),
       nakshatra: stringOrFallback(
         envelope.nakshatra ?? envelope.nakshatra_name ?? envelope.nakshatraName,
-        "Unknown"
+        "Unknown",
       ),
       yoga: stringOrFallback(envelope.yoga ?? envelope.yoga_name ?? envelope.yogaName, "Unknown"),
       karana: stringOrFallback(
         envelope.karana ?? envelope.karana_name ?? envelope.karanaName,
-        "Unknown"
+        "Unknown",
       ),
       sunrise: stringOrFallback(envelope.sunrise ?? envelope.sunrise_time, ""),
-      sunset: stringOrFallback(envelope.sunset ?? envelope.sunset_time, "")
-    }
+      sunset: stringOrFallback(envelope.sunset ?? envelope.sunset_time, ""),
+    },
   };
 }
 
@@ -261,13 +261,15 @@ function extractEnvelope(payload: unknown): Record<string, unknown> {
     if (casted.data && typeof casted.data === "object") {
       return casted.data as Record<string, unknown>;
     }
-    return casted as Record<string, unknown>;
+    return casted;
   }
   return {};
 }
 
 function buildGuidance(envelope: Record<string, unknown>, sunSign: SunSign) {
-  const components = [`Planetary snapshot for ${sunSign.charAt(0).toUpperCase() + sunSign.slice(1)}.`];
+  const components = [
+    `Planetary snapshot for ${sunSign.charAt(0).toUpperCase() + sunSign.slice(1)}.`,
+  ];
 
   const moonSign = envelope.moon_sign ?? envelope.moonSign;
   if (moonSign) {
@@ -284,7 +286,9 @@ function buildGuidance(envelope: Record<string, unknown>, sunSign: SunSign) {
     components.push(`Yoga: ${String(yoga)}.`);
   }
 
-  const planets = extractSequence(envelope.planets ?? envelope.planet_positions ?? envelope.planetPositions);
+  const planets = extractSequence(
+    envelope.planets ?? envelope.planet_positions ?? envelope.planetPositions,
+  );
   if (planets.length > 0) {
     const firstPlanet = planets[0];
     if (firstPlanet && typeof firstPlanet === "object") {
@@ -368,12 +372,11 @@ function getZonedDateTimeParts(date: Date, timeZone: string) {
       hour: "numeric",
       minute: "numeric",
       second: "numeric",
-      hour12: false
+      hour12: false,
     });
 
     const parts = formatter.formatToParts(date);
-    const resolve = (type: string) =>
-      Number(parts.find((part) => part.type === type)?.value ?? 0);
+    const resolve = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
 
     return {
       year: resolve("year"),
@@ -381,7 +384,7 @@ function getZonedDateTimeParts(date: Date, timeZone: string) {
       day: resolve("day"),
       hour: resolve("hour"),
       minute: resolve("minute"),
-      second: resolve("second")
+      second: resolve("second"),
     };
   } catch {
     return {
@@ -390,7 +393,7 @@ function getZonedDateTimeParts(date: Date, timeZone: string) {
       day: date.getUTCDate(),
       hour: date.getUTCHours(),
       minute: date.getUTCMinutes(),
-      second: date.getUTCSeconds()
+      second: date.getUTCSeconds(),
     };
   }
 }
@@ -402,7 +405,7 @@ function getTimezoneOffsetHours(timeZone: string, date: Date): number {
       hour: "2-digit",
       minute: "2-digit",
       timeZoneName: "shortOffset",
-      hour12: false
+      hour12: false,
     });
     const parts = formatter.formatToParts(date);
     const offsetValue = parts.find((part) => part.type === "timeZoneName")?.value;

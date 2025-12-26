@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { useEffect, useRef } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
-import type { AuthChangeEvent, Session } from '@supabase/supabase-js'
+import { useEffect, useRef } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+import type { AuthChangeEvent, Session } from "@supabase/supabase-js";
 
 interface AuthListenerProviderProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 /**
@@ -26,56 +26,55 @@ interface AuthListenerProviderProps {
  * Wrap this provider in your root layout.tsx around your app content.
  */
 export default function AuthListenerProvider({ children }: AuthListenerProviderProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const supabaseRef = useRef(createClient())
+  const router = useRouter();
+  const pathname = usePathname();
+  const supabaseRef = useRef(createClient());
 
   useEffect(() => {
-    const supabase = supabaseRef.current
+    const supabase = supabaseRef.current;
 
     // Subscribe to auth state changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session: Session | null) => {
-      console.log('[AuthListener] Auth event:', event, 'Session exists:', !!session)
+      console.error("[AuthListener] Auth event:", event, "Session exists:", !!session);
 
       // Only redirect on actual sign-in events
-      if (event === 'SIGNED_IN' && session) {
+      if (event === "SIGNED_IN" && session) {
         // Avoid redirect loops - don't redirect if already on dashboard or onboarding
-        const currentPath = pathname || ''
+        const currentPath = pathname || "";
         const isOnProtectedRoute =
-          currentPath.startsWith('/dashboard') ||
-          currentPath.startsWith('/onboarding')
+          currentPath.startsWith("/dashboard") || currentPath.startsWith("/onboarding");
 
         if (!isOnProtectedRoute) {
-          console.log('[AuthListener] User signed in, redirecting to /dashboard')
-          router.push('/dashboard')
-          router.refresh()
+          console.error("[AuthListener] User signed in, redirecting to /dashboard");
+          router.push("/dashboard");
+          router.refresh();
         } else {
-          console.log('[AuthListener] Already on protected route, skipping redirect')
+          console.error("[AuthListener] Already on protected route, skipping redirect");
         }
       }
 
       // Optional: Handle sign out
-      if (event === 'SIGNED_OUT') {
-        console.log('[AuthListener] User signed out')
+      if (event === "SIGNED_OUT") {
+        console.error("[AuthListener] User signed out");
         // You could redirect to home page or signin page here if desired
         // router.push('/auth/signin')
       }
 
       // Optional: Handle token refresh
-      if (event === 'TOKEN_REFRESHED') {
-        console.log('[AuthListener] Token refreshed')
+      if (event === "TOKEN_REFRESHED") {
+        console.error("[AuthListener] Token refreshed");
         // Session is still valid, no action needed
       }
-    })
+    });
 
     // Cleanup subscription on unmount
     return () => {
-      console.log('[AuthListener] Cleaning up auth subscription')
-      subscription.unsubscribe()
-    }
-  }, [router, pathname])
+      console.error("[AuthListener] Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
+  }, [router, pathname]);
 
-  return <>{children}</>
+  return <>{children}</>;
 }

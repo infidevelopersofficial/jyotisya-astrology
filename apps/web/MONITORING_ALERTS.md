@@ -7,9 +7,13 @@ This guide covers setting up monitoring alerts for the Digital Astrology platfor
 ## Alert Categories
 
 ### 1. Application Health
+
 ### 2. Performance Degradation
+
 ### 3. Error Rates
+
 ### 4. Resource Utilization
+
 ### 5. Security Events
 
 ---
@@ -25,6 +29,7 @@ Sentry provides error tracking and performance monitoring with built-in alerting
    - Click "Create Alert"
 
 2. **Create Error Alert**
+
    ```
    Alert Name: High Error Rate
    Environment: production
@@ -51,18 +56,21 @@ Sentry provides error tracking and performance monitoring with built-in alerting
 ### Recommended Sentry Alerts
 
 #### Critical Alerts (PagerDuty/On-call)
+
 - **Circuit Breaker Opened**: Tag = `circuit_breaker:opened`
 - **Database Connection Failures**: Error contains "database" or "prisma"
 - **Authentication Failures**: Error rate > 10% in 5 minutes
 - **Payment Processing Errors**: Error contains "payment" or "razorpay"
 
 #### Warning Alerts (Slack/Email)
+
 - **Slow Queries**: Query duration > 5 seconds
 - **High Memory Usage**: Memory > 1GB for 5 minutes
 - **Elevated Error Rate**: Error rate > 1% for 10 minutes
 - **Failed Health Checks**: Health check errors > 3 in 5 minutes
 
 #### Info Alerts (Email only)
+
 - **New Error Types**: When new error is first seen
 - **Performance Regression**: P95 latency increase > 50%
 - **Deprecated API Usage**: Specific error patterns
@@ -74,26 +82,26 @@ Sentry provides error tracking and performance monitoring with built-in alerting
 Sentry.init({
   beforeSend(event, hint) {
     // Tag circuit breaker events
-    if (event.message?.includes('Circuit breaker opened')) {
+    if (event.message?.includes("Circuit breaker opened")) {
       event.tags = {
         ...event.tags,
-        alert_priority: 'critical',
-        circuit_breaker: 'opened',
-      }
+        alert_priority: "critical",
+        circuit_breaker: "opened",
+      };
     }
 
     // Tag database errors
-    if (event.message?.includes('database') || event.message?.includes('prisma')) {
+    if (event.message?.includes("database") || event.message?.includes("prisma")) {
       event.tags = {
         ...event.tags,
-        alert_priority: 'critical',
-        component: 'database',
-      }
+        alert_priority: "critical",
+        component: "database",
+      };
     }
 
-    return event
+    return event;
   },
-})
+});
 ```
 
 ---
@@ -107,6 +115,7 @@ Use services like UptimeRobot, Pingdom, or StatusCake.
 1. **Create Account**: https://uptimerobot.com
 
 2. **Add Health Check Monitor**
+
    ```
    Monitor Type: HTTP(s)
    Friendly Name: Production Health Check
@@ -119,6 +128,7 @@ Use services like UptimeRobot, Pingdom, or StatusCake.
    ```
 
 3. **Add Readiness Check Monitor**
+
    ```
    Monitor Type: HTTP(s) with Keyword
    Friendly Name: Production Readiness
@@ -134,13 +144,13 @@ Use services like UptimeRobot, Pingdom, or StatusCake.
 
 ### Recommended Monitoring Endpoints
 
-| Endpoint | Check | Frequency | Alert Threshold |
-|----------|-------|-----------|-----------------|
-| `/api/health` | Basic health | 5 min | 2 consecutive failures |
-| `/api/ready` | Dependencies | 5 min | 2 consecutive failures |
-| `/api/metrics` | Performance | 15 min | Response time > 5s |
-| `/` | Homepage | 5 min | Status code != 200 |
-| `/auth/login` | Auth flow | 10 min | Status code != 200 |
+| Endpoint       | Check        | Frequency | Alert Threshold        |
+| -------------- | ------------ | --------- | ---------------------- |
+| `/api/health`  | Basic health | 5 min     | 2 consecutive failures |
+| `/api/ready`   | Dependencies | 5 min     | 2 consecutive failures |
+| `/api/metrics` | Performance  | 15 min    | Response time > 5s     |
+| `/`            | Homepage     | 5 min     | Status code != 200     |
+| `/auth/login`  | Auth flow    | 10 min    | Status code != 200     |
 
 ---
 
@@ -177,6 +187,7 @@ fi
 ```
 
 Run via cron:
+
 ```cron
 */15 * * * * /path/to/check-performance.sh
 ```
@@ -186,6 +197,7 @@ Run via cron:
 Use log aggregation services (CloudWatch, Datadog, ELK):
 
 **CloudWatch Alarms** (if on AWS):
+
 ```
 Metric: Custom Metric "SlowOperations"
 Condition: > 5 occurrences in 5 minutes
@@ -193,6 +205,7 @@ Action: Send SNS notification
 ```
 
 **Datadog Monitors** (if using Datadog):
+
 ```
 Monitor Type: Metric
 Metric: performance.p95
@@ -285,6 +298,7 @@ fi
 ### Slack Integration
 
 **Setup Incoming Webhook**:
+
 1. Go to https://api.slack.com/apps
 2. Create New App > From scratch
 3. Add "Incoming Webhooks" feature
@@ -292,6 +306,7 @@ fi
 5. Copy webhook URL
 
 **Send Alert**:
+
 ```bash
 curl -X POST https://hooks.slack.com/services/YOUR/WEBHOOK/URL \
   -H 'Content-Type: application/json' \
@@ -315,33 +330,32 @@ Use services like SendGrid or AWS SES:
 
 ```typescript
 // lib/alerts/email.ts
-import sgMail from '@sendgrid/mail'
+import sgMail from "@sendgrid/mail";
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY!)
+sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
 
 export async function sendAlert(
   subject: string,
   message: string,
-  priority: 'critical' | 'warning' | 'info'
+  priority: "critical" | "warning" | "info",
 ) {
   const msg = {
-    to: 'alerts@yourcompany.com',
-    from: 'noreply@yourcompany.com',
+    to: "alerts@yourcompany.com",
+    from: "noreply@yourcompany.com",
     subject: `[${priority.toUpperCase()}] ${subject}`,
     text: message,
     html: `
       <div style="padding: 20px; background-color: ${
-        priority === 'critical' ? '#ff0000' :
-        priority === 'warning' ? '#ff9900' : '#0099ff'
+        priority === "critical" ? "#ff0000" : priority === "warning" ? "#ff9900" : "#0099ff"
       }; color: white;">
         <h2>${subject}</h2>
         <p>${message}</p>
         <p><small>Time: ${new Date().toISOString()}</small></p>
       </div>
     `,
-  }
+  };
 
-  await sgMail.send(msg)
+  await sgMail.send(msg);
 }
 ```
 
@@ -359,6 +373,7 @@ For critical alerts requiring immediate response:
 ## 7. Alert Priority Levels
 
 ### Critical (Immediate Response Required)
+
 - Production down (health check failing)
 - Database connection failure
 - Payment processing errors
@@ -370,6 +385,7 @@ For critical alerts requiring immediate response:
 **Channels**: PagerDuty, SMS, Phone, Slack
 
 ### Warning (Response Within 1 Hour)
+
 - High error rate (> 5%)
 - Slow API responses (> 3s)
 - High memory usage (> 85%)
@@ -380,6 +396,7 @@ For critical alerts requiring immediate response:
 **Channels**: Slack, Email
 
 ### Info (Review Daily)
+
 - New error types
 - Performance degradation (> 20%)
 - Cache hit rate changes
@@ -397,6 +414,7 @@ For critical alerts requiring immediate response:
 **Alert**: Health check endpoint returning 503
 
 **Investigation Steps**:
+
 1. Check application logs: `kubectl logs -l app=web --tail=100`
 2. Check `/api/ready` for dependency status
 3. Check database connectivity: `psql $DATABASE_URL -c "SELECT 1"`
@@ -404,6 +422,7 @@ For critical alerts requiring immediate response:
 5. Review recent deployments
 
 **Remediation**:
+
 - Restart application if memory leak
 - Scale up if resource constrained
 - Fix database connection if needed
@@ -414,12 +433,14 @@ For critical alerts requiring immediate response:
 **Alert**: Circuit breaker opened for external service
 
 **Investigation Steps**:
+
 1. Check Sentry for error context
 2. Test external service manually
 3. Check service status page
 4. Review rate limits
 
 **Remediation**:
+
 - Wait for circuit breaker auto-reset (30s)
 - Contact external service if ongoing issue
 - Enable fallback/cache if available
@@ -430,12 +451,14 @@ For critical alerts requiring immediate response:
 **Alert**: Database queries > 1 second
 
 **Investigation Steps**:
+
 1. Check `/api/metrics` for slow operations
 2. Review Prisma query logs
 3. Check database CPU/memory in Supabase dashboard
 4. Review connection pool stats
 
 **Remediation**:
+
 - Add database indexes
 - Optimize slow queries
 - Increase connection pool size
@@ -478,18 +501,21 @@ curl http://localhost:3000/sentry-test
 ## 10. Alert Maintenance
 
 ### Weekly
+
 - Review alert thresholds
 - Check for false positives
 - Update contact information
 - Test escalation paths
 
 ### Monthly
+
 - Review alert response times
 - Analyze alert trends
 - Update runbooks
 - Review and adjust thresholds
 
 ### Quarterly
+
 - Audit all alert rules
 - Update on-call schedules
 - Review incident retrospectives
@@ -568,6 +594,7 @@ echo "Monitoring check completed at $(date)"
 ```
 
 **Cron Schedule**:
+
 ```cron
 # Run every 5 minutes
 */5 * * * * /path/to/comprehensive-monitoring.sh >> /var/log/monitoring.log 2>&1

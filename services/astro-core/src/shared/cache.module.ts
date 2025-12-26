@@ -4,9 +4,9 @@ import { CacheModule as NestCacheModule, Module } from "@nestjs/common";
   imports: [
     NestCacheModule.register({
       ttl: 60,
-      max: 100
-    })
+      max: 100,
+    }),
   ],
-  exports: [NestCacheModule]
+  exports: [NestCacheModule],
 })
 export class CacheModule {}

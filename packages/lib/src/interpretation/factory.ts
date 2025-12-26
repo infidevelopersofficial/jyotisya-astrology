@@ -29,7 +29,7 @@ function createProvider(): InterpretationProvider {
       apiKey,
       baseUrl: process.env.OPENAI_BASE_URL,
       model: process.env.OPENAI_MODEL,
-      timeoutMs: Number(process.env.OPENAI_TIMEOUT_MS ?? 10000)
+      timeoutMs: Number(process.env.OPENAI_TIMEOUT_MS ?? 10000),
     });
   }
 

@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server'
-import { cachedAstrologyAPI, createAstrologyRequest } from '@/lib/astrology/cached-client'
-import { logger } from '@/lib/monitoring/logger'
+import { NextResponse } from "next/server";
+import { cachedAstrologyAPI, createAstrologyRequest } from "@/lib/astrology/cached-client";
+import { logger } from "@/lib/monitoring/logger";
 
 /**
  * POST /api/astrology/birth-chart
@@ -15,21 +15,44 @@ import { logger } from '@/lib/monitoring/logger'
  *   "timezone": 5.5
  * }
  */
-export async function POST(request: Request) {
+
+interface BirthChartRequestBody {
+  dateTime: string;
+  latitude: number;
+  longitude: number;
+  timezone: number;
+}
+
+function isBirthChartRequestBody(body: unknown): body is BirthChartRequestBody {
+  if (typeof body !== "object" || body === null) {
+    return false;
+  }
+
+  const candidate = body as Record<string, unknown>;
+
+  return (
+    typeof candidate.dateTime === "string" &&
+    typeof candidate.latitude === "number" &&
+    typeof candidate.longitude === "number" &&
+    typeof candidate.timezone === "number"
+  );
+}
+
+export async function POST(request: Request): Promise<NextResponse> {
   try {
-    const body = await request.json()
+    const body: unknown = await request.json();
 
-    const { dateTime, latitude, longitude, timezone } = body
-
-    if (!dateTime || !latitude || !longitude || timezone === undefined) {
+    if (!isBirthChartRequestBody(body)) {
       return NextResponse.json(
         {
-          error: 'Missing required fields',
-          required: ['dateTime', 'latitude', 'longitude', 'timezone'],
+          error: "Invalid request body",
+          required: ["dateTime", "latitude", "longitude", "timezone"],
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
+
+    const { dateTime, latitude, longitude, timezone } = body;
 
     // Create astrology request
     const astrologyRequest = createAstrologyRequest({
@@ -37,21 +60,21 @@ export async function POST(request: Request) {
       latitude,
       longitude,
       timezone,
-    })
+    });
 
     // Get birth chart (will be cached for 24 hours)
-    const result = await cachedAstrologyAPI.getBirthChart(astrologyRequest)
+    const result = await cachedAstrologyAPI.getBirthChart(astrologyRequest);
 
-    return NextResponse.json(result, { status: 200 })
-  } catch (error) {
-    logger.error('Birth chart API error', error)
+    return NextResponse.json(result, { status: 200 });
+  } catch (error: unknown) {
+    logger.error("Birth chart API error", error);
 
     return NextResponse.json(
       {
-        error: 'Failed to fetch birth chart',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch birth chart",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

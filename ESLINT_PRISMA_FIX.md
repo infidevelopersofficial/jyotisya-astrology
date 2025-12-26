@@ -3,27 +3,33 @@
 ## 🐛 Issues Fixed
 
 ### 1. ESLint v9 Incompatibility with Next.js 14.1.4
+
 **Error:** `Unknown options: useEslintrc, extensions - 'extensions' has been removed`
 
 **Root Cause:**
+
 - Next.js 14.1.4 uses internal ESLint configs that rely on ESLint v8 APIs
 - ESLint v9 removed options like `useEslintrc`, `extensions`, `resolvePluginsRelativeTo`
 - `eslint-config-next@16.0.8` requires ESLint v9, but Next.js 14.1.4 doesn't support it
 
 **Fix Applied:**
+
 1. **Downgraded ESLint** from v9.39.1 → v8.57.1
 2. **Matched eslint-config-next** version to Next.js version: v14.1.4
 3. **Root package.json** already has `eslint@^8.57.0` specified
 
 ### 2. Prisma Client Not Initialized in CI/CD
+
 **Error:** `@prisma/client did not initialize yet. Please run 'prisma generate'`
 
 **Root Cause:**
+
 - Prisma schema at `packages/schemas/prisma/schema.prisma`
 - `@prisma/client` package is installed, but the actual client code isn't generated
 - GitHub Actions needs explicit `prisma generate` before build
 
 **Fix Applied:**
+
 1. **Added postinstall scripts** to auto-generate Prisma client after `yarn install`
 2. **Updated GitHub Actions workflows** with explicit "Generate Prisma Client" step
 3. **Ensures compatibility** with both local dev and CI/CD
@@ -33,6 +39,7 @@
 ## ✅ Files Modified
 
 ### 1. Root `package.json` - Added Postinstall Script
+
 ```json
 {
   "scripts": {
@@ -47,6 +54,7 @@
 **Why:** Automatically generates Prisma client whenever `yarn install` runs (local or CI).
 
 ### 2. `packages/schemas/package.json` - Added Postinstall Script
+
 ```json
 {
   "scripts": {
@@ -60,7 +68,9 @@
 **Why:** Ensures Prisma client is generated when this workspace package is installed.
 
 ### 3. `apps/web/package.json` - Fixed ESLint Versions
+
 **Before:**
+
 ```json
 {
   "devDependencies": {
@@ -71,6 +81,7 @@
 ```
 
 **After:**
+
 ```json
 {
   "devDependencies": {
@@ -81,10 +92,12 @@
 ```
 
 **Why:**
+
 - ESLint v8 is compatible with Next.js 14.1.4's internal lint configs
 - `eslint-config-next` version should match Next.js version for stability
 
 ### 4. `.github/workflows/ci.yml` - Already Fixed (Previous Commit)
+
 ```yaml
 - name: Generate Prisma Client
   run: |
@@ -95,6 +108,7 @@
 ```
 
 ### 5. `.github/workflows/deploy.yml` - Already Fixed (Previous Commit)
+
 ```yaml
 - name: Generate Prisma Client
   run: |
@@ -105,6 +119,7 @@
 ```
 
 ### 6. `apps/web/.eslintrc.json` - Already Created (Previous Commit)
+
 ```json
 {
   "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"]
@@ -116,6 +131,7 @@
 ## 🔧 How It Works
 
 ### Postinstall Flow
+
 ```
 1. yarn install
    ├─> Installs all dependencies including @prisma/client
@@ -127,6 +143,7 @@
 ```
 
 ### GitHub Actions Flow
+
 ```
 1. Install dependencies (yarn install --immutable)
    └─> Postinstall generates Prisma client automatically
@@ -145,6 +162,7 @@
 ## 🎯 Verification
 
 ### Local Build Test
+
 ```bash
 # Clean install
 rm -rf node_modules .yarn/cache
@@ -161,6 +179,7 @@ yarn lint
 ```
 
 ### Expected Results
+
 ✅ Prisma client generated at `node_modules/.prisma/client/`
 ✅ Build completes without errors
 ✅ ESLint runs without "unknown options" errors
@@ -170,19 +189,20 @@ yarn lint
 
 ## 📋 Version Compatibility Matrix
 
-| Package | Version | Reason |
-|---------|---------|--------|
-| **next** | 14.1.4 | Current stable version |
-| **eslint** | ^8.57.1 | Required by Next.js 14.x (v9 not supported) |
-| **eslint-config-next** | ^14.1.4 | Must match Next.js version |
-| **@prisma/client** | 5.11.0 | Stable Prisma version |
-| **prisma** (dev) | 5.11.0 | Must match @prisma/client |
+| Package                | Version | Reason                                      |
+| ---------------------- | ------- | ------------------------------------------- |
+| **next**               | 14.1.4  | Current stable version                      |
+| **eslint**             | ^8.57.1 | Required by Next.js 14.x (v9 not supported) |
+| **eslint-config-next** | ^14.1.4 | Must match Next.js version                  |
+| **@prisma/client**     | 5.11.0  | Stable Prisma version                       |
+| **prisma** (dev)       | 5.11.0  | Must match @prisma/client                   |
 
 ---
 
 ## 🚀 GitHub Actions - What Changed
 
 ### Before (Broken)
+
 ```yaml
 - name: Install dependencies
   run: yarn install --immutable
@@ -194,12 +214,13 @@ yarn lint
 ```
 
 ### After (Fixed)
+
 ```yaml
 - name: Install dependencies
   run: yarn install --immutable
   # ✅ Postinstall generates Prisma client
 
-- name: Generate Prisma Client  # Explicit step for safety
+- name: Generate Prisma Client # Explicit step for safety
   run: |
     cd packages/schemas
     npx prisma generate
@@ -215,6 +236,7 @@ yarn lint
 ## 📝 Next Steps
 
 1. **Commit and push these changes:**
+
    ```bash
    git add package.json packages/schemas/package.json apps/web/package.json yarn.lock
    git commit -m "fix: downgrade ESLint to v8 and add Prisma postinstall scripts
@@ -245,16 +267,19 @@ yarn lint
 ## 🔍 Troubleshooting
 
 ### If ESLint still shows errors:
+
 1. Clear Next.js cache: `rm -rf apps/web/.next`
 2. Reinstall dependencies: `yarn install`
 3. Check ESLint version: `yarn why eslint` (should show v8.57.1)
 
 ### If Prisma client not found:
+
 1. Manually generate: `cd packages/schemas && npx prisma generate`
 2. Check output: `ls -la node_modules/.prisma/client/`
 3. Verify schema location: `packages/schemas/prisma/schema.prisma` exists
 
 ### If GitHub Actions still fails:
+
 1. Check workflow file has "Generate Prisma Client" step
 2. Verify postinstall script in package.json
 3. Check GitHub Actions logs for exact error message
@@ -270,6 +295,7 @@ yarn lint
 ✅ CI/CD failures → GitHub Actions workflows updated
 
 **Result:**
+
 - Local builds work ✅
 - GitHub Actions builds work ✅
 - ESLint runs without errors ✅

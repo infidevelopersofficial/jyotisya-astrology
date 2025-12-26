@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Optional, Dict
 
 from pydantic import BaseModel, Field
 
@@ -8,17 +8,17 @@ class HoroscopeSummary(BaseModel):
   date: datetime = Field(default_factory=datetime.utcnow)
   sunSign: str
   guidance: str
-  mood: str | None = None
-  luckyNumber: str | None = None
-  luckyColor: str | None = None
-  snapshot: dict[str, Any] | None = None
+  mood: Optional[str] = None
+  luckyNumber: Optional[str] = None
+  luckyColor: Optional[str] = None
+  snapshot: Optional[Dict[str, Any]] = None
 
 
 class ProviderMetadata(BaseModel):
   provider: str = "freeastrologyapi"
   generatedAt: datetime = Field(default_factory=datetime.utcnow)
-  timezone: str | None = None
-  raw: Any | None = None
+  timezone: Optional[str] = None
+  raw: Optional[Any] = None
 
 
 class DailyHoroscopeResult(BaseModel):
@@ -46,4 +46,4 @@ class PanchangResult(BaseModel):
 class ErrorResponse(BaseModel):
   error: str
   message: str
-  details: Any | None = None
+  details: Optional[Any] = None

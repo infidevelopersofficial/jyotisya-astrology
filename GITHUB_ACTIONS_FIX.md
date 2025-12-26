@@ -3,6 +3,7 @@
 ## 🐛 Issues Fixed
 
 ### 1. Prisma Client Not Initialized Error
+
 **Error:** `@prisma/client did not initialize yet. Please run 'prisma generate' and try to import it again.`
 
 **Root Cause:** The Prisma schema exists in `packages/schemas/prisma/schema.prisma`, but the CI workflow didn't run `prisma generate` before building. When Next.js tried to collect page data from API routes using PrismaClient (like `/api/ready`), the client hadn't been generated yet.
@@ -19,11 +20,13 @@
 ```
 
 ### 2. ESLint Configuration Error
+
 **Error:** `ESLint: Failed to load config 'next/core-web-vitals' to extend from.`
 
 **Root Cause:** The root `.eslintrc.json` extended `next/core-web-vitals`, but `eslint-config-next` and `eslint` packages were not installed in the monorepo.
 
 **Fix Applied:**
+
 1. **Root ESLint config** - Removed `next/core-web-vitals` (only needed for Next.js apps)
 2. **apps/web/.eslintrc.json** - Created app-specific config with `next/core-web-vitals`
 3. **Package dependencies** - Added `eslint` and `eslint-config-next` to `apps/web/package.json`
@@ -33,6 +36,7 @@
 ## ✅ Files Modified
 
 ### 1. `.github/workflows/ci.yml`
+
 Added Prisma generation step in **build job** (line 95-100) and **test job** (line 156-161):
 
 ```yaml
@@ -45,6 +49,7 @@ Added Prisma generation step in **build job** (line 95-100) and **test job** (li
 ```
 
 ### 2. `.github/workflows/deploy.yml`
+
 Added Prisma generation step in **build job** (line 88-93):
 
 ```yaml
@@ -57,7 +62,9 @@ Added Prisma generation step in **build job** (line 88-93):
 ```
 
 ### 3. `.eslintrc.json` (Root)
+
 **Before:**
+
 ```json
 {
   "root": true,
@@ -67,6 +74,7 @@ Added Prisma generation step in **build job** (line 88-93):
 ```
 
 **After:**
+
 ```json
 {
   "root": true,
@@ -76,6 +84,7 @@ Added Prisma generation step in **build job** (line 88-93):
 ```
 
 ### 4. `apps/web/.eslintrc.json` (New File)
+
 ```json
 {
   "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended"]
@@ -83,7 +92,9 @@ Added Prisma generation step in **build job** (line 88-93):
 ```
 
 ### 5. `apps/web/package.json`
+
 Added devDependencies:
+
 ```json
 {
   "devDependencies": {
@@ -99,6 +110,7 @@ Added devDependencies:
 ## 🚀 Verification Steps
 
 ### Local Verification
+
 1. ✅ Build succeeds locally: `yarn build`
 2. ✅ ESLint runs without errors: `yarn lint`
 3. ✅ All workflows updated with Prisma generate step
@@ -117,6 +129,7 @@ When the workflows run, they will now:
 ## 📋 Next Steps
 
 1. **Commit these changes:**
+
    ```bash
    git add .github/workflows/ci.yml .github/workflows/deploy.yml
    git add .eslintrc.json apps/web/.eslintrc.json
@@ -125,6 +138,7 @@ When the workflows run, they will now:
    ```
 
 2. **Push to GitHub:**
+
    ```bash
    git push origin <your-branch>
    ```
@@ -140,6 +154,7 @@ When the workflows run, they will now:
 ## 🔍 Why This Works
 
 ### Prisma Generate Timing
+
 The build process looks like this now:
 
 ```
@@ -158,7 +173,9 @@ The build process looks like this now:
 ```
 
 ### ESLint Config Resolution
+
 In a monorepo:
+
 - **Root config** - Shared rules for all packages (TypeScript, Prettier)
 - **App-specific config** - Next.js-specific rules only where Next.js is installed
 - This prevents dependency resolution errors in CI
@@ -183,6 +200,7 @@ After pushing these changes:
 - **Vercel Builds:** Vercel already handles Prisma generation in their build process via `package.json` build script or auto-detection
 
 If you encounter any issues after pushing, check:
+
 1. GitHub Actions logs for the "Generate Prisma Client" step
 2. Verify `packages/schemas/prisma/schema.prisma` exists in the repository
 3. Ensure GitHub Secrets are properly configured (for deploy workflow)

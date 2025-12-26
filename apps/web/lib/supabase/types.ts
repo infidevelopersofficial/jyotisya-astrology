@@ -5,36 +5,30 @@
  * npx supabase gen types typescript --project-id <project-id> > lib/supabase/types.ts
  */
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
 export interface Database {
   public: {
     Tables: {
       [_ in string]: {
-        Row: Record<string, unknown>
-        Insert: Record<string, unknown>
-        Update: Record<string, unknown>
-      }
-    }
+        Row: Record<string, unknown>;
+        Insert: Record<string, unknown>;
+        Update: Record<string, unknown>;
+      };
+    };
     Views: {
       [_ in string]: {
-        Row: Record<string, unknown>
-      }
-    }
+        Row: Record<string, unknown>;
+      };
+    };
     Functions: {
       [_ in string]: {
-        Args: Record<string, unknown>
-        Returns: unknown
-      }
-    }
+        Args: Record<string, unknown>;
+        Returns: unknown;
+      };
+    };
     Enums: {
-      [_ in string]: string
-    }
-  }
+      [_ in string]: string;
+    };
+  };
 }

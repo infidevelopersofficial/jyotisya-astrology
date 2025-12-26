@@ -1,9 +1,9 @@
 export async function apiClient(input: RequestInfo, init?: RequestInit) {
   const response = await fetch(input, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    ...init
+    ...init,
   });
 
   if (!response.ok) {
