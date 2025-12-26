@@ -33,16 +33,16 @@ NEXT_PUBLIC_VERCEL_ENV=production # Auto-set by Vercel
 ### Usage
 
 ```typescript
-import { captureException, setUser } from '@/lib/monitoring/sentry'
+import { captureException, setUser } from "@/lib/monitoring/sentry";
 
 // Capture exception
 try {
-  await riskyOperation()
+  await riskyOperation();
 } catch (error) {
   captureException(error, {
-    operation: 'riskyOperation',
+    operation: "riskyOperation",
     userId: user.id,
-  })
+  });
 }
 
 // Set user context
@@ -50,15 +50,16 @@ setUser({
   id: user.id,
   email: user.email,
   username: user.name,
-})
+});
 
 // Clear user on logout
-setUser(null)
+setUser(null);
 ```
 
 ### Error Filtering
 
 Sentry automatically filters:
+
 - ResizeObserver errors (browser quirks)
 - Network errors (user connection issues)
 - Expected auth errors (invalid sessions)
@@ -67,18 +68,18 @@ Sentry automatically filters:
 ### Performance Tracking
 
 ```typescript
-import { startTransaction } from '@/lib/monitoring/sentry'
+import { startTransaction } from "@/lib/monitoring/sentry";
 
-const transaction = startTransaction('api.users.fetch', 'http')
+const transaction = startTransaction("api.users.fetch", "http");
 
 try {
-  const users = await fetchUsers()
-  transaction.setStatus('ok')
+  const users = await fetchUsers();
+  transaction.setStatus("ok");
 } catch (error) {
-  transaction.setStatus('internal_error')
-  throw error
+  transaction.setStatus("internal_error");
+  throw error;
 } finally {
-  transaction.finish()
+  transaction.finish();
 }
 ```
 
@@ -89,34 +90,35 @@ try {
 ### Configuration
 
 Logging is environment-aware:
+
 - **Development**: Pretty-printed, debug enabled
 - **Production**: JSON format, info+ only
 
 ### Usage
 
 ```typescript
-import { logger } from '@/lib/monitoring/logger'
+import { logger } from "@/lib/monitoring/logger";
 
 // Basic logging
-logger.info('User signed in', { userId: user.id })
-logger.warn('Rate limit approaching', { count: 95, limit: 100 })
-logger.error('Payment failed', error, { orderId: '123' })
+logger.info("User signed in", { userId: user.id });
+logger.warn("Rate limit approaching", { count: 95, limit: 100 });
+logger.error("Payment failed", error, { orderId: "123" });
 
 // API logging
-logger.apiRequest('GET', '/api/users', { page: 1 })
-logger.apiResponse('GET', '/api/users', 200, 150) // 150ms
+logger.apiRequest("GET", "/api/users", { page: 1 });
+logger.apiResponse("GET", "/api/users", 200, 150); // 150ms
 
 // Database logging
-logger.dbQuery('SELECT', 'users', 45, { userId: '123' })
+logger.dbQuery("SELECT", "users", 45, { userId: "123" });
 
 // Auth events
-logger.auth('signin', userId, { method: 'google' })
+logger.auth("signin", userId, { method: "google" });
 
 // Performance
-logger.performance('page.render', 1200, 'ms')
+logger.performance("page.render", 1200, "ms");
 
 // User actions
-logger.userAction('product.purchase', userId, { productId: 'abc' })
+logger.userAction("product.purchase", userId, { productId: "abc" });
 ```
 
 ### Log Levels
@@ -129,6 +131,7 @@ logger.userAction('product.purchase', userId, { productId: 'abc' })
 ### Log Format
 
 #### Development
+
 ```
 [INFO] User signed in
 {
@@ -138,6 +141,7 @@ logger.userAction('product.purchase', userId, { productId: 'abc' })
 ```
 
 #### Production (JSON)
+
 ```json
 {
   "level": "info",
@@ -159,46 +163,46 @@ logger.userAction('product.purchase', userId, { productId: 'abc' })
 
 ```typescript
 try {
-  await operation()
+  await operation();
 } catch (error) {
-  logger.error('Operation failed', error, { operation: 'name' })
-  captureException(error)
-  throw error
+  logger.error("Operation failed", error, { operation: "name" });
+  captureException(error);
+  throw error;
 }
 ```
 
 ### 2. Add Context
 
 ```typescript
-logger.info('Order created', {
+logger.info("Order created", {
   orderId: order.id,
   userId: user.id,
   amount: order.total,
   items: order.items.length,
-})
+});
 ```
 
 ### 3. Use Appropriate Levels
 
 ```typescript
-logger.debug('Cache hit') // Development only
-logger.info('User action completed') // Normal flow
-logger.warn('Approaching rate limit') // Potential issue
-logger.error('Database connection failed') // Error state
+logger.debug("Cache hit"); // Development only
+logger.info("User action completed"); // Normal flow
+logger.warn("Approaching rate limit"); // Potential issue
+logger.error("Database connection failed"); // Error state
 ```
 
 ### 4. Track Performance
 
 ```typescript
-const start = Date.now()
-await slowOperation()
-const duration = Date.now() - start
+const start = Date.now();
+await slowOperation();
+const duration = Date.now() - start;
 
 if (duration > 1000) {
-  logger.warn('Slow operation detected', {
-    operation: 'slowOperation',
+  logger.warn("Slow operation detected", {
+    operation: "slowOperation",
     duration,
-  })
+  });
 }
 ```
 
@@ -206,15 +210,15 @@ if (duration > 1000) {
 
 ```typescript
 // Authentication
-logger.auth('signin.attempt', undefined, { method: 'google' })
-logger.auth('signin.success', userId, { method: 'google' })
+logger.auth("signin.attempt", undefined, { method: "google" });
+logger.auth("signin.success", userId, { method: "google" });
 
 // Payments
-logger.userAction('payment.initiated', userId, { amount: 1000 })
-logger.userAction('payment.completed', userId, { orderId: 'abc' })
+logger.userAction("payment.initiated", userId, { amount: 1000 });
+logger.userAction("payment.completed", userId, { orderId: "abc" });
 
 // Data operations
-logger.dbQuery('UPDATE', 'users', duration, { userId })
+logger.dbQuery("UPDATE", "users", duration, { userId });
 ```
 
 ---
@@ -225,11 +229,11 @@ logger.dbQuery('UPDATE', 'users', duration, { userId })
 
 ```typescript
 try {
-  await riskyOperation()
+  await riskyOperation();
 } catch (error) {
-  captureException(error, { context: 'operation' })
-  logger.error('Operation failed', error)
-  throw error // Let Next.js error boundary handle it
+  captureException(error, { context: "operation" });
+  logger.error("Operation failed", error);
+  throw error; // Let Next.js error boundary handle it
 }
 ```
 
@@ -237,23 +241,20 @@ try {
 
 ```typescript
 try {
-  await riskyOperation()
+  await riskyOperation();
 } catch (error) {
-  captureException(error)
-  logger.error('Operation failed, using fallback', error)
-  return fallbackValue
+  captureException(error);
+  logger.error("Operation failed, using fallback", error);
+  return fallbackValue;
 }
 ```
 
 ### Pattern 3: Wrap Functions
 
 ```typescript
-import { withErrorTracking } from '@/lib/monitoring/sentry'
+import { withErrorTracking } from "@/lib/monitoring/sentry";
 
-const safeFunction = withErrorTracking(
-  riskyFunction,
-  { context: 'user-action' }
-)
+const safeFunction = withErrorTracking(riskyFunction, { context: "user-action" });
 ```
 
 ---
@@ -274,13 +275,13 @@ Configure in Sentry dashboard:
 ```typescript
 // Alert on critical errors
 if (isCritical) {
-  logger.error('CRITICAL: Payment processor down', error)
-  captureException(error, { level: 'fatal' })
+  logger.error("CRITICAL: Payment processor down", error);
+  captureException(error, { level: "fatal" });
 }
 
 // Alert on threshold
 if (errorCount > threshold) {
-  captureMessage('Error threshold exceeded', 'warning')
+  captureMessage("Error threshold exceeded", "warning");
 }
 ```
 
@@ -314,9 +315,11 @@ Before going live:
 ### Logs
 
 #### Development
+
 Check terminal output
 
 #### Production (Vercel)
+
 1. Visit Vercel dashboard
 2. Select deployment
 3. Click **Logs**
@@ -329,6 +332,7 @@ Check terminal output
 ### Sentry not capturing errors
 
 Check:
+
 1. `NEXT_PUBLIC_SENTRY_DSN` is set
 2. Error isn't filtered (see filtering rules)
 3. Sentry is initialized (`sentry.*.config.ts`)
@@ -337,6 +341,7 @@ Check:
 ### Logs not showing
 
 Check:
+
 1. Log level (debug only shows in dev)
 2. Environment configuration
 3. Console.log suppression (tests)

@@ -31,7 +31,7 @@ const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
 function AuthErrorContent() {
   const searchParams = useSearchParams();
   const errorCode = searchParams?.get("message") || "default";
-  const error = (ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.default)!
+  const error = (ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.default)!;
 
   return (
     <div className="w-full max-w-md space-y-8">

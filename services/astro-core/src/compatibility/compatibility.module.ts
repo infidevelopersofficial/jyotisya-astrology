@@ -3,6 +3,6 @@ import { CompatibilityService } from "./compatibility.service";
 
 @Module({
   providers: [CompatibilityService],
-  exports: [CompatibilityService]
+  exports: [CompatibilityService],
 })
 export class CompatibilityModule {}

@@ -1,25 +1,28 @@
-import { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
-import { prisma } from '@/lib/db/prisma'
-import { createClient } from '@/lib/supabase/server'
-import { Button } from '@digital-astrology/ui'
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
+import { prisma } from "@/lib/db/prisma";
+import { createClient } from "@/lib/supabase/server";
+import { Button } from "@digital-astrology/ui";
 
 export const metadata: Metadata = {
-  title: 'Consultation Details | Jyotishya'
-}
+  title: "Consultation Details | Jyotishya",
+};
 
 interface ConsultationDetailsPageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export default async function ConsultationDetailsPage({ params }: ConsultationDetailsPageProps) {
   // Get authenticated user
-  const supabase = await createClient()
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
 
   if (authError || !user) {
     return (
@@ -32,21 +35,18 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
           </Button>
         </div>
       </main>
-    )
+    );
   }
 
   // Find user in database
   const dbUser = await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: user.email || undefined },
-        { phone: user.phone || undefined },
-      ]
-    }
-  })
+      OR: [{ email: user.email || undefined }, { phone: user.phone || undefined }],
+    },
+  });
 
   if (!dbUser) {
-    notFound()
+    notFound();
   }
 
   // Fetch consultation details
@@ -65,52 +65,60 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
           languages: true,
           rating: true,
           experience: true,
-        }
-      }
-    }
-  })
+        },
+      },
+    },
+  });
 
   if (!consultation) {
-    notFound()
+    notFound();
   }
 
   // Format date and time
-  const consultationDate = new Date(consultation.scheduledAt)
-  const formattedDate = consultationDate.toLocaleDateString('en-IN', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  })
-  const formattedTime = consultationDate.toLocaleTimeString('en-IN', {
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  const consultationDate = new Date(consultation.scheduledAt);
+  const formattedDate = consultationDate.toLocaleDateString("en-IN", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const formattedTime = consultationDate.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
   // Status color mapping
   const statusColors = {
-    SCHEDULED: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-    IN_PROGRESS: 'bg-green-500/10 text-green-400 border-green-500/20',
-    COMPLETED: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
-    CANCELLED: 'bg-red-500/10 text-red-400 border-red-500/20',
-    NO_SHOW: 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-  }
+    SCHEDULED: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    IN_PROGRESS: "bg-green-500/10 text-green-400 border-green-500/20",
+    COMPLETED: "bg-slate-500/10 text-slate-400 border-slate-500/20",
+    CANCELLED: "bg-red-500/10 text-red-400 border-red-500/20",
+    NO_SHOW: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  };
 
   const paymentStatusColors = {
-    PENDING: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-    PAID: 'bg-green-500/10 text-green-400 border-green-500/20',
-    FAILED: 'bg-red-500/10 text-red-400 border-red-500/20',
-    REFUNDED: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-  }
+    PENDING: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+    PAID: "bg-green-500/10 text-green-400 border-green-500/20",
+    FAILED: "bg-red-500/10 text-red-400 border-red-500/20",
+    REFUNDED: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+  };
 
   return (
     <main className="px-6 pb-24 pt-16 lg:px-16">
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/consultations" className="text-slate-400 hover:text-white mb-4 inline-flex items-center gap-2">
+          <Link
+            href="/consultations"
+            className="text-slate-400 hover:text-white mb-4 inline-flex items-center gap-2"
+          >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
             Back to Consultations
           </Link>
@@ -118,14 +126,15 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
         </div>
 
         {/* Success Banner for Paid */}
-        {consultation.paymentStatus === 'PAID' && consultation.status === 'SCHEDULED' && (
+        {consultation.paymentStatus === "PAID" && consultation.status === "SCHEDULED" && (
           <div className="mb-6 bg-green-500/10 border border-green-500/20 rounded-2xl p-6">
             <div className="flex items-center gap-3">
               <div className="text-3xl">✅</div>
               <div>
                 <h2 className="text-xl font-semibold text-white">Booking Confirmed!</h2>
                 <p className="text-slate-300 mt-1">
-                  Your payment has been received. A confirmation email has been sent with meeting details.
+                  Your payment has been received. A confirmation email has been sent with meeting
+                  details.
                 </p>
               </div>
             </div>
@@ -152,8 +161,8 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
                 <span>{consultation.astrologer.experience} years experience</span>
               </div>
               <div className="mt-2 text-sm text-slate-400">
-                <p>Specialties: {consultation.astrologer.specialization.join(', ')}</p>
-                <p>Languages: {consultation.astrologer.languages.join(', ')}</p>
+                <p>Specialties: {consultation.astrologer.specialization.join(", ")}</p>
+                <p>Languages: {consultation.astrologer.languages.join(", ")}</p>
               </div>
             </div>
           </div>
@@ -184,10 +193,14 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
 
           {/* Status Badges */}
           <div className="flex flex-wrap gap-3 pt-6 border-t border-white/10">
-            <div className={`px-4 py-2 rounded-lg border text-sm font-medium ${statusColors[consultation.status]}`}>
-              Status: {consultation.status.replace('_', ' ')}
+            <div
+              className={`px-4 py-2 rounded-lg border text-sm font-medium ${statusColors[consultation.status]}`}
+            >
+              Status: {consultation.status.replace("_", " ")}
             </div>
-            <div className={`px-4 py-2 rounded-lg border text-sm font-medium ${paymentStatusColors[consultation.paymentStatus]}`}>
+            <div
+              className={`px-4 py-2 rounded-lg border text-sm font-medium ${paymentStatusColors[consultation.paymentStatus]}`}
+            >
               Payment: {consultation.paymentStatus}
             </div>
           </div>
@@ -211,7 +224,7 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
 
         {/* Actions */}
         <div className="mt-6 flex gap-3">
-          {consultation.status === 'SCHEDULED' && consultation.paymentStatus === 'PAID' && (
+          {consultation.status === "SCHEDULED" && consultation.paymentStatus === "PAID" && (
             <>
               <Button variant="secondary" disabled>
                 Join Meeting (Link will be sent via email)
@@ -221,7 +234,7 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
               </Button>
             </>
           )}
-          {consultation.status === 'COMPLETED' && (
+          {consultation.status === "COMPLETED" && (
             <Button variant="secondary" disabled>
               Leave Review (Coming Soon)
             </Button>
@@ -231,9 +244,11 @@ export default async function ConsultationDetailsPage({ params }: ConsultationDe
         {/* Help Text */}
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
           <p className="font-medium text-white mb-2">Need help?</p>
-          <p>For any issues with your consultation, please contact support with your Consultation ID.</p>
+          <p>
+            For any issues with your consultation, please contact support with your Consultation ID.
+          </p>
         </div>
       </div>
     </main>
-  )
+  );
 }

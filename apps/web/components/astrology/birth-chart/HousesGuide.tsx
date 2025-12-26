@@ -1,6 +1,6 @@
-'use client'
+"use client";
 
-import { houseMeanings } from '@/constants/astrology/meanings'
+import { houseMeanings } from "@/constants/astrology/meanings";
 
 export default function HousesGuide(): React.ReactElement {
   return (
@@ -23,30 +23,24 @@ export default function HousesGuide(): React.ReactElement {
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <p className="text-xs font-semibold text-purple-300">
-                  {house.lifeArea}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-white">
-                  {house.name}
-                </p>
-                <p className="mt-2 text-xs leading-relaxed text-slate-300">
-                  {house.meaning}
-                </p>
+                <p className="text-xs font-semibold text-purple-300">{house.lifeArea}</p>
+                <p className="mt-1 text-sm font-semibold text-white">{house.name}</p>
+                <p className="mt-2 text-xs leading-relaxed text-slate-300">{house.meaning}</p>
               </div>
 
               <span className="ml-2 text-xl opacity-40 transition-opacity group-hover:opacity-100">
                 {parseInt(houseNum) === 1
-                  ? '👤'
+                  ? "👤"
                   : parseInt(houseNum) === 7
-                    ? '💑'
+                    ? "💑"
                     : parseInt(houseNum) === 10
-                      ? '💼'
-                      : '🏠'}
+                      ? "💼"
+                      : "🏠"}
               </span>
             </div>
           </div>
         ))}
       </div>
     </div>
-  )
+  );
 }

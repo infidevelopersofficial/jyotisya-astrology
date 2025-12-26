@@ -10,14 +10,14 @@ export class MockInterpretationProvider implements InterpretationProvider {
       `${localizedGreeting} ${this.toTitleCase(summary.sunSign)}!`,
       `Today (${summary.date}) sets a ${tone} tone for your ${focus}.`,
       summary.guidance,
-      `Lucky color: ${summary.luckyColor ?? "Saffron"}, lucky number: ${summary.luckyNumber ?? "7"}.`
+      `Lucky color: ${summary.luckyColor ?? "Saffron"}, lucky number: ${summary.luckyNumber ?? "7"}.`,
     ].join(" ");
 
     return {
       provider: "mock_llm",
       generatedAt: new Date().toISOString(),
       locale,
-      narrative
+      narrative,
     };
   }
 

@@ -31,9 +31,7 @@ export default function Hero(): React.ReactElement {
         <h1 className="mt-6 bg-gradient-to-r from-orange-300 via-pink-300 to-purple-300 bg-clip-text text-4xl font-extrabold text-transparent sm:text-6xl">
           {hero.title}
         </h1>
-        <p className="mt-6 max-w-2xl text-lg text-slate-300">
-          {hero.description}
-        </p>
+        <p className="mt-6 max-w-2xl text-lg text-slate-300">{hero.description}</p>
         <div className="mt-8 flex flex-wrap gap-4">
           <Button>{hero.primaryCta}</Button>
           <Button variant="secondary">{hero.secondaryCta}</Button>

@@ -20,6 +20,7 @@ Load testing validates that the Digital Astrology platform can handle expected t
 Modern load testing tool with powerful scripting capabilities.
 
 **Installation**:
+
 ```bash
 # macOS
 brew install k6
@@ -40,6 +41,7 @@ choco install k6
 Fast and flexible alternative with YAML config.
 
 **Installation**:
+
 ```bash
 npm install -g artillery
 ```
@@ -59,28 +61,29 @@ GUI-based tool, good for complex scenarios.
 **Goal**: Test main page under normal traffic
 
 **k6 Script** (`tests/load/homepage.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '30s', target: 20 },  // Ramp up to 20 users
-    { duration: '1m', target: 20 },   // Stay at 20 users
-    { duration: '30s', target: 0 },   // Ramp down
+    { duration: "30s", target: 20 }, // Ramp up to 20 users
+    { duration: "1m", target: 20 }, // Stay at 20 users
+    { duration: "30s", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<2000'], // 95% requests < 2s
-    http_req_failed: ['rate<0.01'],    // <1% error rate
+    http_req_duration: ["p(95)<2000"], // 95% requests < 2s
+    http_req_failed: ["rate<0.01"], // <1% error rate
   },
 };
 
 export default function () {
-  const res = http.get('https://your-domain.com/');
+  const res = http.get("https://your-domain.com/");
 
   check(res, {
-    'status is 200': (r) => r.status === 200,
-    'page loaded': (r) => r.body.includes('Digital Astrology'),
+    "status is 200": (r) => r.status === 200,
+    "page loaded": (r) => r.body.includes("Digital Astrology"),
   });
 
   sleep(1);
@@ -88,6 +91,7 @@ export default function () {
 ```
 
 **Run**:
+
 ```bash
 k6 run tests/load/homepage.js
 ```
@@ -97,31 +101,32 @@ k6 run tests/load/homepage.js
 **Goal**: Test API endpoints under sustained load
 
 **k6 Script** (`tests/load/api.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check, sleep } from 'k6';
+import http from "k6/http";
+import { check, sleep } from "k6";
 
 export const options = {
   stages: [
-    { duration: '1m', target: 50 },   // Ramp up
-    { duration: '3m', target: 50 },   // Sustained load
-    { duration: '1m', target: 100 },  // Spike
-    { duration: '2m', target: 50 },   // Back to normal
-    { duration: '1m', target: 0 },    // Ramp down
+    { duration: "1m", target: 50 }, // Ramp up
+    { duration: "3m", target: 50 }, // Sustained load
+    { duration: "1m", target: 100 }, // Spike
+    { duration: "2m", target: 50 }, // Back to normal
+    { duration: "1m", target: 0 }, // Ramp down
   ],
   thresholds: {
-    http_req_duration: ['p(95)<1000', 'p(99)<2000'],
-    http_req_failed: ['rate<0.05'],
+    http_req_duration: ["p(95)<1000", "p(99)<2000"],
+    http_req_failed: ["rate<0.05"],
   },
 };
 
-const BASE_URL = 'https://your-domain.com';
+const BASE_URL = "https://your-domain.com";
 
 export default function () {
   // Test health check
   let res = http.get(`${BASE_URL}/api/health`);
   check(res, {
-    'health check OK': (r) => r.status === 200,
+    "health check OK": (r) => r.status === 200,
   });
 
   sleep(0.5);
@@ -130,17 +135,17 @@ export default function () {
   res = http.post(
     `${BASE_URL}/api/horoscope`,
     JSON.stringify({
-      sign: 'Aries',
-      date: '2025-12-03',
+      sign: "Aries",
+      date: "2025-12-03",
     }),
     {
-      headers: { 'Content-Type': 'application/json' },
-    }
+      headers: { "Content-Type": "application/json" },
+    },
   );
 
   check(res, {
-    'horoscope API OK': (r) => r.status === 200,
-    'has data': (r) => r.json('data') !== null,
+    "horoscope API OK": (r) => r.status === 200,
+    "has data": (r) => r.json("data") !== null,
   });
 
   sleep(1);
@@ -152,27 +157,28 @@ export default function () {
 **Goal**: Find system breaking point
 
 **k6 Script** (`tests/load/stress.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check } from "k6";
 
 export const options = {
   stages: [
-    { duration: '2m', target: 100 },   // Below normal load
-    { duration: '5m', target: 100 },
-    { duration: '2m', target: 200 },   // Normal load
-    { duration: '5m', target: 200 },
-    { duration: '2m', target: 300 },   // Around breaking point
-    { duration: '5m', target: 300 },
-    { duration: '2m', target: 400 },   // Beyond breaking point
-    { duration: '5m', target: 400 },
-    { duration: '10m', target: 0 },    // Recovery
+    { duration: "2m", target: 100 }, // Below normal load
+    { duration: "5m", target: 100 },
+    { duration: "2m", target: 200 }, // Normal load
+    { duration: "5m", target: 200 },
+    { duration: "2m", target: 300 }, // Around breaking point
+    { duration: "5m", target: 300 },
+    { duration: "2m", target: 400 }, // Beyond breaking point
+    { duration: "5m", target: 400 },
+    { duration: "10m", target: 0 }, // Recovery
   ],
 };
 
 export default function () {
-  const res = http.get('https://your-domain.com/api/health');
-  check(res, { 'status is 200': (r) => r.status === 200 });
+  const res = http.get("https://your-domain.com/api/health");
+  check(res, { "status is 200": (r) => r.status === 200 });
 }
 ```
 
@@ -181,35 +187,37 @@ export default function () {
 **Goal**: Verify caching reduces database load
 
 **k6 Script** (`tests/load/cache-test.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check } from "k6";
 
 export const options = {
   stages: [
-    { duration: '30s', target: 50 },
-    { duration: '2m', target: 50 },
-    { duration: '30s', target: 0 },
+    { duration: "30s", target: 50 },
+    { duration: "2m", target: 50 },
+    { duration: "30s", target: 0 },
   ],
 };
 
-const userId = 'test-user-123';
+const userId = "test-user-123";
 
 export default function () {
   // Request same data repeatedly to test cache
   const res = http.get(`https://your-domain.com/api/user/${userId}/profile`);
 
   check(res, {
-    'status OK': (r) => r.status === 200,
-    'fast response': (r) => r.timings.duration < 200, // Should be fast from cache
+    "status OK": (r) => r.status === 200,
+    "fast response": (r) => r.timings.duration < 200, // Should be fast from cache
   });
 }
 ```
 
 **Artillery Config** (`tests/load/cache-test.yml`):
+
 ```yaml
 config:
-  target: 'https://your-domain.com'
+  target: "https://your-domain.com"
   phases:
     - duration: 60
       arrivalRate: 20
@@ -237,29 +245,30 @@ scenarios:
 **Goal**: Verify retry logic handles failures gracefully
 
 **k6 Script** (`tests/load/retry-test.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check } from "k6";
 
 export const options = {
   stages: [
-    { duration: '1m', target: 20 },
-    { duration: '2m', target: 20 },
-    { duration: '30s', target: 0 },
+    { duration: "1m", target: 20 },
+    { duration: "2m", target: 20 },
+    { duration: "30s", target: 0 },
   ],
   thresholds: {
     // Allow higher error rate since we're testing retries
-    http_req_failed: ['rate<0.10'], // <10% ultimate failure
+    http_req_failed: ["rate<0.10"], // <10% ultimate failure
   },
 };
 
 export default function () {
   // Call endpoint that depends on external service
-  const res = http.get('https://your-domain.com/api/external-data');
+  const res = http.get("https://your-domain.com/api/external-data");
 
   check(res, {
-    'eventually successful': (r) => r.status === 200 || r.status === 503,
-    'has retry header': (r) => r.headers['X-Retry-Count'] !== undefined,
+    "eventually successful": (r) => r.status === 200 || r.status === 503,
+    "has retry header": (r) => r.headers["X-Retry-Count"] !== undefined,
   });
 }
 ```
@@ -287,6 +296,7 @@ watch -n 1 'psql $DATABASE_URL -c "SELECT count(*) FROM pg_stat_activity"'
 ### Monitoring Checklist
 
 During load test, monitor:
+
 - [ ] Response times (P50, P95, P99)
 - [ ] Error rates
 - [ ] CPU usage
@@ -313,6 +323,7 @@ During load test, monitor:
 ```
 
 **Analysis**:
+
 - ✅ **P95 < 1s**: Good performance
 - ⚠️ **Error rate 2.34%**: Slightly high, investigate
 - ✅ **Throughput 66.5 req/s**: Meets requirements
@@ -320,13 +331,13 @@ During load test, monitor:
 
 ### Performance Targets
 
-| Metric | Target | Acceptable | Poor |
-|--------|--------|------------|------|
-| P50 Response Time | < 200ms | < 500ms | > 500ms |
-| P95 Response Time | < 500ms | < 1000ms | > 1000ms |
-| P99 Response Time | < 1000ms | < 2000ms | > 2000ms |
-| Error Rate | < 0.1% | < 1% | > 1% |
-| Throughput | > 100 req/s | > 50 req/s | < 50 req/s |
+| Metric            | Target      | Acceptable | Poor       |
+| ----------------- | ----------- | ---------- | ---------- |
+| P50 Response Time | < 200ms     | < 500ms    | > 500ms    |
+| P95 Response Time | < 500ms     | < 1000ms   | > 1000ms   |
+| P99 Response Time | < 1000ms    | < 2000ms   | > 2000ms   |
+| Error Rate        | < 0.1%      | < 1%       | > 1%       |
+| Throughput        | > 100 req/s | > 50 req/s | < 50 req/s |
 
 ---
 
@@ -340,26 +351,28 @@ k6 run --vus 100 --duration 30s tests/load/db-pool.js
 ```
 
 **Script** (`tests/load/db-pool.js`):
+
 ```javascript
-import http from 'k6/http';
-import { check } from 'k6';
+import http from "k6/http";
+import { check } from "k6";
 
 export const options = {
-  vus: 100,  // 100 virtual users
-  duration: '30s',
+  vus: 100, // 100 virtual users
+  duration: "30s",
 };
 
 export default function () {
   // Each request requires database query
-  const res = http.get('https://your-domain.com/api/users');
+  const res = http.get("https://your-domain.com/api/users");
 
   check(res, {
-    'no connection errors': (r) => !r.body.includes('connection'),
+    "no connection errors": (r) => !r.body.includes("connection"),
   });
 }
 ```
 
 **Monitor**:
+
 ```bash
 # Check active connections
 psql $DATABASE_URL -c "SELECT count(*) FROM pg_stat_activity WHERE datname = 'postgres'"
@@ -375,12 +388,13 @@ curl -s http://localhost:3000/api/metrics | jq '.database'
 ### CI/CD Integration
 
 **GitHub Actions** (`.github/workflows/load-test.yml`):
+
 ```yaml
 name: Load Test
 
 on:
   schedule:
-    - cron: '0 0 * * 0'  # Weekly on Sunday
+    - cron: "0 0 * * 0" # Weekly on Sunday
   workflow_dispatch:
 
 jobs:
@@ -433,6 +447,7 @@ jobs:
 ## Load Testing Checklist
 
 ### Pre-Test
+
 - [ ] Backup production database (if testing prod)
 - [ ] Notify team of load test
 - [ ] Ensure monitoring is active
@@ -440,6 +455,7 @@ jobs:
 - [ ] Set up alert thresholds
 
 ### During Test
+
 - [ ] Monitor response times
 - [ ] Watch error rates
 - [ ] Check resource utilization
@@ -447,6 +463,7 @@ jobs:
 - [ ] Monitor cache effectiveness
 
 ### Post-Test
+
 - [ ] Analyze results
 - [ ] Identify bottlenecks
 - [ ] Document findings
@@ -461,10 +478,12 @@ jobs:
 ### Issue: High Response Times
 
 **Symptoms**:
+
 - P95 > 2 seconds
 - Increasing latency over time
 
 **Investigation**:
+
 ```bash
 # Check slow operations
 curl -s http://localhost:3000/api/metrics | jq '.slowOperations'
@@ -474,6 +493,7 @@ curl -s http://localhost:3000/api/metrics | jq '.slowOperations'
 ```
 
 **Solutions**:
+
 - Add database indexes
 - Optimize N+1 queries
 - Increase cache TTL
@@ -482,17 +502,20 @@ curl -s http://localhost:3000/api/metrics | jq '.slowOperations'
 ### Issue: Connection Pool Exhaustion
 
 **Symptoms**:
+
 - Errors: "Connection pool timeout"
 - High error rate
 - Timeouts
 
 **Investigation**:
+
 ```bash
 # Check connection pool
 curl -s http://localhost:3000/api/ready | jq '.checks.database'
 ```
 
 **Solutions**:
+
 - Increase `connection_limit` in DATABASE_URL
 - Use Supabase connection pooler (pgbouncer)
 - Optimize long-running queries
@@ -501,17 +524,20 @@ curl -s http://localhost:3000/api/ready | jq '.checks.database'
 ### Issue: Memory Leaks
 
 **Symptoms**:
+
 - Increasing memory usage over time
 - OOM errors
 - Crashes
 
 **Investigation**:
+
 ```bash
 # Monitor memory
 watch -n 1 'curl -s http://localhost:3000/api/metrics | jq .memory'
 ```
 
 **Solutions**:
+
 - Clear cache periodically
 - Fix event listener leaks
 - Increase memory limit
@@ -520,14 +546,17 @@ watch -n 1 'curl -s http://localhost:3000/api/metrics | jq .memory'
 ### Issue: Circuit Breaker Opens
 
 **Symptoms**:
+
 - Errors: "Circuit breaker is open"
 - Service unavailable
 
 **Investigation**:
+
 - Check Sentry for circuit breaker events
 - Test external service availability
 
 **Solutions**:
+
 - Fix external service integration
 - Increase timeout values
 - Add fallback responses
@@ -553,24 +582,28 @@ watch -n 1 'curl -s http://localhost:3000/api/metrics | jq .memory'
 ## Sample Test Plan
 
 ### Week 1: Baseline Testing
+
 - Run homepage load test
 - Run API load test
 - Document baseline metrics
 - Identify obvious bottlenecks
 
 ### Week 2: Optimization
+
 - Implement fixes
 - Re-run tests
 - Compare to baseline
 - Iterate
 
 ### Week 3: Stress Testing
+
 - Find breaking points
 - Test recovery
 - Document limits
 - Plan capacity
 
 ### Week 4: Production Validation
+
 - Final load test
 - Verify monitoring
 - Update documentation

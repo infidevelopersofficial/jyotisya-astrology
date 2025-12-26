@@ -1,31 +1,31 @@
-import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db/prisma'
-import { getSunSignFromDate } from '@/services/astrology/birthChartService'
-import { DailyHoroscopePanel } from '@/components/astrology/DailyHoroscopePanel'
-import type { Metadata } from 'next'
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { getSunSignFromDate } from "@/services/astrology/birthChartService";
+import { DailyHoroscopePanel } from "@/components/astrology/DailyHoroscopePanel";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Chart Details | Digital Astrology',
-  description: 'View your saved birth chart details',
-}
+  title: "Chart Details | Digital Astrology",
+  description: "View your saved birth chart details",
+};
 
 interface PageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string }>;
 }
 
 export default async function SavedChartDetailPage({ params }: PageProps) {
-  const { id } = await params
+  const { id } = await params;
 
   // Authenticate user
-  const supabase = await createClient()
+  const supabase = await createClient();
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/auth/signin?callbackUrl=/dashboard/saved-charts')
+    redirect("/auth/signin?callbackUrl=/dashboard/saved-charts");
   }
 
   // Load kundli from database
@@ -45,26 +45,26 @@ export default async function SavedChartDetailPage({ params }: PageProps) {
       isFavorite: true,
       createdAt: true,
     },
-  })
+  });
 
   if (!kundli) {
-    redirect('/dashboard/saved-charts')
+    redirect("/dashboard/saved-charts");
   }
 
   // Verify ownership
   if (kundli.userId !== user.id) {
-    redirect('/dashboard/saved-charts')
+    redirect("/dashboard/saved-charts");
   }
 
   // Compute sun sign from birth date
-  const sunSign = getSunSignFromDate(new Date(kundli.birthDate))
+  const sunSign = getSunSignFromDate(new Date(kundli.birthDate));
 
   // Construct HoroscopeData
   const horoscopeData = {
-    date: new Date().toISOString().split('T')[0]!, // Today's date in YYYY-MM-DD
+    date: new Date().toISOString().split("T")[0]!, // Today's date in YYYY-MM-DD
     sunSign,
     text: undefined, // Placeholder
-  }
+  };
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-12 lg:px-16">
@@ -73,11 +73,13 @@ export default async function SavedChartDetailPage({ params }: PageProps) {
         <div>
           <h1 className="text-3xl font-bold text-white">{kundli.name}</h1>
           <p className="mt-2 text-slate-400">
-            Born {new Date(kundli.birthDate).toLocaleDateString('en-IN', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            })} at {kundli.birthTime} in {kundli.birthPlace}
+            Born{" "}
+            {new Date(kundli.birthDate).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}{" "}
+            at {kundli.birthTime} in {kundli.birthPlace}
           </p>
         </div>
 
@@ -91,11 +93,8 @@ export default async function SavedChartDetailPage({ params }: PageProps) {
         </div>
 
         {/* Daily Horoscope Panel */}
-        <DailyHoroscopePanel
-          kundliId={kundli.id}
-          data={horoscopeData}
-        />
+        <DailyHoroscopePanel kundliId={kundli.id} data={horoscopeData} />
       </div>
     </div>
-  )
+  );
 }

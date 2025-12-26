@@ -1,24 +1,24 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import { prisma } from '@/lib/db/prisma'
-import SettingsForm from '@/components/settings/settings-form'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { prisma } from "@/lib/db/prisma";
+import SettingsForm from "@/components/settings/settings-form";
 
 export default async function SettingsPage() {
   // Server-side authentication check
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/auth/signin?callbackUrl=/settings')
+    redirect("/auth/signin?callbackUrl=/settings");
   }
 
   // Fetch user data from database
   const dbUser = await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: user.email || undefined },
-        { phone: user.phone || undefined },
-      ]
+      OR: [{ email: user.email || undefined }, { phone: user.phone || undefined }],
     },
     select: {
       id: true,
@@ -38,12 +38,12 @@ export default async function SettingsPage() {
       moonSign: true,
       risingSign: true,
       onboardingCompleted: true,
-    }
-  })
+    },
+  });
 
   if (!dbUser) {
     // If user doesn't exist in DB, redirect to onboarding
-    redirect('/onboarding')
+    redirect("/onboarding");
   }
 
   return (
@@ -57,5 +57,5 @@ export default async function SettingsPage() {
       {/* Settings Form */}
       <SettingsForm user={dbUser} supabaseUser={user} />
     </div>
-  )
+  );
 }

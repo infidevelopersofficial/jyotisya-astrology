@@ -4,7 +4,7 @@ const QUICK_LINKS = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms", label: "Terms" },
   { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" }
+  { href: "/contact", label: "Contact" },
 ];
 
 export default function Footer(): React.ReactElement {
@@ -24,7 +24,9 @@ export default function Footer(): React.ReactElement {
           </p>
         </div>
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-widest text-orange-200">Quick Links</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-widest text-orange-200">
+            Quick Links
+          </h3>
           <ul className="mt-4 space-y-2 text-sm text-slate-300">
             {QUICK_LINKS.map((link) => (
               <li key={link.href}>
@@ -36,7 +38,9 @@ export default function Footer(): React.ReactElement {
           </ul>
         </div>
         <div>
-          <h3 className="text-sm font-semibold uppercase tracking-widest text-orange-200">Stay Updated</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-widest text-orange-200">
+            Stay Updated
+          </h3>
           <p className="mt-4 text-sm text-slate-300">
             Get auspicious alerts, festival insights, and exclusive offers on WhatsApp.
           </p>

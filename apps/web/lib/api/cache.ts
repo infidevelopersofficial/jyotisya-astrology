@@ -1,35 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
-import { logger } from '@/lib/monitoring/logger'
+import { logger } from "@/lib/monitoring/logger";
 
 export interface CacheOptions {
   /**
    * Time to live in milliseconds
    * @default 300000 (5 minutes)
    */
-  ttl?: number
+  ttl?: number;
 
   /**
    * Custom cache key generator
    */
-  key?: (...args: unknown[]) => string
+  key?: (...args: unknown[]) => string;
 
   /**
    * Whether to cache errors
    * @default false
    */
-  cacheErrors?: boolean
+  cacheErrors?: boolean;
 
   /**
    * Whether to return stale data while revalidating
    * @default true
    */
-  staleWhileRevalidate?: boolean
+  staleWhileRevalidate?: boolean;
 }
 
 interface CacheEntry<T> {
-  data: T
-  timestamp: number
-  isError: boolean
+  data: T;
+  timestamp: number;
+  isError: boolean;
 }
 
 /**
@@ -37,38 +37,38 @@ interface CacheEntry<T> {
  * For production, consider using Redis
  */
 class MemoryCache {
-  private cache = new Map<string, CacheEntry<unknown>>()
-  private revalidating = new Set<string>()
+  private cache = new Map<string, CacheEntry<unknown>>();
+  private revalidating = new Set<string>();
 
   /**
    * Get item from cache
    */
   get<T>(key: string, options?: CacheOptions): T | null {
-    const entry = this.cache.get(key)
+    const entry = this.cache.get(key);
 
     if (!entry) {
-      return null
+      return null;
     }
 
-    const age = Date.now() - entry.timestamp
-    const ttl = options?.ttl || 300000
+    const age = Date.now() - entry.timestamp;
+    const ttl = options?.ttl || 300000;
 
     // Return cached data if still fresh
     if (age < ttl) {
-      logger.debug('Cache hit', { key, age, ttl })
-      return entry.data as T
+      logger.debug("Cache hit", { key, age, ttl });
+      return entry.data as T;
     }
 
     // Stale data - trigger revalidation but return stale
     if (options?.staleWhileRevalidate && !this.revalidating.has(key)) {
-      logger.debug('Cache stale - returning stale data', { key, age, ttl })
-      return entry.data as T
+      logger.debug("Cache stale - returning stale data", { key, age, ttl });
+      return entry.data as T;
     }
 
     // Expired
-    logger.debug('Cache miss - expired', { key, age, ttl })
-    this.cache.delete(key)
-    return null
+    logger.debug("Cache miss - expired", { key, age, ttl });
+    this.cache.delete(key);
+    return null;
   }
 
   /**
@@ -79,38 +79,38 @@ class MemoryCache {
       data,
       timestamp: Date.now(),
       isError,
-    })
-    logger.debug('Cache set', { key })
+    });
+    logger.debug("Cache set", { key });
   }
 
   /**
    * Delete item from cache
    */
   delete(key: string) {
-    this.cache.delete(key)
-    logger.debug('Cache delete', { key })
+    this.cache.delete(key);
+    logger.debug("Cache delete", { key });
   }
 
   /**
    * Clear all cache
    */
   clear() {
-    this.cache.clear()
-    logger.info('Cache cleared')
+    this.cache.clear();
+    logger.info("Cache cleared");
   }
 
   /**
    * Mark key as revalidating
    */
   markRevalidating(key: string) {
-    this.revalidating.add(key)
+    this.revalidating.add(key);
   }
 
   /**
    * Unmark key as revalidating
    */
   unmarkRevalidating(key: string) {
-    this.revalidating.delete(key)
+    this.revalidating.delete(key);
   }
 
   /**
@@ -120,42 +120,42 @@ class MemoryCache {
     return {
       size: this.cache.size,
       revalidating: this.revalidating.size,
-    }
+    };
   }
 
   /**
    * Clean expired entries
    */
   cleanup(ttl: number = 300000) {
-    const now = Date.now()
-    let cleaned = 0
+    const now = Date.now();
+    let cleaned = 0;
 
     for (const [key, entry] of this.cache.entries()) {
       if (now - entry.timestamp > ttl) {
-        this.cache.delete(key)
-        cleaned++
+        this.cache.delete(key);
+        cleaned++;
       }
     }
 
     if (cleaned > 0) {
-      logger.info('Cache cleanup', { cleaned, remaining: this.cache.size })
+      logger.info("Cache cleanup", { cleaned, remaining: this.cache.size });
     }
   }
 }
 
 // Singleton cache instance
-export const cache = new MemoryCache()
+export const cache = new MemoryCache();
 
 // Auto-cleanup every 5 minutes
-if (typeof window === 'undefined') {
-  setInterval(() => cache.cleanup(), 300000)
+if (typeof window === "undefined") {
+  setInterval(() => cache.cleanup(), 300000);
 }
 
 /**
  * Default cache key generator
  */
 function defaultKeyGenerator(...args: unknown[]): string {
-  return JSON.stringify(args)
+  return JSON.stringify(args);
 }
 
 /**
@@ -171,49 +171,49 @@ function defaultKeyGenerator(...args: unknown[]): string {
  */
 export function cached<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
-  options: CacheOptions = {}
+  options: CacheOptions = {},
 ): T {
-  const keyGenerator = options.key || defaultKeyGenerator
-  const ttl = options.ttl || 300000
+  const keyGenerator = options.key || defaultKeyGenerator;
+  const ttl = options.ttl || 300000;
 
   return (async (...args: Parameters<T>) => {
-    const key = `cached:${fn.name}:${keyGenerator(...args)}`
+    const key = `cached:${fn.name}:${keyGenerator(...args)}`;
 
     // Try to get from cache
-    const cached = cache.get(key, options)
+    const cached = cache.get(key, options);
     if (cached !== null) {
       // If stale, trigger background revalidation
-      const entry = (cache as any).cache.get(key)
+      const entry = (cache as any).cache.get(key);
       if (entry && Date.now() - entry.timestamp >= ttl) {
-        cache.markRevalidating(key)
+        cache.markRevalidating(key);
 
         // Revalidate in background
         fn(...args)
-          .then(data => {
-            cache.set(key, data)
-            cache.unmarkRevalidating(key)
+          .then((data) => {
+            cache.set(key, data);
+            cache.unmarkRevalidating(key);
           })
-          .catch(err => {
-            logger.error('Cache revalidation failed', err, { key })
-            cache.unmarkRevalidating(key)
-          })
+          .catch((err) => {
+            logger.error("Cache revalidation failed", err, { key });
+            cache.unmarkRevalidating(key);
+          });
       }
 
-      return cached
+      return cached;
     }
 
     // Execute function
     try {
-      const data = await fn(...args)
-      cache.set(key, data, false)
-      return data
+      const data = await fn(...args);
+      cache.set(key, data, false);
+      return data;
     } catch (error: unknown) {
       if (options.cacheErrors) {
-        cache.set(key, error, true)
+        cache.set(key, error, true);
       }
-      throw error
+      throw error;
     }
-  }) as T
+  }) as T;
 }
 
 /**
@@ -221,32 +221,32 @@ export function cached<T extends (...args: unknown[]) => Promise<unknown>>(
  */
 export function memoize<T extends (...args: unknown[]) => any>(
   fn: T,
-  options: { key?: (...args: unknown[]) => string; maxSize?: number } = {}
+  options: { key?: (...args: unknown[]) => string; maxSize?: number } = {},
 ): T {
-  const cache = new Map<string, any>()
-  const keyGenerator = options.key || defaultKeyGenerator
-  const maxSize = options.maxSize || 100
+  const cache = new Map<string, any>();
+  const keyGenerator = options.key || defaultKeyGenerator;
+  const maxSize = options.maxSize || 100;
 
   return ((...args: Parameters<T>) => {
-    const key = keyGenerator(...args)
+    const key = keyGenerator(...args);
 
     if (cache.has(key)) {
-      return cache.get(key)
+      return cache.get(key);
     }
 
-    const result = fn(...args)
+    const result = fn(...args);
 
     // LRU eviction if cache is full
     if (cache.size >= maxSize) {
-      const firstKey = cache.keys().next().value
+      const firstKey = cache.keys().next().value;
       if (firstKey !== undefined) {
-        cache.delete(firstKey)
+        cache.delete(firstKey);
       }
     }
 
-    cache.set(key, result)
-    return result
-  }) as T
+    cache.set(key, result);
+    return result;
+  }) as T;
 }
 
 /**
@@ -254,52 +254,48 @@ export function memoize<T extends (...args: unknown[]) => any>(
  * Prevents multiple identical requests from running simultaneously
  */
 class RequestDeduplicator {
-  private pending = new Map<string, Promise<unknown>>()
+  private pending = new Map<string, Promise<unknown>>();
 
-  async deduplicate<T>(
-    key: string,
-    fn: () => Promise<T>
-  ): Promise<T> {
+  async deduplicate<T>(key: string, fn: () => Promise<T>): Promise<T> {
     // Return existing promise if request is in flight
     if (this.pending.has(key)) {
-      logger.debug('Request deduplicated', { key })
+      logger.debug("Request deduplicated", { key });
       // @ts-expect-error - Type inference issue with deduplicator return type
-      return this.pending.get(key)!
+      return this.pending.get(key)!;
     }
 
     // Execute and store promise
-    const promise = fn()
-      .finally(() => {
-        this.pending.delete(key)
-      })
+    const promise = fn().finally(() => {
+      this.pending.delete(key);
+    });
 
-    this.pending.set(key, promise)
-    return promise
+    this.pending.set(key, promise);
+    return promise;
   }
 
   /**
    * Get number of pending requests
    */
   getPendingCount() {
-    return this.pending.size
+    return this.pending.size;
   }
 }
 
-export const deduplicator = new RequestDeduplicator()
+export const deduplicator = new RequestDeduplicator();
 
 /**
  * Deduplicate requests with the same key
  */
 export function deduplicated<T extends (...args: unknown[]) => Promise<unknown>>(
   fn: T,
-  keyGenerator?: (...args: unknown[]) => string
+  keyGenerator?: (...args: unknown[]) => string,
 ): T {
-  const getKey = keyGenerator || defaultKeyGenerator
+  const getKey = keyGenerator || defaultKeyGenerator;
 
   return (async (...args: Parameters<T>) => {
-    const key = `dedup:${fn.name}:${getKey(...args)}`
-    return deduplicator.deduplicate(key, () => fn(...args))
-  }) as T
+    const key = `dedup:${fn.name}:${getKey(...args)}`;
+    return deduplicator.deduplicate(key, () => fn(...args));
+  }) as T;
 }
 
 /**
@@ -307,65 +303,62 @@ export function deduplicated<T extends (...args: unknown[]) => Promise<unknown>>
  */
 export class RequestBatcher<T, K = string> {
   private queue: Array<{
-    key: K
-    resolve: (value: T) => void
-    reject: (error: any) => void
-  }> = []
-  private timer: NodeJS.Timeout | null = null
+    key: K;
+    resolve: (value: T) => void;
+    reject: (error: any) => void;
+  }> = [];
+  private timer: NodeJS.Timeout | null = null;
 
   constructor(
     private batchFn: (keys: K[]) => Promise<T[]>,
     private options: {
-      maxBatchSize?: number
-      maxWaitTime?: number
-    } = {}
+      maxBatchSize?: number;
+      maxWaitTime?: number;
+    } = {},
   ) {}
 
   async load(key: K): Promise<T> {
     return new Promise((resolve, reject) => {
-      this.queue.push({ key, resolve, reject })
+      this.queue.push({ key, resolve, reject });
 
       // Execute immediately if batch is full
       if (this.queue.length >= (this.options.maxBatchSize || 50)) {
-        this.executeBatch()
-        return
+        this.executeBatch();
+        return;
       }
 
       // Otherwise wait for more requests
       if (!this.timer) {
-        this.timer = setTimeout(
-          () => this.executeBatch(),
-          this.options.maxWaitTime || 50
-        )
+        this.timer = setTimeout(() => this.executeBatch(), this.options.maxWaitTime || 50);
       }
-    })
+    });
   }
 
   private async executeBatch() {
     if (this.timer) {
-      clearTimeout(this.timer)
-      this.timer = null
+      clearTimeout(this.timer);
+      this.timer = null;
     }
 
-    const batch = this.queue.splice(0)
-    if (batch.length === 0) return
+    const batch = this.queue.splice(0);
+    if (batch.length === 0) return;
 
     try {
-      const keys = batch.map(item => item.key)
-      const results = await this.batchFn(keys)
+      const keys = batch.map((item) => item.key);
+      const results = await this.batchFn(keys);
 
       // Resolve all promises
       batch.forEach((item, index) => {
-        const result = results[index]
+        const result = results[index];
         if (result !== undefined) {
-          item.resolve(result)
+          item.resolve(result);
         }
-      })
+      });
     } catch (error: unknown) {
       // Reject all promises
-      batch.forEach(item => {
-        item.reject(error)
-      })
+      batch.forEach((item) => {
+        item.reject(error);
+      });
     }
   }
 }

@@ -5,6 +5,7 @@
 **UI-only enhancement**: Display the last 3 charts clicked in the current session at the top of the saved charts page.
 
 **Key characteristics**:
+
 - ✅ Client-side state only (no database changes)
 - ✅ Session-based (resets on page refresh)
 - ✅ Maximum 3 charts
@@ -17,25 +18,27 @@
 ## 📝 Files Created/Modified
 
 ### 1. Hook - `hooks/useRecentlyViewedCharts.ts` (NEW)
+
 **Purpose**: Manage recently viewed charts in client-side state
 
 ```typescript
 export function useRecentlyViewedCharts() {
-  const [recentlyViewed, setRecentlyViewed] = useState<SavedChartListItem[]>([])
+  const [recentlyViewed, setRecentlyViewed] = useState<SavedChartListItem[]>([]);
 
   const addToRecent = useCallback((chart: SavedChartListItem) => {
     // Remove duplicates, add to front, limit to 3
-  }, [])
+  }, []);
 
   const clearRecent = useCallback(() => {
-    setRecentlyViewed([])
-  }, [])
+    setRecentlyViewed([]);
+  }, []);
 
-  return { recentlyViewed, addToRecent, clearRecent }
+  return { recentlyViewed, addToRecent, clearRecent };
 }
 ```
 
 **Features**:
+
 - ✅ Maintains list of up to 3 charts
 - ✅ Most recent first ordering
 - ✅ Automatic duplicate removal (moves to front)
@@ -44,6 +47,7 @@ export function useRecentlyViewedCharts() {
 ---
 
 ### 2. Component - `components/saved-charts/RecentlyViewedList.tsx` (NEW)
+
 **Purpose**: Display recently viewed charts section
 
 ```typescript
@@ -79,6 +83,7 @@ export default function RecentlyViewedList({
 ```
 
 **Features**:
+
 - ✅ Clock icon header
 - ✅ Count badge
 - ✅ Compact 3-column grid
@@ -89,7 +94,9 @@ export default function RecentlyViewedList({
 ---
 
 ### 3. Component - `components/saved-charts/SavedChartCard.tsx` (MODIFIED)
+
 **Changes**:
+
 - Added optional `onChartClick` prop
 - Calls `onChartClick(chart)` when card is clicked
 
@@ -112,7 +119,9 @@ const handleCardClick = () => {
 ---
 
 ### 4. Component - `components/saved-charts/SavedChartsList.tsx` (MODIFIED)
+
 **Changes**:
+
 - Import `useRecentlyViewedCharts` hook
 - Import `RecentlyViewedList` component
 - Render recently viewed section above filters
@@ -143,6 +152,7 @@ export default function SavedChartsList() {
 ---
 
 ### 5. Tests - `__tests__/hooks/useRecentlyViewedCharts.test.ts` (NEW)
+
 **7 comprehensive test cases**:
 
 ```
@@ -168,6 +178,7 @@ Duration  1.72s
 ```
 
 **Coverage**:
+
 - ✅ Empty state on initial load
 - ✅ Adding charts updates list
 - ✅ Order is correct (most recent first)
@@ -244,16 +255,19 @@ Chart 2 moved to front (no duplicate)
 ## 🚀 How to Test
 
 ### 1. Start Dev Server
+
 ```bash
 npm run dev
 ```
 
 ### 2. Navigate to Saved Charts
+
 ```
 http://localhost:3000/dashboard/saved-charts
 ```
 
 ### 3. Test Behavior
+
 1. **Initial state**: Recently Viewed section is hidden
 2. **Click any chart**: Section appears with that chart
 3. **Click 2 more charts**: Section shows 3 charts, most recent first
@@ -266,17 +280,20 @@ http://localhost:3000/dashboard/saved-charts
 ## 🎨 Visual Design
 
 ### Section Header
+
 - **Icon**: 🕒 Clock (orange-400)
 - **Title**: "Recently Viewed" (white, semibold)
 - **Badge**: Chart count (orange background)
 
 ### Grid Layout
+
 - **Desktop (lg)**: 3 columns
 - **Tablet (sm)**: 2 columns
 - **Mobile**: 1 column
 - **Gap**: 3 (12px)
 
 ### Divider
+
 - **Style**: Horizontal border
 - **Color**: white/10 (subtle)
 - **Spacing**: 8 (32px) margin top
@@ -290,6 +307,7 @@ http://localhost:3000/dashboard/saved-charts
 ```
 
 All type definitions are consistent:
+
 - `SavedChartListItem` used throughout
 - `onChartClick` is optional prop
 - Hook return types properly defined
@@ -299,41 +317,46 @@ All type definitions are consistent:
 
 ## 📊 Code Statistics
 
-| File | Type | Lines | Purpose |
-|------|------|-------|---------|
-| `useRecentlyViewedCharts.ts` | Hook | 38 | State management |
-| `RecentlyViewedList.tsx` | Component | 42 | UI display |
-| `SavedChartCard.tsx` | Component | +8 | Click tracking |
-| `SavedChartsList.tsx` | Component | +10 | Integration |
-| `useRecentlyViewedCharts.test.ts` | Tests | 155 | 7 test cases |
-| **Total** | **5 files** | **253** | **Complete feature** |
+| File                              | Type        | Lines   | Purpose              |
+| --------------------------------- | ----------- | ------- | -------------------- |
+| `useRecentlyViewedCharts.ts`      | Hook        | 38      | State management     |
+| `RecentlyViewedList.tsx`          | Component   | 42      | UI display           |
+| `SavedChartCard.tsx`              | Component   | +8      | Click tracking       |
+| `SavedChartsList.tsx`             | Component   | +10     | Integration          |
+| `useRecentlyViewedCharts.test.ts` | Tests       | 155     | 7 test cases         |
+| **Total**                         | **5 files** | **253** | **Complete feature** |
 
 ---
 
 ## ✨ Key Features
 
 ### 1. Zero Database Impact
+
 - No new tables
 - No new columns
 - No API changes
 - Pure client-side state
 
 ### 2. Smart Duplicate Handling
+
 - Re-clicking a chart moves it to the front
 - Always maintains unique list
 - No visual glitches
 
 ### 3. Automatic Limiting
+
 - Always shows max 3 charts
 - Oldest chart automatically removed when limit exceeded
 - Smooth user experience
 
 ### 4. Conditional Rendering
+
 - Section only appears after first click
 - Clean UI when no charts viewed yet
 - No wasted space
 
 ### 5. Reusable Components
+
 - Uses existing SavedChartCard
 - Consistent styling
 - DRY principle maintained
@@ -342,14 +365,14 @@ All type definitions are consistent:
 
 ## 🛡️ Edge Cases Handled
 
-| Scenario | Behavior |
-|----------|----------|
-| No charts clicked yet | Section hidden |
-| Same chart clicked twice | Moved to front, no duplicate |
-| Same chart clicked 3 times | Only appears once |
-| 4 charts clicked | Oldest removed, newest at front |
-| Page refresh | List clears (session-based) |
-| Empty charts list | Component still works |
+| Scenario                   | Behavior                        |
+| -------------------------- | ------------------------------- |
+| No charts clicked yet      | Section hidden                  |
+| Same chart clicked twice   | Moved to front, no duplicate    |
+| Same chart clicked 3 times | Only appears once               |
+| 4 charts clicked           | Oldest removed, newest at front |
+| Page refresh               | List clears (session-based)     |
+| Empty charts list          | Component still works           |
 
 ---
 
@@ -392,16 +415,20 @@ All type definitions are consistent:
 ## 📚 Related Files
 
 **Hooks**:
+
 - `hooks/useRecentlyViewedCharts.ts` - State management
 - `hooks/useSavedCharts.ts` - Main charts list
 
 **Components**:
+
 - `components/saved-charts/RecentlyViewedList.tsx` - Recently viewed section
 - `components/saved-charts/SavedChartsList.tsx` - Main list page
 - `components/saved-charts/SavedChartCard.tsx` - Individual card
 
 **Tests**:
+
 - `__tests__/hooks/useRecentlyViewedCharts.test.ts` - Hook tests (7 cases)
 
 **Types**:
+
 - `types/savedChart.types.ts` - SavedChartListItem interface

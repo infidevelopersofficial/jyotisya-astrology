@@ -7,7 +7,7 @@ const SUPPORTED_LOCALES = ["en", "hi", "ta"] as const satisfies readonly LocaleC
 const querySchema = z.object({
   date: z.string().optional(),
   timezone: z.string().default("Asia/Kolkata"),
-  locale: z.enum(SUPPORTED_LOCALES).default("en")
+  locale: z.enum(SUPPORTED_LOCALES).default("en"),
 });
 
 // eslint-disable-next-line complexity, max-lines-per-function
@@ -20,9 +20,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       {
         error: "invalid_request",
         message: "Invalid Panchang query parameters",
-        details: parsed.error.flatten().fieldErrors
+        details: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -33,30 +33,30 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const result = await provider.getPanchang({
       date,
       timezone,
-      locale
+      locale,
     });
 
     return NextResponse.json({
       source: result.source,
       metadata: result.metadata,
-      panchang: result.details
+      panchang: result.details,
     });
   } catch (error: unknown) {
     // Log detailed error information to server console
     console.error("[api/panchang/today] provider failure", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      params: { date, timezone, locale }
+      params: { date, timezone, locale },
     });
 
     // Extract detailed error information
     const errorDetails: Record<string, unknown> = {
       type: error instanceof Error ? error.constructor.name : typeof error,
-      message: error instanceof Error ? error.message : String(error)
+      message: error instanceof Error ? error.message : String(error),
     };
 
     // Check if it's a fetch error with response
-    if (error && typeof error === 'object' && 'cause' in error) {
+    if (error && typeof error === "object" && "cause" in error) {
       errorDetails.cause = error.cause;
     }
 
@@ -64,9 +64,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       {
         ok: false,
         message: "Upstream astrology API error",
-        details: errorDetails
+        details: errorDetails,
       },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }

@@ -11,6 +11,7 @@ All Phase 1 MVP critical path features have been successfully implemented and ar
 ### 1. **Save Chart to Account** (Commit 1)
 
 #### API Endpoint Created
+
 **File:** `apps/web/app/api/user/kundli/route.ts`
 
 - ✅ **POST /api/user/kundli** - Save chart to user account
@@ -18,6 +19,7 @@ All Phase 1 MVP critical path features have been successfully implemented and ar
 - ✅ **DELETE /api/user/kundli?id={kundliId}** - Delete chart
 
 **Features:**
+
 - Full validation with Zod schema
 - User authentication check
 - Ownership verification for delete operations
@@ -25,7 +27,9 @@ All Phase 1 MVP critical path features have been successfully implemented and ar
 - Returns chart ID and metadata on success
 
 #### Database Integration
+
 Uses existing `Kundli` model from Prisma schema:
+
 - Stores: name, birthDate, birthTime, birthPlace, coordinates, timezone, chartData (JSON)
 - Linked to user via `userId` foreign key
 - Supports public/private charts
@@ -38,6 +42,7 @@ Uses existing `Kundli` model from Prisma schema:
 **File:** `apps/web/components/astrology/birth-chart-generator-v2.tsx`
 
 #### Added Chart Name Field
+
 ```tsx
 <input
   type="text"
@@ -48,6 +53,7 @@ Uses existing `Kundli` model from Prisma schema:
 ```
 
 **Features:**
+
 - Optional chart name input in Step 1 form
 - Auto-generates fallback: `"Birth Chart - 15 Jan 2025"`
 - Helpful placeholder text
@@ -85,6 +91,7 @@ Added `💾 Save` button alongside download buttons:
 ```
 
 **Features:**
+
 - Green gradient button (distinct from download buttons)
 - Loading state with spinner
 - Success state with checkmark (5-second display)
@@ -96,15 +103,18 @@ Added `💾 Save` button alongside download buttons:
 ### 4. **Enhanced My Kundlis Page** (Commit 3)
 
 **Files Created:**
+
 - `apps/web/components/kundli/kundli-card.tsx` - Individual chart card component
 - `apps/web/components/kundli/kundlis-grid.tsx` - Grid wrapper with state management
 
 **File Updated:**
+
 - `apps/web/app/my-kundlis/page.tsx` - Integrated new components
 
 #### New Features:
 
 **Chart Cards Display:**
+
 - Chart name with birth date
 - Birth time and place details
 - Ascendant degree (if available)
@@ -119,6 +129,7 @@ Added `💾 Save` button alongside download buttons:
 | **Delete** | Remove chart (with confirmation) | 🗑️ |
 
 **UI Enhancements:**
+
 - Responsive grid layout (1/2/3 columns)
 - Hover effects on cards
 - Color-coded ascendant info
@@ -132,20 +143,23 @@ Added `💾 Save` button alongside download buttons:
 **File Created:** `apps/web/lib/analytics/events.ts`
 
 #### Event Tracking Functions:
+
 ```typescript
-trackChartGenerated()      // When chart is generated
-trackChartSaved()          // When chart is saved
-trackChartDownloadedPNG()  // PNG download
-trackChartDownloadedPDF()  // PDF download
-trackChartShared()         // Share link copied
-trackChartDeleted()        // Chart deleted
+trackChartGenerated(); // When chart is generated
+trackChartSaved(); // When chart is saved
+trackChartDownloadedPNG(); // PNG download
+trackChartDownloadedPDF(); // PDF download
+trackChartShared(); // Share link copied
+trackChartDeleted(); // Chart deleted
 ```
 
 #### Integration Points:
+
 1. **Birth Chart Generator** - Tracks generation, save, downloads, share
 2. **Kundli Card** - Tracks delete and share actions
 
 #### Analytics Support:
+
 - ✅ Console logging in development
 - ✅ Posthog integration (if installed)
 - ✅ Google Analytics integration (if installed)
@@ -153,6 +167,7 @@ trackChartDeleted()        // Chart deleted
 - ✅ Error-safe implementation (won't break app)
 
 **Event Properties Tracked:**
+
 - Chart name (auto-generated or custom)
 - Chart type (D1, D9, D10, etc.)
 - Location & timezone
@@ -167,6 +182,7 @@ trackChartDeleted()        // Chart deleted
 **Status:** ✅ Already implemented and integrated with Sentry
 
 **Features:**
+
 - Catches React errors gracefully
 - Displays user-friendly fallback UI
 - Logs to Sentry automatically
@@ -181,12 +197,14 @@ trackChartDeleted()        // Chart deleted
 ## 📊 Summary of Changes
 
 ### Files Created (New)
+
 1. `apps/web/app/api/user/kundli/route.ts` - API endpoints
 2. `apps/web/components/kundli/kundli-card.tsx` - Chart card component
 3. `apps/web/components/kundli/kundlis-grid.tsx` - Grid wrapper
 4. `apps/web/lib/analytics/events.ts` - Analytics tracking
 
 ### Files Modified (Enhanced)
+
 5. `apps/web/components/astrology/birth-chart-generator-v2.tsx`
    - Added chart name field
    - Added save button and handler
@@ -201,6 +219,7 @@ trackChartDeleted()        // Chart deleted
    - Added `jspdf: ^2.5.2`
 
 ### Files Verified (No Changes Needed)
+
 8. `apps/web/components/error-boundary.tsx` - Already production-ready
 
 ---
@@ -208,6 +227,7 @@ trackChartDeleted()        // Chart deleted
 ## 🧪 Testing Checklist
 
 ### 1. Chart Generation & Save
+
 - [ ] Generate a birth chart
 - [ ] Leave chart name empty (verify auto-generated name)
 - [ ] Enter custom chart name
@@ -216,6 +236,7 @@ trackChartDeleted()        // Chart deleted
 - [ ] Check "Saved!" state appears for 5 seconds
 
 ### 2. My Kundlis Page
+
 - [ ] Navigate to `/my-kundlis`
 - [ ] Verify saved chart appears
 - [ ] Check chart name, date, time, location display correctly
@@ -226,6 +247,7 @@ trackChartDeleted()        // Chart deleted
 - [ ] Verify chart removed from grid without page refresh
 
 ### 3. Multiple Charts
+
 - [ ] Create 3 different charts with different names
 - [ ] Verify all appear in grid
 - [ ] Verify sorting (newest first)
@@ -233,12 +255,14 @@ trackChartDeleted()        // Chart deleted
 - [ ] Verify other 2 remain
 
 ### 4. Download Features (Existing)
+
 - [ ] Generate chart
 - [ ] Download as PNG - verify includes chart name
 - [ ] Download as PDF - verify includes birth details
 - [ ] Verify downloads work after saving
 
 ### 5. Analytics Tracking
+
 - [ ] Open browser console
 - [ ] Generate chart - verify `[Analytics] chart_generated` log
 - [ ] Save chart - verify `[Analytics] chart_saved` log
@@ -248,6 +272,7 @@ trackChartDeleted()        // Chart deleted
 - [ ] Delete chart - verify `[Analytics] chart_deleted` log
 
 ### 6. Error Handling
+
 - [ ] Disconnect internet, try to save chart
 - [ ] Verify error alert appears
 - [ ] Verify app doesn't crash
@@ -255,6 +280,7 @@ trackChartDeleted()        // Chart deleted
 - [ ] Verify success
 
 ### 7. Mobile Responsive
+
 - [ ] Test on mobile viewport (375px width)
 - [ ] Verify chart name input is full-width
 - [ ] Verify save button wraps to new line if needed
@@ -266,7 +292,9 @@ trackChartDeleted()        // Chart deleted
 ## 🚀 Launch Readiness
 
 ### ✅ Phase 1 MVP Complete
+
 All critical path features implemented:
+
 - ✅ Save chart to account
 - ✅ Chart naming
 - ✅ Enhanced My Kundlis page
@@ -278,23 +306,28 @@ All critical path features implemented:
 ### ⚠️ Before Launch (Remaining Items)
 
 #### 1. Install npm packages
+
 ```bash
 cd apps/web
 yarn install
 ```
+
 This will install `html2canvas` and `jspdf` added to package.json.
 
 #### 2. Upgrade API Tier (BLOCKER)
+
 **Current:** FreeAstrologyAPI.com free tier (50 req/day)
 **Needed:** Paid tier - $9/month (500 req/day) or $29/month (2000 req/day)
 
 **Steps:**
+
 1. Visit https://freeastrologyapi.com/pricing
 2. Upgrade to Basic or Pro tier
 3. Get new API key
 4. Update `JYOTISH_API_KEY` in `.env.local`
 
 #### 3. Test Cross-Browser (1 hour)
+
 - [ ] Chrome/Edge (Chromium)
 - [ ] Firefox
 - [ ] Safari (macOS)
@@ -302,6 +335,7 @@ This will install `html2canvas` and `jspdf` added to package.json.
 - [ ] Chrome (Android)
 
 #### 4. Deploy to Staging/Production
+
 ```bash
 # Run build to catch any TypeScript errors
 npm run build
@@ -313,7 +347,9 @@ npm run deploy
 ```
 
 #### 5. Set Up Analytics (Optional)
+
 If you want full Posthog or Google Analytics:
+
 ```bash
 # Install Posthog
 yarn add posthog-js
@@ -329,14 +365,14 @@ posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY)
 
 ### Metrics to Track (First Week)
 
-| Metric | Target | How to Measure |
-|--------|--------|----------------|
-| Chart generation success rate | >95% | Analytics events |
-| Save vs Download ratio | Track trend | Compare counts |
-| Charts saved per user | Avg 1.5+ | Database queries |
-| Delete rate | <10% | Analytics events |
-| Share link usage | Track adoption | Analytics events |
-| API errors | <1% | Sentry + logs |
+| Metric                        | Target         | How to Measure   |
+| ----------------------------- | -------------- | ---------------- |
+| Chart generation success rate | >95%           | Analytics events |
+| Save vs Download ratio        | Track trend    | Compare counts   |
+| Charts saved per user         | Avg 1.5+       | Database queries |
+| Delete rate                   | <10%           | Analytics events |
+| Share link usage              | Track adoption | Analytics events |
+| API errors                    | <1%            | Sentry + logs    |
 
 ### Key Analytics Queries
 
@@ -369,13 +405,16 @@ LIMIT 10;
 ## 🐛 Known Limitations & Future Enhancements
 
 ### Current Limitations
+
 1. **No chart editing** - Users must delete and recreate
 2. **No bulk operations** - Delete one at a time
 3. **No chart privacy toggle** - All charts private by default
 4. **No chart search/filter** - Only shows all in chronological order
 
 ### Phase 1.5 Enhancements (Post-Launch)
+
 Based on user feedback, consider adding:
+
 - Chart editing (rename, update birth time)
 - Recent charts history (last 3 on dashboard)
 - Chart thumbnails/previews
@@ -457,17 +496,20 @@ Related to: MVP Phase 1 features"
 ### Troubleshooting
 
 **Issue: "Failed to save chart"**
+
 - Check browser console for error details
 - Verify user is authenticated
 - Check database connection
 - Verify Prisma schema is synced
 
 **Issue: Analytics not tracking**
+
 - Check browser console for `[Analytics]` logs
 - Verify `trackEvent` function is imported
 - Events only appear in production for Posthog/GA
 
 **Issue: Charts not appearing in My Kundlis**
+
 - Verify chart was saved successfully (check success alert)
 - Refresh page to re-fetch from database
 - Check `userId` matches between Supabase and Prisma

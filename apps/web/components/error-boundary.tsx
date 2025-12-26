@@ -1,18 +1,18 @@
-'use client'
+"use client";
 
-import React, { Component, ErrorInfo, ReactNode } from 'react'
-import { captureException } from '@/lib/monitoring/sentry'
-import { logger } from '@/lib/monitoring/logger'
+import React, { Component, ErrorInfo, ReactNode } from "react";
+import { captureException } from "@/lib/monitoring/sentry";
+import { logger } from "@/lib/monitoring/logger";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
-  onError?: (error: Error, errorInfo: ErrorInfo) => void
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
+  hasError: boolean;
+  error: Error | null;
 }
 
 /**
@@ -26,53 +26,53 @@ interface State {
  */
 export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
+    super(props);
     this.state = {
       hasError: false,
       error: null,
-    }
+    };
   }
 
   static getDerivedStateFromError(error: Error): State {
     return {
       hasError: true,
       error,
-    }
+    };
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log to console in development
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error Boundary caught an error:', error, errorInfo)
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error Boundary caught an error:", error, errorInfo);
     }
 
     // Log to monitoring services
-    logger.error('React Error Boundary', error, {
+    logger.error("React Error Boundary", error, {
       componentStack: errorInfo.componentStack,
       errorBoundary: true,
-    })
+    });
 
     captureException(error, {
       componentStack: errorInfo.componentStack,
       errorBoundary: true,
-    })
+    });
 
     // Call custom error handler if provided
-    this.props.onError?.(error, errorInfo)
+    this.props.onError?.(error, errorInfo);
   }
 
   handleReset = () => {
     this.setState({
       hasError: false,
       error: null,
-    })
-  }
+    });
+  };
 
   override render() {
     if (this.state.hasError) {
       // Custom fallback UI
       if (this.props.fallback) {
-        return this.props.fallback
+        return this.props.fallback;
       }
 
       // Default fallback UI
@@ -95,12 +95,10 @@ export class ErrorBoundary extends Component<Props, State> {
               </svg>
             </div>
 
-            <h1 className="mb-2 text-2xl font-bold text-gray-900">
-              Something went wrong
-            </h1>
+            <h1 className="mb-2 text-2xl font-bold text-gray-900">Something went wrong</h1>
 
             <p className="mb-6 text-gray-600">
-              {this.state.error?.message || 'An unexpected error occurred'}
+              {this.state.error?.message || "An unexpected error occurred"}
             </p>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -119,7 +117,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </a>
             </div>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <details className="mt-8 text-left">
                 <summary className="cursor-pointer font-semibold text-gray-700">
                   Error Details (Dev Only)
@@ -131,10 +129,10 @@ export class ErrorBoundary extends Component<Props, State> {
             )}
           </div>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
@@ -147,9 +145,7 @@ export function AsyncErrorBoundary({ children }: { children: ReactNode }) {
       fallback={
         <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <p className="text-lg font-semibold text-gray-900">
-              Failed to load content
-            </p>
+            <p className="text-lg font-semibold text-gray-900">Failed to load content</p>
             <p className="mt-2 text-gray-600">Please try again later</p>
           </div>
         </div>
@@ -157,5 +153,5 @@ export function AsyncErrorBoundary({ children }: { children: ReactNode }) {
     >
       {children}
     </ErrorBoundary>
-  )
+  );
 }

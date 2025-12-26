@@ -7,22 +7,25 @@ const TESTIMONIALS = [
     city: "Lucknow",
     quote:
       "The Kundli insights and muhurat alerts helped us plan our daughter’s wedding flawlessly. Jyotishya feels like our family pandit online!",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80"
+    avatar:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=200&q=80",
   },
   {
     name: "Akash Mehra",
     city: "Bengaluru",
     quote:
       "Daily rashifal in Hindi and the loyalty rewards on gemstone purchases are unmatched. Consultations are seamless even late night.",
-    avatar: "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80"
+    avatar:
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80",
   },
   {
     name: "Priya Iyer",
     city: "Chennai",
     quote:
       "Loved the Tamil remedies suggested by the astrologer. The experience felt respectful of traditions yet super modern.",
-    avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80"
-  }
+    avatar:
+      "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=200&q=80",
+  },
 ];
 
 export default function TestimonialsSection(): React.ReactElement {

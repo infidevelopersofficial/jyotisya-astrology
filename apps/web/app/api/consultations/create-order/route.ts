@@ -1,55 +1,55 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db/prisma'
-import { createRazorpayOrder } from '@/lib/payments/razorpay'
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { createRazorpayOrder } from "@/lib/payments/razorpay";
 
 // Force dynamic rendering for this API route
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 interface RequestBody {
-  astrologerId: string
-  scheduledAt: string
-  duration: number
+  astrologerId: string;
+  scheduledAt: string;
+  duration: number;
 }
 
 function isValidRequestBody(body: unknown): body is RequestBody {
-  if (typeof body !== 'object' || body === null) return false
-  const candidate = body as Record<string, unknown>
+  if (typeof body !== "object" || body === null) return false;
+  const candidate = body as Record<string, unknown>;
   return (
-    typeof candidate.astrologerId === 'string' &&
-    typeof candidate.scheduledAt === 'string' &&
-    typeof candidate.duration === 'number' &&
+    typeof candidate.astrologerId === "string" &&
+    typeof candidate.scheduledAt === "string" &&
+    typeof candidate.duration === "number" &&
     candidate.duration > 0
-  )
+  );
 }
 
-async function validateUser(email?: string, phone?: string): Promise<{
-  id: string
-  name: string | null
-  email: string | null
-  phone: string | null
+async function validateUser(
+  email?: string,
+  phone?: string,
+): Promise<{
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
 } | null> {
   return await prisma.user.findFirst({
     where: {
-      OR: [
-        { email: email || undefined },
-        { phone: phone || undefined },
-      ]
+      OR: [{ email: email || undefined }, { phone: phone || undefined }],
     },
     select: {
       id: true,
       name: true,
       email: true,
       phone: true,
-    }
-  })
+    },
+  });
 }
 
 async function getAstrologer(astrologerId: string): Promise<{
-  id: string
-  name: string
-  hourlyRate: number
-  available: boolean
+  id: string;
+  name: string;
+  hourlyRate: number;
+  available: boolean;
 } | null> {
   return await prisma.astrologer.findUnique({
     where: { id: astrologerId },
@@ -58,12 +58,12 @@ async function getAstrologer(astrologerId: string): Promise<{
       name: true,
       hourlyRate: true,
       available: true,
-    }
-  })
+    },
+  });
 }
 
 function calculateAmount(hourlyRate: number, duration: number): number {
-  return Math.ceil((hourlyRate / 60) * duration)
+  return Math.ceil((hourlyRate / 60) * duration);
 }
 
 /**
@@ -79,86 +79,77 @@ function calculateAmount(hourlyRate: number, duration: number): number {
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Please sign in first.' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized. Please sign in first." }, { status: 401 });
     }
 
     // Find user in database
-    const dbUser = await validateUser(user.email, user.phone)
+    const dbUser = await validateUser(user.email, user.phone);
 
     if (!dbUser) {
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "User not found in database" }, { status: 404 });
     }
 
     // Parse and validate request body
-    const body: unknown = await request.json()
+    const body: unknown = await request.json();
 
     if (!isValidRequestBody(body)) {
       return NextResponse.json(
         {
-          error: 'Invalid request body',
+          error: "Invalid request body",
           required: {
-            astrologerId: 'string',
-            scheduledAt: 'ISO datetime string',
-            duration: 'positive number (minutes)'
-          }
+            astrologerId: "string",
+            scheduledAt: "ISO datetime string",
+            duration: "positive number (minutes)",
+          },
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    const { astrologerId, scheduledAt, duration } = body
+    const { astrologerId, scheduledAt, duration } = body;
 
     // Validate datetime format
-    const scheduledDate = new Date(scheduledAt)
+    const scheduledDate = new Date(scheduledAt);
     if (isNaN(scheduledDate.getTime())) {
       return NextResponse.json(
-        { error: 'Invalid scheduledAt format. Must be a valid ISO datetime.' },
-        { status: 400 }
-      )
+        { error: "Invalid scheduledAt format. Must be a valid ISO datetime." },
+        { status: 400 },
+      );
     }
 
     // Check if scheduled time is in the future
     if (scheduledDate <= new Date()) {
-      return NextResponse.json(
-        { error: 'Scheduled time must be in the future.' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Scheduled time must be in the future." }, { status: 400 });
     }
 
     // Fetch astrologer details
-    const astrologer = await getAstrologer(astrologerId)
+    const astrologer = await getAstrologer(astrologerId);
 
     if (!astrologer) {
-      return NextResponse.json(
-        { error: 'Astrologer not found.' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Astrologer not found." }, { status: 404 });
     }
 
     if (!astrologer.available) {
       return NextResponse.json(
-        { error: 'This astrologer is currently unavailable.' },
-        { status: 400 }
-      )
+        { error: "This astrologer is currently unavailable." },
+        { status: 400 },
+      );
     }
 
     // Calculate amount based on hourly rate and duration
-    const amountInRupees = calculateAmount(astrologer.hourlyRate, duration)
+    const amountInRupees = calculateAmount(astrologer.hourlyRate, duration);
 
     // Create Razorpay order
     const razorpayOrder = await createRazorpayOrder({
       amount: amountInRupees,
-      currency: 'INR',
+      currency: "INR",
       receipt: `consultation_${Date.now()}`,
       notes: {
         userId: dbUser.id,
@@ -166,8 +157,8 @@ export async function POST(request: Request): Promise<NextResponse> {
         astrologerName: astrologer.name,
         scheduledAt: scheduledDate.toISOString(),
         duration: duration.toString(),
-      }
-    })
+      },
+    });
 
     // Create consultation record in database with PENDING payment status
     const consultation = await prisma.consultation.create({
@@ -177,9 +168,9 @@ export async function POST(request: Request): Promise<NextResponse> {
         scheduledAt: scheduledDate,
         duration,
         amount: amountInRupees,
-        paymentStatus: 'PENDING',
+        paymentStatus: "PENDING",
         paymentId: razorpayOrder.id,
-        status: 'SCHEDULED',
+        status: "SCHEDULED",
       },
       include: {
         astrologer: {
@@ -189,15 +180,15 @@ export async function POST(request: Request): Promise<NextResponse> {
             imageUrl: true,
             specialization: true,
             languages: true,
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Consultation order created successfully',
+        message: "Consultation order created successfully",
         consultation: {
           id: consultation.id,
           scheduledAt: consultation.scheduledAt,
@@ -209,19 +200,19 @@ export async function POST(request: Request): Promise<NextResponse> {
           orderId: razorpayOrder.id,
           amount: razorpayOrder.amount,
           currency: razorpayOrder.currency,
-        }
+        },
       },
-      { status: 201 }
-    )
+      { status: 201 },
+    );
   } catch (error: unknown) {
-    console.error('Consultation order creation error:', error)
+    console.error("Consultation order creation error:", error);
 
     return NextResponse.json(
       {
-        error: 'Failed to create consultation order',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to create consultation order",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,18 +1,18 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client'
+"use client";
 
-import type { BirthData } from '@/types/astrology/birthChart.types'
-import DateTimePicker from '../datetime-picker'
-import LocationPicker from '../location-picker'
+import type { BirthData } from "@/types/astrology/birthChart.types";
+import DateTimePicker from "../datetime-picker";
+import LocationPicker from "../location-picker";
 
 interface BirthChartFormProps {
-  birthData: BirthData
-  setBirthData: (data: BirthData) => void
-  loading: boolean
-  error: string | null
-  showHelp: boolean
-  onGenerate: () => void
-  onDismissError: () => void
+  birthData: BirthData;
+  setBirthData: (data: BirthData) => void;
+  loading: boolean;
+  error: string | null;
+  showHelp: boolean;
+  onGenerate: () => void;
+  onDismissError: () => void;
 }
 
 export default function BirthChartForm({
@@ -64,9 +64,7 @@ export default function BirthChartForm({
             <input
               type="text"
               value={birthData.chartName}
-              onChange={(e) =>
-                setBirthData({ ...birthData, chartName: e.target.value })
-              }
+              onChange={(e) => setBirthData({ ...birthData, chartName: e.target.value })}
               placeholder="e.g., My Birth Chart or Rahul's Kundli"
               className="w-full rounded-xl border border-white/20 bg-white/5 px-4 py-3.5 text-white placeholder:text-slate-500 transition-all focus:border-orange-400 focus:bg-white/10 focus:outline-none focus:ring-2 focus:ring-orange-400/30"
             />
@@ -80,9 +78,7 @@ export default function BirthChartForm({
           {/* Date & Time Picker */}
           <DateTimePicker
             value={birthData.dateTime}
-            onChange={(isoDatetime) =>
-              setBirthData({ ...birthData, dateTime: isoDatetime })
-            }
+            onChange={(isoDatetime) => setBirthData({ ...birthData, dateTime: isoDatetime })}
             showHelp={showHelp}
           />
 
@@ -139,9 +135,7 @@ export default function BirthChartForm({
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2.5">
-                  <span className="text-xl transition-transform group-hover:scale-110">
-                    ✨
-                  </span>
+                  <span className="text-xl transition-transform group-hover:scale-110">✨</span>
                   <span>Generate My Birth Chart</span>
                 </span>
               )}
@@ -155,5 +149,5 @@ export default function BirthChartForm({
         </div>
       </div>
     </div>
-  )
+  );
 }

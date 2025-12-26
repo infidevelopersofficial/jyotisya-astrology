@@ -12,6 +12,7 @@ yarn install
 ```
 
 This will install:
+
 - `husky` - Git hooks manager
 - `lint-staged` - Run linters on staged files only
 - Updated ESLint and TypeScript configs
@@ -150,6 +151,7 @@ git commit -m "Test commit"
   4. Add fixes back to staging area
 
 **Example output:**
+
 ```bash
 $ git commit -m "Add feature"
 
@@ -171,6 +173,7 @@ $ git commit -m "Add feature"
   3. Prettier format check (no auto-fix)
 
 **Example output:**
+
 ```bash
 $ git push origin main
 
@@ -197,6 +200,7 @@ Based on the codebase analysis, here are issues you'll need to fix:
 ### 1. Files Exceeding Line Limits
 
 **Files over 400 lines:**
+
 - `apps/web/components/astrology/birth-chart-generator-v2.tsx` (1113 lines)
 - `apps/web/components/astrology/birth-chart-generator-v3.tsx` (993 lines)
 - `apps/web/components/astrology/birth-chart-generator.tsx` (518 lines)
@@ -205,6 +209,7 @@ Based on the codebase analysis, here are issues you'll need to fix:
 **How to fix:** Refactor large components into smaller pieces.
 
 **Example for birth-chart-generator:**
+
 ```typescript
 // Split into:
 // - birth-chart-form.tsx (form UI + inputs)
@@ -234,12 +239,14 @@ const value = arr[0] ?? defaultValue;
 
 ```typescript
 // Unused parameters
-function handler(event) { // Error: 'event' is unused
+function handler(event) {
+  // Error: 'event' is unused
   doSomething();
 }
 
 // Fix:
-function handler(_event) { // Prefix with underscore
+function handler(_event) {
+  // Prefix with underscore
   doSomething();
 }
 ```
@@ -250,15 +257,15 @@ function handler(_event) { // Prefix with underscore
 
 ```typescript
 // ❌ Blocked
-console.log('User data:', user);
+console.log("User data:", user);
 
 // ✅ Allowed
-console.warn('Unexpected response:', response);
-console.error('Failed to fetch:', error);
+console.warn("Unexpected response:", response);
+console.error("Failed to fetch:", error);
 
 // ✅ Or conditional
-if (process.env.NODE_ENV === 'development') {
-  console.log('Debug:', data);
+if (process.env.NODE_ENV === "development") {
+  console.log("Debug:", data);
 }
 ```
 
@@ -280,13 +287,12 @@ yarn lint        # See lint errors
 1. **Temporarily disable strict rules for existing files:**
 
 Create `legacy-overrides.json`:
+
 ```json
 {
   "overrides": [
     {
-      "files": [
-        "apps/web/components/astrology/birth-chart-generator*.tsx"
-      ],
+      "files": ["apps/web/components/astrology/birth-chart-generator*.tsx"],
       "rules": {
         "max-lines": "off",
         "complexity": "off"
@@ -336,29 +342,22 @@ yarn type-check
 ### VS Code Setup (Highly Recommended)
 
 Install extensions:
+
 ```json
 {
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
-    "usernamehw.errorlens"
-  ]
+  "recommendations": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode", "usernamehw.errorlens"]
 }
 ```
 
 Configure workspace settings (`.vscode/settings.json`):
+
 ```json
 {
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": true
   },
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
-  ],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true
 }
@@ -404,6 +403,7 @@ You'll know the setup is working when:
 **Common Questions:**
 
 **Q: Hooks aren't running?**
+
 ```bash
 yarn prepare
 chmod +x .husky/pre-commit .husky/pre-push

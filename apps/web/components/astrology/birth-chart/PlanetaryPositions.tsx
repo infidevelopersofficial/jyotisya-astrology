@@ -1,15 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client'
+"use client";
 
-import type { Planet } from '@/types/astrology/birthChart.types'
-import { formatDegree, isRetrograde } from '@/services/astrology/birthChartService'
-import { planetMeanings, signMeanings } from '@/constants/astrology/meanings'
+import type { Planet } from "@/types/astrology/birthChart.types";
+import { formatDegree, isRetrograde } from "@/services/astrology/birthChartService";
+import { planetMeanings, signMeanings } from "@/constants/astrology/meanings";
 
 interface PlanetaryPositionsProps {
-  planets: Planet[]
-  showHelp: boolean
-  expandedPlanet: string | null
-  onTogglePlanet: (planetName: string) => void
+  planets: Planet[];
+  showHelp: boolean;
+  expandedPlanet: string | null;
+  onTogglePlanet: (planetName: string) => void;
 }
 
 export default function PlanetaryPositions({
@@ -33,10 +33,10 @@ export default function PlanetaryPositions({
 
       <div className="space-y-3">
         {planets.map((planet, idx) => {
-          const meaning = planetMeanings[planet.name]
-          const signInfo = signMeanings[planet.sign || '']
-          const isExpanded = expandedPlanet === planet.name
-          const planetIsRetrograde = isRetrograde(planet.isRetro)
+          const meaning = planetMeanings[planet.name];
+          const signInfo = signMeanings[planet.sign || ""];
+          const isExpanded = expandedPlanet === planet.name;
+          const planetIsRetrograde = isRetrograde(planet.isRetro);
 
           return (
             <div
@@ -52,20 +52,16 @@ export default function PlanetaryPositions({
                     <span className="text-3xl">{meaning?.icon}</span>
                     <div>
                       <p className="font-semibold text-white">{planet.name}</p>
-                      {meaning && (
-                        <p className="text-xs text-slate-400">{meaning.area}</p>
-                      )}
+                      {meaning && <p className="text-xs text-slate-400">{meaning.area}</p>}
                     </div>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div className="text-right">
-                      <p className={`font-semibold ${signInfo?.color || 'text-white'}`}>
+                      <p className={`font-semibold ${signInfo?.color || "text-white"}`}>
                         {planet.sign}
                       </p>
-                      <p className="text-xs text-slate-500">
-                        {formatDegree(planet.normDegree)}
-                      </p>
+                      <p className="text-xs text-slate-500">{formatDegree(planet.normDegree)}</p>
                     </div>
 
                     {planetIsRetrograde && (
@@ -75,7 +71,7 @@ export default function PlanetaryPositions({
                     )}
 
                     <span className="text-slate-400 transition-transform group-hover:translate-x-0.5">
-                      {isExpanded ? '▼' : '▶'}
+                      {isExpanded ? "▼" : "▶"}
                     </span>
                   </div>
                 </div>
@@ -89,9 +85,7 @@ export default function PlanetaryPositions({
                       <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-purple-300">
                         Meaning
                       </p>
-                      <p className="text-sm leading-relaxed text-white">
-                        {meaning.meaning}
-                      </p>
+                      <p className="text-sm leading-relaxed text-white">{meaning.meaning}</p>
                     </div>
 
                     <div>
@@ -109,7 +103,7 @@ export default function PlanetaryPositions({
                       <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-purple-300">
                         House
                       </p>
-                      <p className="text-sm text-white">House {planet.house || '?'}</p>
+                      <p className="text-sm text-white">House {planet.house || "?"}</p>
                     </div>
 
                     {planetIsRetrograde && (
@@ -126,9 +120,9 @@ export default function PlanetaryPositions({
                 </div>
               )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

@@ -11,6 +11,7 @@ Complete integration with [FreeAstrologyAPI.com](https://freeastrologyapi.com) p
 ## Features Integrated
 
 ### ✅ Birth Charts
+
 - D1 Rasi (Main birth chart)
 - 19 Divisional charts (D2-D60)
 - Planetary positions
@@ -18,12 +19,14 @@ Complete integration with [FreeAstrologyAPI.com](https://freeastrologyapi.com) p
 - Nakshatra information
 
 ### ✅ Chart Visualizations
+
 - SVG code generation
 - South Indian & North Indian styles
 - All divisional charts (D2-D60)
 - Customizable Ayanamsha
 
 ### ✅ Panchang (Vedic Calendar)
+
 - Sunrise/Sunset timings
 - Tithi, Nakshatra, Yoga, Karana
 - Rahu Kalam, Yamakanta, Gulika
@@ -31,12 +34,14 @@ Complete integration with [FreeAstrologyAPI.com](https://freeastrologyapi.com) p
 - Lunar month data
 
 ### ✅ Compatibility
+
 - Ashtakoot matching
 - 8-point compatibility analysis
 - Match percentage
 - Detailed attribute scores
 
 ### ⏳ Coming Soon
+
 - Dasa periods (Vimsottari)
 - Planetary strength (Shad Bala)
 - Western astrology natal charts
@@ -52,16 +57,18 @@ Complete integration with [FreeAstrologyAPI.com](https://freeastrologyapi.com) p
 Get complete birth chart with planetary positions.
 
 **Request**:
+
 ```json
 {
   "dateTime": "1990-01-15T10:30:00",
   "latitude": 28.6139,
-  "longitude": 77.2090,
+  "longitude": 77.209,
   "timezone": 5.5
 }
 ```
 
 **Response**:
+
 ```json
 {
   "data": {
@@ -78,7 +85,9 @@ Get complete birth chart with planetary positions.
       }
       // ... more planets
     ],
-    "houses": [ /* house data */ ]
+    "houses": [
+      /* house data */
+    ]
   },
   "cached_at": "2025-12-03T15:00:00.000Z",
   "expires_at": "2025-12-04T15:00:00.000Z",
@@ -97,17 +106,19 @@ Get complete birth chart with planetary positions.
 Get birth chart as SVG code for visualization.
 
 **Request**:
+
 ```json
 {
   "dateTime": "1990-01-15T10:30:00",
   "latitude": 28.6139,
-  "longitude": 77.2090,
+  "longitude": 77.209,
   "timezone": 5.5,
-  "chartType": "D1"  // Optional: D1, D9, D10, etc.
+  "chartType": "D1" // Optional: D1, D9, D10, etc.
 }
 ```
 
 **Response**:
+
 ```json
 {
   "data": {
@@ -123,6 +134,7 @@ Get birth chart as SVG code for visualization.
 **Cache**: 24 hours
 
 **Supported Chart Types**:
+
 - `D1` - Rasi (Birth chart)
 - `D9` - Navamsa (Marriage/Dharma)
 - `D10` - Dasamsa (Career)
@@ -137,16 +149,18 @@ Get birth chart as SVG code for visualization.
 Get Vedic calendar information for a specific date and location.
 
 **Request**:
+
 ```json
 {
   "date": "2025-12-03",
   "latitude": 28.6139,
-  "longitude": 77.2090,
+  "longitude": 77.209,
   "timezone": 5.5
 }
 ```
 
 **Response**:
+
 ```json
 {
   "data": {
@@ -191,17 +205,18 @@ Get Vedic calendar information for a specific date and location.
 Get Ashtakoot compatibility score between two people.
 
 **Request**:
+
 ```json
 {
   "person1": {
     "dateTime": "1990-01-15T10:30:00",
     "latitude": 28.6139,
-    "longitude": 77.2090,
+    "longitude": 77.209,
     "timezone": 5.5
   },
   "person2": {
     "dateTime": "1992-03-20T14:15:00",
-    "latitude": 19.0760,
+    "latitude": 19.076,
     "longitude": 72.8777,
     "timezone": 5.5
   }
@@ -209,6 +224,7 @@ Get Ashtakoot compatibility score between two people.
 ```
 
 **Response**:
+
 ```json
 {
   "data": {
@@ -250,6 +266,7 @@ Get Ashtakoot compatibility score between two people.
 Check current API usage and rate limit status.
 
 **Response**:
+
 ```json
 {
   "daily_limit": 50,
@@ -268,124 +285,119 @@ Check current API usage and rate limit status.
 
 ```typescript
 // Birth Chart
-const birthChart = await fetch('/api/astrology/birth-chart', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const birthChart = await fetch("/api/astrology/birth-chart", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    dateTime: '1990-01-15T10:30:00',
+    dateTime: "1990-01-15T10:30:00",
     latitude: 28.6139,
-    longitude: 77.2090,
+    longitude: 77.209,
     timezone: 5.5,
   }),
-})
-const data = await birthChart.json()
-console.log(data.data.planets)
+});
+const data = await birthChart.json();
+console.log(data.data.planets);
 
 // Chart SVG
-const chartSVG = await fetch('/api/astrology/chart-svg', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const chartSVG = await fetch("/api/astrology/chart-svg", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    dateTime: '1990-01-15T10:30:00',
+    dateTime: "1990-01-15T10:30:00",
     latitude: 28.6139,
-    longitude: 77.2090,
+    longitude: 77.209,
     timezone: 5.5,
-    chartType: 'D9', // Navamsa chart
+    chartType: "D9", // Navamsa chart
   }),
-})
-const svg = await chartSVG.json()
-document.getElementById('chart').innerHTML = svg.data.svg_code
+});
+const svg = await chartSVG.json();
+document.getElementById("chart").innerHTML = svg.data.svg_code;
 
 // Panchang
-const panchang = await fetch('/api/astrology/panchang', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const panchang = await fetch("/api/astrology/panchang", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    date: '2025-12-03',
+    date: "2025-12-03",
     latitude: 28.6139,
-    longitude: 77.2090,
+    longitude: 77.209,
     timezone: 5.5,
   }),
-})
-const panchangData = await panchang.json()
-console.log(panchangData.data.sunrise, panchangData.data.sunset)
+});
+const panchangData = await panchang.json();
+console.log(panchangData.data.sunrise, panchangData.data.sunset);
 
 // Compatibility
-const compatibility = await fetch('/api/astrology/compatibility', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+const compatibility = await fetch("/api/astrology/compatibility", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
     person1: {
-      dateTime: '1990-01-15T10:30:00',
+      dateTime: "1990-01-15T10:30:00",
       latitude: 28.6139,
-      longitude: 77.2090,
+      longitude: 77.209,
       timezone: 5.5,
     },
     person2: {
-      dateTime: '1992-03-20T14:15:00',
-      latitude: 19.0760,
+      dateTime: "1992-03-20T14:15:00",
+      latitude: 19.076,
       longitude: 72.8777,
       timezone: 5.5,
     },
   }),
-})
-const match = await compatibility.json()
-console.log(`Compatibility: ${match.data.match_percentage}%`)
+});
+const match = await compatibility.json();
+console.log(`Compatibility: ${match.data.match_percentage}%`);
 
 // Rate Limit
-const rateLimitInfo = await fetch('/api/astrology/rate-limit')
-const limits = await rateLimitInfo.json()
-console.log(`Remaining requests today: ${limits.remaining_today}/${limits.daily_limit}`)
+const rateLimitInfo = await fetch("/api/astrology/rate-limit");
+const limits = await rateLimitInfo.json();
+console.log(`Remaining requests today: ${limits.remaining_today}/${limits.daily_limit}`);
 ```
 
 ### React Component Example
 
 ```tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 export function BirthChartViewer() {
-  const [chartSVG, setChartSVG] = useState('')
-  const [loading, setLoading] = useState(false)
+  const [chartSVG, setChartSVG] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const fetchChart = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const response = await fetch('/api/astrology/chart-svg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/chart-svg", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          dateTime: '1990-01-15T10:30:00',
+          dateTime: "1990-01-15T10:30:00",
           latitude: 28.6139,
-          longitude: 77.2090,
+          longitude: 77.209,
           timezone: 5.5,
         }),
-      })
+      });
 
-      const data = await response.json()
-      setChartSVG(data.data.svg_code)
+      const data = await response.json();
+      setChartSVG(data.data.svg_code);
     } catch (error) {
-      console.error('Failed to fetch chart:', error)
+      console.error("Failed to fetch chart:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div>
       <button onClick={fetchChart} disabled={loading}>
-        {loading ? 'Loading...' : 'Generate Birth Chart'}
+        {loading ? "Loading..." : "Generate Birth Chart"}
       </button>
 
-      {chartSVG && (
-        <div
-          className="mt-4"
-          dangerouslySetInnerHTML={{ __html: chartSVG }}
-        />
-      )}
+      {chartSVG && <div className="mt-4" dangerouslySetInnerHTML={{ __html: chartSVG }} />}
     </div>
-  )
+  );
 }
 ```
 
@@ -394,6 +406,7 @@ export function BirthChartViewer() {
 ## Rate Limiting & Caching
 
 ### Free Tier Limits
+
 - **Daily Limit**: 50 requests per day
 - **Resets**: Daily at midnight UTC
 - **Overages**: API returns error when limit exceeded
@@ -402,24 +415,26 @@ export function BirthChartViewer() {
 
 To maximize the 50 requests/day limit, we implement aggressive caching:
 
-| Data Type | Cache Duration | Rationale |
-|-----------|----------------|-----------|
-| Birth Charts | 24 hours | Birth data doesn't change |
-| Divisional Charts | 24 hours | Static calculation |
-| Chart SVGs | 24 hours | Visual doesn't change |
-| Panchang | 6 hours | Daily data, but changes slowly |
-| Compatibility | 24 hours | Static calculation |
-| Dasa/Strength | 24 hours | Birth-based, doesn't change |
+| Data Type         | Cache Duration | Rationale                      |
+| ----------------- | -------------- | ------------------------------ |
+| Birth Charts      | 24 hours       | Birth data doesn't change      |
+| Divisional Charts | 24 hours       | Static calculation             |
+| Chart SVGs        | 24 hours       | Visual doesn't change          |
+| Panchang          | 6 hours        | Daily data, but changes slowly |
+| Compatibility     | 24 hours       | Static calculation             |
+| Dasa/Strength     | 24 hours       | Birth-based, doesn't change    |
 
 ### Cache Key Strategy
 
 Cache keys are generated based on:
+
 - Birth date/time (down to the second)
 - Location coordinates (rounded to 4 decimal places ≈ 11 meters)
 - Timezone
 - Chart configuration (ayanamsha, observation point)
 
 **Example Cache Key**:
+
 ```
 astro:birth-chart:1990-1-15T10:30:0:28.6139:77.2090:5.5:topocentric:lahiri
 ```
@@ -450,6 +465,7 @@ FREE_ASTROLOGY_API_KEY=your_api_key_here
 ### Ayanamsha Options
 
 Supported Ayanamsha systems:
+
 - `lahiri` (default) - Lahiri/Chitrapaksha
 - `raman` - Raman
 - `krishnamurti` - KP System
@@ -476,6 +492,7 @@ All endpoints return consistent error responses:
 ### Common Errors
 
 **400 Bad Request**:
+
 ```json
 {
   "error": "Missing required fields",
@@ -484,6 +501,7 @@ All endpoints return consistent error responses:
 ```
 
 **429 Too Many Requests** (Rate Limit Exceeded):
+
 ```json
 {
   "error": "Daily API rate limit exceeded (50/50). Resets at 2025-12-04T00:00:00.000Z"
@@ -491,6 +509,7 @@ All endpoints return consistent error responses:
 ```
 
 **500 Internal Server Error**:
+
 ```json
 {
   "error": "Failed to fetch birth chart",
@@ -505,11 +524,11 @@ All endpoints return consistent error responses:
 ### 1. Check Rate Limits Before Making Requests
 
 ```typescript
-const { remaining_today } = await fetch('/api/astrology/rate-limit').then(r => r.json())
+const { remaining_today } = await fetch("/api/astrology/rate-limit").then((r) => r.json());
 
 if (remaining_today < 5) {
   // Warn user about low remaining requests
-  console.warn('Low API quota remaining')
+  console.warn("Low API quota remaining");
 }
 ```
 
@@ -524,6 +543,7 @@ If you need multiple charts for the same person, fetch them all at once instead 
 ### 4. Monitor Usage
 
 Set up monitoring for:
+
 - Daily quota usage
 - Cache hit rate
 - API errors
@@ -551,6 +571,7 @@ For production with multiple users:
 **Symptom**: Error "Daily API rate limit exceeded"
 
 **Solutions**:
+
 1. Check cache hit rate: `curl http://localhost:3000/api/metrics | jq '.cache'`
 2. Verify cache is working: Same request twice should hit cache
 3. Wait for daily reset (check `reset_at` in rate limit response)
@@ -561,6 +582,7 @@ For production with multiple users:
 **Symptom**: API requests taking > 5 seconds
 
 **Solutions**:
+
 1. First request is slow (API call), subsequent requests fast (cache)
 2. Check network connectivity to FreeAstrologyAPI.com
 3. Monitor with: `curl -s http://localhost:3000/api/metrics | jq '.slowOperations'`
@@ -570,6 +592,7 @@ For production with multiple users:
 **Symptom**: Error "Invalid latitude/longitude"
 
 **Solutions**:
+
 - Latitude: -90 to 90
 - Longitude: -180 to 180
 - Use decimal degrees (not DMS format)
@@ -591,6 +614,7 @@ FreeAstrologyAPI.com (50 req/day)
 ```
 
 **Files**:
+
 - `lib/astrology/types.ts` - TypeScript types
 - `lib/astrology/client.ts` - Base API client with rate limiting
 - `lib/astrology/cached-client.ts` - Caching wrapper

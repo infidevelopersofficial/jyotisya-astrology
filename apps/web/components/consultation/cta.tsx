@@ -18,27 +18,27 @@ export default function ConsultationCTA(): React.ReactElement {
           fill
           className="pointer-events-none -z-10 object-cover opacity-30"
         />
-          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-            <div className="max-w-2xl">
-              <h2 className="text-3xl font-semibold text-white">{consultation.title}</h2>
-              <p className="mt-2 text-sm text-slate-200">{consultation.description}</p>
-              <ul className="mt-4 grid gap-2 text-xs text-slate-200 md:grid-cols-2">
-                <li>✅ KP, Nadi, Prashna, Tarot specialists</li>
-                <li>✅ Support in हिंदी, English, தமிழ், తెలుగు</li>
-                <li>✅ Audio/Video call recordings available</li>
-                <li>✅ Secure Jyotishya wallet & UPI</li>
-              </ul>
-            </div>
-            <div className="flex gap-4">
-              <Button asChild>
-                <Link href="/consultations">{consultation.explore}</Link>
-              </Button>
-              <Button variant="secondary" asChild>
-                <Link href="/consultations?intent=book">{consultation.book}</Link>
-              </Button>
-            </div>
+        <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="max-w-2xl">
+            <h2 className="text-3xl font-semibold text-white">{consultation.title}</h2>
+            <p className="mt-2 text-sm text-slate-200">{consultation.description}</p>
+            <ul className="mt-4 grid gap-2 text-xs text-slate-200 md:grid-cols-2">
+              <li>✅ KP, Nadi, Prashna, Tarot specialists</li>
+              <li>✅ Support in हिंदी, English, தமிழ், తెలుగు</li>
+              <li>✅ Audio/Video call recordings available</li>
+              <li>✅ Secure Jyotishya wallet & UPI</li>
+            </ul>
+          </div>
+          <div className="flex gap-4">
+            <Button asChild>
+              <Link href="/consultations">{consultation.explore}</Link>
+            </Button>
+            <Button variant="secondary" asChild>
+              <Link href="/consultations?intent=book">{consultation.book}</Link>
+            </Button>
           </div>
         </div>
+      </div>
     </section>
   );
 }

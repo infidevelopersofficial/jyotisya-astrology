@@ -14,7 +14,7 @@ export class MockAuthClient implements AuthClient {
     return {
       userId: "mock-user",
       token: "mock-token",
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     };
   }
 

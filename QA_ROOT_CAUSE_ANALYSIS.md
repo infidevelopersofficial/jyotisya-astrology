@@ -1,4 +1,5 @@
 # ROOT CAUSE ANALYSIS & FIX IMPLEMENTATION PLAN
+
 ## Profile Page Data Persistence Issues - Jyotishya Astrology App
 
 **Date**: 2025-12-17
@@ -11,14 +12,15 @@
 
 ### Issues Reported from QA Testing
 
-| Issue # | Severity | Description | User Impact |
-|---------|----------|-------------|-------------|
-| #1 | 🔴 HIGH | Birth Time not persisting | Shows "Not set" despite being entered |
-| #2 | 🔴 HIGH | Edit form not pre-filling | All fields empty/wrong on edit |
-| #3 | 🟡 MEDIUM | Birth place mismatch | Shows Delhi instead of saved Mumbai |
-| #4 | 🟡 MEDIUM | Astrology system reversed | Shows Vedic instead of saved Western |
+| Issue # | Severity  | Description               | User Impact                           |
+| ------- | --------- | ------------------------- | ------------------------------------- |
+| #1      | 🔴 HIGH   | Birth Time not persisting | Shows "Not set" despite being entered |
+| #2      | 🔴 HIGH   | Edit form not pre-filling | All fields empty/wrong on edit        |
+| #3      | 🟡 MEDIUM | Birth place mismatch      | Shows Delhi instead of saved Mumbai   |
+| #4      | 🟡 MEDIUM | Astrology system reversed | Shows Vedic instead of saved Western  |
 
 **Root Cause Categories:**
+
 1. ✅ **Backend API Issue** - Missing field in GET response
 2. ✅ **Frontend Architecture Issue** - Wrong page used for editing
 3. ✅ **State Management Issue** - Form not hydrated with user data
@@ -30,6 +32,7 @@
 ### **ISSUE #1: Birth Time Shows "Not set"**
 
 #### Evidence from QA Report
+
 - User entered: "02:02 AM"
 - Profile shows: "Not set"
 - Database: **Likely saved correctly** (backend validates and saves)
@@ -43,21 +46,24 @@
 ```typescript
 // ❌ CURRENT CODE (Line 362-370)
 const dbUser = await prisma.user.findFirst({
-  where: { /* ... */ },
+  where: {
+    /* ... */
+  },
   select: {
     id: true,
     name: true,
     email: true,
-    birthDate: true,        // ✅ Included
-    birthPlace: true,       // ✅ Included
-    preferredSystem: true,  // ✅ Included
+    birthDate: true, // ✅ Included
+    birthPlace: true, // ✅ Included
+    preferredSystem: true, // ✅ Included
     onboardingCompleted: true,
     // ❌ birthTime: true,   <-- MISSING!
-  }
-})
+  },
+});
 ```
 
 **What happens:**
+
 1. User submits onboarding form with `birthTime: "02:02"` ✅
 2. POST handler saves it to database (line 278) ✅
 3. Profile page fetches user data via GET `/api/onboarding` ❌
@@ -65,6 +71,7 @@ const dbUser = await prisma.user.findFirst({
 5. Profile page displays `{profile.birthTime || 'Not set'}` → "Not set" ❌
 
 **Proof**:
+
 - POST handler includes `birthTime` in onboardingData (line 278) ✅
 - GET handler's select query doesn't fetch `birthTime` ❌
 - Profile page correctly displays `birthTime` **if** it were returned (line 159)
@@ -74,6 +81,7 @@ const dbUser = await prisma.user.findFirst({
 ### **ISSUE #2, #3, #4: Edit Form Shows Wrong Data**
 
 #### Evidence from QA Report
+
 - Clicking "Edit Profile" shows empty/wrong fields:
   - Name: Empty (should be "QA Test")
   - Date/Time: Empty (should be "01/12/2025" and "02:02 AM")
@@ -102,18 +110,19 @@ const dbUser = await prisma.user.findFirst({
 ```typescript
 // ❌ CURRENT CODE (Lines 14-23)
 const [formData, setFormData] = useState({
-  name: '',                       // Empty! ❌
-  birthDate: '',                  // Empty! ❌
-  birthTime: '',                  // Empty! ❌
-  birthPlace: 'Delhi, India',     // Hardcoded default! ❌
-  birthLatitude: 28.6139,         // Hardcoded Delhi coordinates! ❌
-  birthLongitude: 77.2090,
+  name: "", // Empty! ❌
+  birthDate: "", // Empty! ❌
+  birthTime: "", // Empty! ❌
+  birthPlace: "Delhi, India", // Hardcoded default! ❌
+  birthLatitude: 28.6139, // Hardcoded Delhi coordinates! ❌
+  birthLongitude: 77.209,
   birthTimezone: 5.5,
-  preferredSystem: 'VEDIC'        // Hardcoded default! ❌
-})
+  preferredSystem: "VEDIC", // Hardcoded default! ❌
+});
 ```
 
 **What happens:**
+
 1. User completes onboarding and saves data (Mumbai, Western) ✅
 2. User views profile page - sees correct data ✅
 3. User clicks "Edit Profile" ❌
@@ -122,6 +131,7 @@ const [formData, setFormData] = useState({
 6. User sees wrong data ❌
 
 **Design Issue**:
+
 - The onboarding page has **NO logic** to fetch existing user data
 - It's meant for new users only, with sensible defaults (Delhi is a common Indian city)
 - Using it for editing causes all 3 related issues (#2, #3, #4)
@@ -133,30 +143,36 @@ const [formData, setFormData] = useState({
 ### Option A: Fix Onboarding Page to Support Editing ✅ **RECOMMENDED**
 
 **Pros:**
+
 - Reuses existing form components
 - Single source of truth for birth details
 - Less code duplication
 
 **Cons:**
+
 - Onboarding page becomes more complex
 - Need to handle two modes (create vs edit)
 
 ### Option B: Create Separate Edit Page
 
 **Pros:**
+
 - Clear separation of concerns
 - Onboarding stays simple
 
 **Cons:**
+
 - Code duplication (form components)
 - More files to maintain
 
 ### Option C: Add Birth Details to Settings Form
 
 **Pros:**
+
 - Centralized settings location
 
 **Cons:**
+
 - Settings form already says "read-only"
 - Breaks user expectation
 
@@ -174,6 +190,7 @@ const [formData, setFormData] = useState({
 **Risk**: 🟢 Low
 
 **Change**:
+
 ```typescript
 // ✅ FIXED CODE
 select: {
@@ -189,10 +206,12 @@ select: {
 ```
 
 **Impact**:
+
 - Profile page will now receive `birthTime` in the API response
 - Display will show actual time instead of "Not set"
 
 **Testing**:
+
 ```bash
 # Before fix
 curl http://localhost:3000/api/onboarding \
@@ -220,50 +239,48 @@ curl http://localhost:3000/api/onboarding \
 
 ```typescript
 // ✅ ADD THIS CODE after line 23
-const [isEditing, setIsEditing] = useState(false)
-const [dataLoaded, setDataLoaded] = useState(false)
+const [isEditing, setIsEditing] = useState(false);
+const [dataLoaded, setDataLoaded] = useState(false);
 
 useEffect(() => {
   // Fetch existing user data when component mounts
   const loadUserData = async () => {
     try {
-      const response = await fetch('/api/onboarding')
+      const response = await fetch("/api/onboarding");
       if (!response.ok) {
         // User hasn't completed onboarding yet (first time)
-        setDataLoaded(true)
-        return
+        setDataLoaded(true);
+        return;
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.onboardingCompleted && data.user) {
         // User is editing - pre-fill form
-        setIsEditing(true)
+        setIsEditing(true);
         setFormData({
-          name: data.user.name || '',
+          name: data.user.name || "",
           birthDate: data.user.birthDate
-            ? new Date(data.user.birthDate).toISOString().split('T')[0]
-            : '',
-          birthTime: data.user.birthTime || '',
-          birthPlace: data.user.birthPlace || 'Delhi, India',
+            ? new Date(data.user.birthDate).toISOString().split("T")[0]
+            : "",
+          birthTime: data.user.birthTime || "",
+          birthPlace: data.user.birthPlace || "Delhi, India",
           birthLatitude: data.user.birthLatitude || 28.6139,
-          birthLongitude: data.user.birthLongitude || 77.2090,
-          birthTimezone: data.user.birthTimezone
-            ? parseFloat(data.user.birthTimezone)
-            : 5.5,
-          preferredSystem: data.user.preferredSystem || 'VEDIC',
-        })
+          birthLongitude: data.user.birthLongitude || 77.209,
+          birthTimezone: data.user.birthTimezone ? parseFloat(data.user.birthTimezone) : 5.5,
+          preferredSystem: data.user.preferredSystem || "VEDIC",
+        });
       }
 
-      setDataLoaded(true)
+      setDataLoaded(true);
     } catch (err) {
-      console.error('Failed to load user data:', err)
-      setDataLoaded(true) // Continue anyway with defaults
+      console.error("Failed to load user data:", err);
+      setDataLoaded(true); // Continue anyway with defaults
     }
-  }
+  };
 
-  loadUserData()
-}, [])
+  loadUserData();
+}, []);
 ```
 
 #### Step 2: Update UI to Show Loading State
@@ -300,9 +317,15 @@ if (!dataLoaded) {
 
 ```typescript
 // ✅ REPLACE line 215 with:
-{loading
-  ? (isEditing ? 'Updating Your Profile...' : 'Creating Your Profile...')
-  : (isEditing ? 'Save Changes ✅' : 'Complete Setup 🎉')}
+{
+  loading
+    ? isEditing
+      ? "Updating Your Profile..."
+      : "Creating Your Profile..."
+    : isEditing
+      ? "Save Changes ✅"
+      : "Complete Setup 🎉";
+}
 ```
 
 **TypeScript Interface Updates**:
@@ -311,17 +334,17 @@ Add to `apps/web/app/onboarding/page.tsx` after imports:
 
 ```typescript
 interface UserData {
-  id: string
-  name: string
-  email: string | null
-  birthDate: string | null
-  birthTime: string | null
-  birthPlace: string | null
-  birthLatitude: number | null
-  birthLongitude: number | null
-  birthTimezone: string | null
-  preferredSystem: 'VEDIC' | 'WESTERN'
-  onboardingCompleted: boolean
+  id: string;
+  name: string;
+  email: string | null;
+  birthDate: string | null;
+  birthTime: string | null;
+  birthPlace: string | null;
+  birthLatitude: number | null;
+  birthLongitude: number | null;
+  birthTimezone: string | null;
+  preferredSystem: "VEDIC" | "WESTERN";
+  onboardingCompleted: boolean;
 }
 ```
 
@@ -335,6 +358,7 @@ interface UserData {
 **Risk**: 🟢 Low
 
 **Change**:
+
 ```typescript
 // ✅ COMPLETE FIXED SELECT
 select: {
@@ -379,6 +403,7 @@ npx prisma studio
 ### Test Case 1: Verify Birth Time Persistence
 
 **Steps**:
+
 1. Complete onboarding with birth time "10:30 AM"
 2. Go to `/profile` page
 3. **Expected**: Birth Time shows "10:30"
@@ -386,6 +411,7 @@ npx prisma studio
 5. **Actual (after fix)**: "10:30" ✅
 
 **API Verification**:
+
 ```bash
 curl http://localhost:3000/api/onboarding \
   -H "Cookie: sb-<your-session-cookie>" \
@@ -397,6 +423,7 @@ curl http://localhost:3000/api/onboarding \
 ### Test Case 2: Verify Edit Form Pre-filling
 
 **Steps**:
+
 1. Complete onboarding with:
    - Name: "Test User"
    - Birth Date: "15/06/1990"
@@ -410,6 +437,7 @@ curl http://localhost:3000/api/onboarding \
 6. **Actual (after fix)**: All fields correctly filled ✅
 
 **Checklist**:
+
 - [ ] Name field shows "Test User"
 - [ ] Date field shows "15/06/1990"
 - [ ] Time field shows "14:30"
@@ -419,6 +447,7 @@ curl http://localhost:3000/api/onboarding \
 ### Test Case 3: Verify Data Update Persistence
 
 **Steps**:
+
 1. Edit birth time from "14:30" to "15:45"
 2. Click "Save Changes"
 3. Navigate to `/profile`
@@ -428,6 +457,7 @@ curl http://localhost:3000/api/onboarding \
 ### Test Case 4: Verify New User Flow Unchanged
 
 **Steps**:
+
 1. Sign in as a brand new user (never onboarded)
 2. Redirected to `/onboarding`
 3. **Expected**: Form shows defaults (empty name, Delhi location, Vedic system)
@@ -438,6 +468,7 @@ curl http://localhost:3000/api/onboarding \
 ### Test Case 5: Verify Astrology System Toggle
 
 **Steps**:
+
 1. Save profile with "Vedic" selected
 2. Edit profile
 3. **Expected**: Vedic card has orange border
@@ -483,9 +514,11 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 ### Phase 1: Backend Fix (Low Risk) ✅
 
 **Files to Change**: 1
+
 - `apps/web/app/api/onboarding/route.ts`
 
 **Changes**:
+
 - Add `birthTime`, `birthLatitude`, `birthLongitude`, `birthTimezone` to GET select query
 
 **Risk**: 🟢 Low - Only adds fields to response, doesn't change behavior
@@ -499,9 +532,11 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 ### Phase 2: Frontend Edit Mode (Medium Risk) ⚠️
 
 **Files to Change**: 1
+
 - `apps/web/app/onboarding/page.tsx`
 
 **Changes**:
+
 - Add `useEffect` to fetch user data on mount
 - Add `isEditing` state
 - Pre-fill form when editing
@@ -510,6 +545,7 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 **Risk**: 🟡 Medium - Changes component behavior, could affect new users
 
 **Testing**:
+
 - Test new user signup flow (must NOT break)
 - Test existing user edit flow (must pre-fill)
 
@@ -539,13 +575,13 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 
 ### Timeline Estimate
 
-| Phase | Duration | Complexity |
-|-------|----------|------------|
-| Backend Fix | 30 min | Easy |
-| Frontend Edit Mode | 2-3 hours | Medium |
-| Testing | 1-2 hours | Medium |
-| Code Review | 30 min | - |
-| **TOTAL** | **4-6 hours** | **Medium** |
+| Phase              | Duration      | Complexity |
+| ------------------ | ------------- | ---------- |
+| Backend Fix        | 30 min        | Easy       |
+| Frontend Edit Mode | 2-3 hours     | Medium     |
+| Testing            | 1-2 hours     | Medium     |
+| Code Review        | 30 min        | -          |
+| **TOTAL**          | **4-6 hours** | **Medium** |
 
 ---
 
@@ -556,6 +592,7 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 **Probability**: Medium
 **Impact**: High
 **Mitigation**:
+
 - Test with a fresh account before deploying
 - Add conditional logic: only pre-fill if `onboardingCompleted === true`
 - Add feature flag if needed
@@ -565,6 +602,7 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 **Probability**: Low
 **Impact**: Medium
 **Mitigation**:
+
 - Add loading state until data fetch completes
 - Show skeleton/spinner while loading
 - Handle fetch errors gracefully
@@ -574,6 +612,7 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 **Probability**: Medium
 **Impact**: Low
 **Mitigation**:
+
 - Store `birthTimezone` as string (already done)
 - Parse carefully with `parseFloat()`
 - Validate before rendering
@@ -583,6 +622,7 @@ If `birthTime` column shows the correct value, **the backend is working** - it's
 ## 📋 DEVELOPER CHECKLIST
 
 Before implementing:
+
 - [ ] Read this entire document
 - [ ] Understand root causes for all 4 issues
 - [ ] Review affected files
@@ -590,6 +630,7 @@ Before implementing:
 - [ ] Create feature branch: `git checkout -b fix/profile-data-persistence`
 
 During implementation:
+
 - [ ] Fix #1: Add birthTime to GET response
 - [ ] Test #1 with API call
 - [ ] Fix #2-4: Add edit mode logic
@@ -600,6 +641,7 @@ During implementation:
 - [ ] Update TypeScript types
 
 After implementation:
+
 - [ ] Run all test cases from testing plan
 - [ ] Check database values
 - [ ] Test on mobile viewport
@@ -613,16 +655,16 @@ After implementation:
 
 ## 📚 RELATED FILES REFERENCE
 
-| File Path | Purpose | Lines of Interest |
-|-----------|---------|-------------------|
-| `apps/web/app/api/onboarding/route.ts` | Backend API for onboarding | 151-398 (POST), 341-398 (GET) |
-| `apps/web/app/profile/page.tsx` | Profile display page | 45-62 (fetch), 159 (birthTime display), 213 (edit button) |
-| `apps/web/app/onboarding/page.tsx` | Onboarding/Edit form | 14-23 (state init), 45-87 (submit) |
-| `apps/web/app/settings/page.tsx` | Settings page (server) | 16-42 (data fetch) |
-| `apps/web/components/settings/settings-form.tsx` | Settings form component | 42-46 (form init), 231 (birthTime display) |
-| `apps/web/components/astrology/datetime-picker.tsx` | Date/time input component | - |
-| `apps/web/components/astrology/location-picker.tsx` | Location search component | - |
-| `packages/schemas/prisma/schema.prisma` | Database schema | User model (birthTime field) |
+| File Path                                           | Purpose                    | Lines of Interest                                         |
+| --------------------------------------------------- | -------------------------- | --------------------------------------------------------- |
+| `apps/web/app/api/onboarding/route.ts`              | Backend API for onboarding | 151-398 (POST), 341-398 (GET)                             |
+| `apps/web/app/profile/page.tsx`                     | Profile display page       | 45-62 (fetch), 159 (birthTime display), 213 (edit button) |
+| `apps/web/app/onboarding/page.tsx`                  | Onboarding/Edit form       | 14-23 (state init), 45-87 (submit)                        |
+| `apps/web/app/settings/page.tsx`                    | Settings page (server)     | 16-42 (data fetch)                                        |
+| `apps/web/components/settings/settings-form.tsx`    | Settings form component    | 42-46 (form init), 231 (birthTime display)                |
+| `apps/web/components/astrology/datetime-picker.tsx` | Date/time input component  | -                                                         |
+| `apps/web/components/astrology/location-picker.tsx` | Location search component  | -                                                         |
+| `packages/schemas/prisma/schema.prisma`             | Database schema            | User model (birthTime field)                              |
 
 ---
 

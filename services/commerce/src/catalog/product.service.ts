@@ -12,8 +12,8 @@ const MOCK_PRODUCTS: Product[] = [
     name: "Premium Neelam",
     category: "Gemstone",
     price: 34999,
-    currency: "INR"
-  }
+    currency: "INR",
+  },
 ];
 
 export class ProductService {

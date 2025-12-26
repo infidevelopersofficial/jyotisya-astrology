@@ -8,7 +8,7 @@ import { getProducts } from "@lib/api/products";
 export default function MarketplaceGrid(): React.ReactElement {
   const { data, isLoading } = useQuery({
     queryKey: ["products", "all"],
-    queryFn: getProducts
+    queryFn: getProducts,
   });
 
   if (isLoading) {

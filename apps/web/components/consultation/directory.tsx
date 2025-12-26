@@ -15,7 +15,7 @@ const ASTROLOGERS = [
     languages: ["Hindi", "English"],
     status: "Available",
     avatar:
-      "https://images.unsplash.com/photo-1580894906472-6ad3946e8866?auto=format&fit=crop&w=400&q=80"
+      "https://images.unsplash.com/photo-1580894906472-6ad3946e8866?auto=format&fit=crop&w=400&q=80",
   },
   {
     id: "guru-raj",
@@ -27,8 +27,8 @@ const ASTROLOGERS = [
     languages: ["Hindi", "Gujarati"],
     status: "Busy",
     avatar:
-      "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=400&q=80"
-  }
+      "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=400&q=80",
+  },
 ];
 
 type Filter = "all" | "available";
@@ -46,7 +46,10 @@ export default function AstrologerDirectory(): React.ReactElement {
   return (
     <section className="mt-12 space-y-6">
       <div className="flex gap-4">
-        <Button variant={filter === "all" ? "primary" : "secondary"} onClick={() => setFilter("all")}>
+        <Button
+          variant={filter === "all" ? "primary" : "secondary"}
+          onClick={() => setFilter("all")}
+        >
           All Experts
         </Button>
         <Button
@@ -71,7 +74,9 @@ export default function AstrologerDirectory(): React.ReactElement {
                 <p className="text-[13px] text-slate-200">
                   Specialities: {astro.skills.join(", ")}
                 </p>
-                <p className="text-[13px] text-slate-300">Languages: {astro.languages.join(", ")}</p>
+                <p className="text-[13px] text-slate-300">
+                  Languages: {astro.languages.join(", ")}
+                </p>
               </div>
             </div>
             <div className="mt-4 flex gap-3">

@@ -8,13 +8,13 @@
  */
 
 // Client-side browser client
-export { createClient } from './client'
+export { createClient } from "./client";
 
 // Auth helpers (client-side only)
-export { supabaseAuth } from './auth'
+export { supabaseAuth } from "./auth";
 
 // Database helpers (client-side only)
-export { supabaseDB, supabaseRealtime, supabaseStorage } from './database'
+export { supabaseDB, supabaseRealtime, supabaseStorage } from "./database";
 
 // Types
-export type { Database } from './types'
+export type { Database } from "./types";

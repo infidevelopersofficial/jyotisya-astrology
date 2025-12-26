@@ -14,7 +14,7 @@ const LINKS = [
   { href: "/", key: "home" },
   { href: "/consultations", key: "consult" },
   { href: "/dashboard", key: "dashboard" },
-  { href: "/shop", key: "shop" }
+  { href: "/shop", key: "shop" },
 ] as const;
 
 export default function MainNav(): React.ReactElement {
@@ -35,7 +35,7 @@ export default function MainNav(): React.ReactElement {
             "rounded-full px-4 py-2 transition",
             pathname === link.href
               ? "bg-white/10 text-white"
-              : "text-slate-300 hover:bg-white/5 hover:text-white"
+              : "text-slate-300 hover:bg-white/5 hover:text-white",
           )}
         >
           {nav.links[link.key]}
@@ -128,7 +128,6 @@ export default function MainNav(): React.ReactElement {
                 )}
               </div>
             )}
-
           </div>
         </div>
       )}

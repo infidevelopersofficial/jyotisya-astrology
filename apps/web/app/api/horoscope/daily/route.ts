@@ -14,7 +14,7 @@ const SUN_SIGNS = [
   "sagittarius",
   "capricorn",
   "aquarius",
-  "pisces"
+  "pisces",
 ] as const satisfies readonly SunSign[];
 
 const SUPPORTED_LOCALES = ["en", "hi", "ta"] as const satisfies readonly LocaleCode[];
@@ -24,7 +24,7 @@ const querySchema = z.object({
   system: z.enum(["vedic", "western"]).optional(),
   date: z.string().optional(),
   timezone: z.string().default("Asia/Kolkata"),
-  locale: z.enum(SUPPORTED_LOCALES).default("en")
+  locale: z.enum(SUPPORTED_LOCALES).default("en"),
 });
 
 const DEFAULT_SUN_SIGN: SunSign = "aries";
@@ -39,9 +39,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       {
         error: "invalid_request",
         message: "Invalid horoscope query parameters",
-        details: parsed.error.flatten().fieldErrors
+        details: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -59,7 +59,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             date,
             timezone,
             locale,
-            system
+            system,
           });
 
           if (candidateLocales.length > 1) {
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
                 date,
                 timezone,
                 locale: candidate,
-                system
+                system,
               });
 
               lastResult = result;
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
           }
 
           return [toTitleCase(sign), lastResult.summary] as const;
-        })
+        }),
       );
 
       const response = Object.fromEntries(
@@ -91,9 +91,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             summary: summary.guidance,
             mood: summary.mood ?? "Balanced",
             luckyNumber: summary.luckyNumber ?? "--",
-            luckyColor: summary.luckyColor ?? "--"
-          }
-        ])
+            luckyColor: summary.luckyColor ?? "--",
+          },
+        ]),
       );
 
       return NextResponse.json(response);
@@ -102,17 +102,17 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       console.error("[api/horoscope/daily] batch provider failure", {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
-        params: { system, locale, timezone, date }
+        params: { system, locale, timezone, date },
       });
 
       // Extract detailed error information
       const errorDetails: Record<string, unknown> = {
         type: error instanceof Error ? error.constructor.name : typeof error,
-        message: error instanceof Error ? error.message : String(error)
+        message: error instanceof Error ? error.message : String(error),
       };
 
       // Check if it's a fetch error with response
-      if (error && typeof error === 'object' && 'cause' in error) {
+      if (error && typeof error === "object" && "cause" in error) {
         errorDetails.cause = error.cause;
       }
 
@@ -120,9 +120,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
         {
           ok: false,
           message: "Upstream astrology API error",
-          details: errorDetails
+          details: errorDetails,
         },
-        { status: 502 }
+        { status: 502 },
       );
     }
   }
@@ -130,10 +130,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const resolvedSunSign = sunSign ?? DEFAULT_SUN_SIGN;
 
   if (!sunSign && !system) {
-    console.warn(
-      "[api/horoscope/daily] No sunSign provided; serving default response.",
-      { resolvedSunSign }
-    );
+    console.warn("[api/horoscope/daily] No sunSign provided; serving default response.", {
+      resolvedSunSign,
+    });
   }
 
   try {
@@ -142,30 +141,30 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       date,
       timezone,
       locale,
-      system
+      system,
     });
 
     return NextResponse.json({
       source: result.source,
       metadata: result.metadata,
-      horoscope: result.summary
+      horoscope: result.summary,
     });
   } catch (error: unknown) {
     // Log detailed error information to server console
     console.error("[api/horoscope/daily] provider failure", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-      params: { sunSign: resolvedSunSign, system, locale, timezone, date }
+      params: { sunSign: resolvedSunSign, system, locale, timezone, date },
     });
 
     // Extract detailed error information
     const errorDetails: Record<string, unknown> = {
       type: error instanceof Error ? error.constructor.name : typeof error,
-      message: error instanceof Error ? error.message : String(error)
+      message: error instanceof Error ? error.message : String(error),
     };
 
     // Check if it's a fetch error with response
-    if (error && typeof error === 'object' && 'cause' in error) {
+    if (error && typeof error === "object" && "cause" in error) {
       errorDetails.cause = error.cause;
     }
 
@@ -173,9 +172,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       {
         ok: false,
         message: "Upstream astrology API error",
-        details: errorDetails
+        details: errorDetails,
       },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }

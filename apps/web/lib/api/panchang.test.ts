@@ -3,7 +3,7 @@ import { getPanchangToday } from "./panchang";
 import { apiClient } from "@lib/utils/api-client";
 
 vi.mock("@lib/utils/api-client", () => ({
-  apiClient: vi.fn()
+  apiClient: vi.fn(),
 }));
 
 const mockApiClient = apiClient as unknown as ReturnType<typeof vi.fn>;
@@ -15,7 +15,7 @@ const samplePanchang = {
   yoga: "Vishkambha",
   karana: "Kinstughna",
   sunrise: "06:05",
-  sunset: "18:45"
+  sunset: "18:45",
 };
 
 describe("getPanchangToday", () => {
@@ -28,8 +28,8 @@ describe("getPanchangToday", () => {
       json: async () => ({
         source: "open_source",
         metadata: { provider: "open_source_engine" },
-        panchang: samplePanchang
-      })
+        panchang: samplePanchang,
+      }),
     } as Response);
 
     const result = await getPanchangToday({ locale: "en" });
@@ -40,7 +40,7 @@ describe("getPanchangToday", () => {
 
   it("returns flat responses unchanged", async () => {
     mockApiClient.mockResolvedValue({
-      json: async () => samplePanchang
+      json: async () => samplePanchang,
     } as Response);
 
     const result = await getPanchangToday({ locale: "hi" });
@@ -50,7 +50,7 @@ describe("getPanchangToday", () => {
 
   it("throws when response payload is invalid", async () => {
     mockApiClient.mockResolvedValue({
-      json: async () => ({ bad: "data" })
+      json: async () => ({ bad: "data" }),
     } as Response);
 
     await expect(getPanchangToday({ locale: "ta" })).rejects.toThrow("Invalid Panchang response");

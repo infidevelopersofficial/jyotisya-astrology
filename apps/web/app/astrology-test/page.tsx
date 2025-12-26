@@ -1,186 +1,182 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
+import { useState } from "react";
 
 // TypeScript interface for API response
 interface AstrologyAPIResponse {
-  cached_at?: string
-  expires_at?: string
+  cached_at?: string;
+  expires_at?: string;
   data?: {
-    svg_code?: string
-    [key: string]: unknown
-  }
-  [key: string]: unknown
+    svg_code?: string;
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
 }
 
 export default function AstrologyTestPage(): React.ReactElement {
-  const [loading, setLoading] = useState(false)
-  const [result, setResult] = useState<AstrologyAPIResponse | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'chart' | 'panchang' | 'compatibility' | 'svg'>('chart')
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<AstrologyAPIResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<"chart" | "panchang" | "compatibility" | "svg">(
+    "chart",
+  );
 
   // Sample birth data (Delhi, India - 15 Jan 1990, 10:30 AM)
   const [birthData, setBirthData] = useState({
-    dateTime: '1990-01-15T10:30:00',
+    dateTime: "1990-01-15T10:30:00",
     latitude: 28.6139,
-    longitude: 77.2090,
+    longitude: 77.209,
     timezone: 5.5,
-  })
+  });
 
   // Sample second person for compatibility
   const [person2Data, setPerson2Data] = useState({
-    dateTime: '1992-03-20T14:15:00',
-    latitude: 19.0760,
+    dateTime: "1992-03-20T14:15:00",
+    latitude: 19.076,
     longitude: 72.8777,
     timezone: 5.5,
-  })
+  });
 
-  const [panchangDate, setPanchangDate] = useState(
-    new Date().toISOString().split('T')[0]
-  )
+  const [panchangDate, setPanchangDate] = useState(new Date().toISOString().split("T")[0]);
 
   const testBirthChart = async () => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/astrology/birth-chart', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/birth-chart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(birthData),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || errorData.message || 'Failed to fetch')
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || "Failed to fetch");
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const testChartSVG = async () => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/astrology/chart-svg', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/chart-svg", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...birthData,
-          chartType: 'D1',
+          chartType: "D1",
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || errorData.message || 'Failed to fetch')
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || "Failed to fetch");
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const testPanchang = async () => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/astrology/panchang', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/panchang", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date: panchangDate,
           latitude: birthData.latitude,
           longitude: birthData.longitude,
           timezone: birthData.timezone,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || errorData.message || 'Failed to fetch')
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || "Failed to fetch");
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const testCompatibility = async () => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/astrology/compatibility', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/astrology/compatibility", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           person1: birthData,
           person2: person2Data,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || errorData.message || 'Failed to fetch')
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || "Failed to fetch");
       }
 
-      const data = await response.json()
-      setResult(data)
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const checkRateLimit = async () => {
-    setLoading(true)
-    setError(null)
-    setResult(null)
+    setLoading(true);
+    setError(null);
+    setResult(null);
 
     try {
-      const response = await fetch('/api/astrology/rate-limit')
-      const data = await response.json()
-      setResult(data)
+      const response = await fetch("/api/astrology/rate-limit");
+      const data = await response.json();
+      setResult(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error')
+      setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-indigo-900 via-purple-900 to-gray-900 p-8">
       <div className="mx-auto max-w-6xl">
         {/* Header */}
         <div className="mb-8 text-center">
-          <h1 className="mb-2 text-4xl font-bold text-white">
-            🔮 Astrology API Test Dashboard
-          </h1>
-          <p className="text-purple-200">
-            Test FreeAstrologyAPI.com integration
-          </p>
+          <h1 className="mb-2 text-4xl font-bold text-white">🔮 Astrology API Test Dashboard</h1>
+          <p className="text-purple-200">Test FreeAstrologyAPI.com integration</p>
         </div>
 
         {/* Rate Limit Info */}
@@ -199,41 +195,41 @@ export default function AstrologyTestPage(): React.ReactElement {
         {/* Tabs */}
         <div className="mb-6 flex gap-2">
           <button
-            onClick={() => setActiveTab('chart')}
+            onClick={() => setActiveTab("chart")}
             className={`rounded-t-lg px-6 py-3 font-semibold ${
-              activeTab === 'chart'
-                ? 'bg-white text-purple-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
+              activeTab === "chart"
+                ? "bg-white text-purple-900"
+                : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
             Birth Chart
           </button>
           <button
-            onClick={() => setActiveTab('svg')}
+            onClick={() => setActiveTab("svg")}
             className={`rounded-t-lg px-6 py-3 font-semibold ${
-              activeTab === 'svg'
-                ? 'bg-white text-purple-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
+              activeTab === "svg"
+                ? "bg-white text-purple-900"
+                : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
             Chart Visualization
           </button>
           <button
-            onClick={() => setActiveTab('panchang')}
+            onClick={() => setActiveTab("panchang")}
             className={`rounded-t-lg px-6 py-3 font-semibold ${
-              activeTab === 'panchang'
-                ? 'bg-white text-purple-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
+              activeTab === "panchang"
+                ? "bg-white text-purple-900"
+                : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
             Panchang
           </button>
           <button
-            onClick={() => setActiveTab('compatibility')}
+            onClick={() => setActiveTab("compatibility")}
             className={`rounded-t-lg px-6 py-3 font-semibold ${
-              activeTab === 'compatibility'
-                ? 'bg-white text-purple-900'
-                : 'bg-white/20 text-white hover:bg-white/30'
+              activeTab === "compatibility"
+                ? "bg-white text-purple-900"
+                : "bg-white/20 text-white hover:bg-white/30"
             }`}
           >
             Compatibility
@@ -243,11 +239,9 @@ export default function AstrologyTestPage(): React.ReactElement {
         {/* Content Area */}
         <div className="rounded-lg bg-white/10 p-6 backdrop-blur-sm">
           {/* Birth Chart Tab */}
-          {activeTab === 'chart' && (
+          {activeTab === "chart" && (
             <div>
-              <h2 className="mb-4 text-2xl font-bold text-white">
-                Birth Chart (D1 Rasi)
-              </h2>
+              <h2 className="mb-4 text-2xl font-bold text-white">Birth Chart (D1 Rasi)</h2>
 
               <div className="mb-4 grid grid-cols-2 gap-4">
                 <div>
@@ -257,16 +251,12 @@ export default function AstrologyTestPage(): React.ReactElement {
                   <input
                     type="datetime-local"
                     value={birthData.dateTime}
-                    onChange={(e) =>
-                      setBirthData({ ...birthData, dateTime: e.target.value })
-                    }
+                    onChange={(e) => setBirthData({ ...birthData, dateTime: e.target.value })}
                     className="w-full rounded bg-white/20 px-3 py-2 text-white"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-purple-200">
-                    Latitude
-                  </label>
+                  <label className="mb-1 block text-sm font-medium text-purple-200">Latitude</label>
                   <input
                     type="number"
                     step="0.0001"
@@ -321,7 +311,7 @@ export default function AstrologyTestPage(): React.ReactElement {
                 disabled={loading}
                 className="rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl disabled:opacity-50"
               >
-                {loading ? 'Generating...' : 'Generate Birth Chart'}
+                {loading ? "Generating..." : "Generate Birth Chart"}
               </button>
 
               <p className="mt-2 text-sm text-purple-200">
@@ -331,37 +321,31 @@ export default function AstrologyTestPage(): React.ReactElement {
           )}
 
           {/* Chart SVG Tab */}
-          {activeTab === 'svg' && (
+          {activeTab === "svg" && (
             <div>
-              <h2 className="mb-4 text-2xl font-bold text-white">
-                Chart Visualization (SVG)
-              </h2>
+              <h2 className="mb-4 text-2xl font-bold text-white">Chart Visualization (SVG)</h2>
 
-              <p className="mb-4 text-purple-200">
-                Uses the same birth data as Birth Chart tab
-              </p>
+              <p className="mb-4 text-purple-200">Uses the same birth data as Birth Chart tab</p>
 
               <button
                 onClick={testChartSVG}
                 disabled={loading}
                 className="rounded-lg bg-gradient-to-r from-green-500 to-teal-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl disabled:opacity-50"
               >
-                {loading ? 'Generating...' : 'Generate Chart SVG'}
+                {loading ? "Generating..." : "Generate Chart SVG"}
               </button>
             </div>
           )}
 
           {/* Panchang Tab */}
-          {activeTab === 'panchang' && (
+          {activeTab === "panchang" && (
             <div>
               <h2 className="mb-4 text-2xl font-bold text-white">
                 Daily Panchang (Vedic Calendar)
               </h2>
 
               <div className="mb-4">
-                <label className="mb-1 block text-sm font-medium text-purple-200">
-                  Date
-                </label>
+                <label className="mb-1 block text-sm font-medium text-purple-200">Date</label>
                 <input
                   type="date"
                   value={panchangDate}
@@ -375,7 +359,7 @@ export default function AstrologyTestPage(): React.ReactElement {
                 disabled={loading}
                 className="rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl disabled:opacity-50"
               >
-                {loading ? 'Fetching...' : 'Get Panchang'}
+                {loading ? "Fetching..." : "Get Panchang"}
               </button>
 
               <p className="mt-2 text-sm text-purple-200">
@@ -385,7 +369,7 @@ export default function AstrologyTestPage(): React.ReactElement {
           )}
 
           {/* Compatibility Tab */}
-          {activeTab === 'compatibility' && (
+          {activeTab === "compatibility" && (
             <div>
               <h2 className="mb-4 text-2xl font-bold text-white">
                 Compatibility (Ashtakoot Matching)
@@ -393,23 +377,17 @@ export default function AstrologyTestPage(): React.ReactElement {
 
               <div className="mb-4 grid grid-cols-2 gap-6">
                 <div className="rounded-lg bg-white/10 p-4">
-                  <h3 className="mb-2 font-semibold text-purple-200">
-                    Person 1 (Delhi)
-                  </h3>
+                  <h3 className="mb-2 font-semibold text-purple-200">Person 1 (Delhi)</h3>
                   <input
                     type="datetime-local"
                     value={birthData.dateTime}
-                    onChange={(e) =>
-                      setBirthData({ ...birthData, dateTime: e.target.value })
-                    }
+                    onChange={(e) => setBirthData({ ...birthData, dateTime: e.target.value })}
                     className="w-full rounded bg-white/20 px-3 py-2 text-sm text-white"
                   />
                 </div>
 
                 <div className="rounded-lg bg-white/10 p-4">
-                  <h3 className="mb-2 font-semibold text-purple-200">
-                    Person 2 (Mumbai)
-                  </h3>
+                  <h3 className="mb-2 font-semibold text-purple-200">Person 2 (Mumbai)</h3>
                   <input
                     type="datetime-local"
                     value={person2Data.dateTime}
@@ -429,7 +407,7 @@ export default function AstrologyTestPage(): React.ReactElement {
                 disabled={loading}
                 className="rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl disabled:opacity-50"
               >
-                {loading ? 'Calculating...' : 'Check Compatibility'}
+                {loading ? "Calculating..." : "Check Compatibility"}
               </button>
 
               <p className="mt-2 text-sm text-purple-200">
@@ -458,13 +436,8 @@ export default function AstrologyTestPage(): React.ReactElement {
                     Troubleshooting
                   </summary>
                   <ul className="mt-2 list-inside list-disc text-sm">
-                    <li>
-                      403 Forbidden: API key needs verification with
-                      FreeAstrologyAPI.com
-                    </li>
-                    <li>
-                      Check .env.local has FREE_ASTROLOGY_API_KEY set correctly
-                    </li>
+                    <li>403 Forbidden: API key needs verification with FreeAstrologyAPI.com</li>
+                    <li>Check .env.local has FREE_ASTROLOGY_API_KEY set correctly</li>
                     <li>Verify dev server is running on port 3000</li>
                   </ul>
                 </details>
@@ -478,22 +451,18 @@ export default function AstrologyTestPage(): React.ReactElement {
                   {result.from_cache !== undefined && (
                     <span
                       className={`rounded px-2 py-1 text-xs font-semibold ${
-                        result.from_cache
-                          ? 'bg-green-600 text-white'
-                          : 'bg-orange-600 text-white'
+                        result.from_cache ? "bg-green-600 text-white" : "bg-orange-600 text-white"
                       }`}
                     >
-                      {result.from_cache
-                        ? '🎯 FROM CACHE'
-                        : '🔄 FRESH API CALL'}
+                      {result.from_cache ? "🎯 FROM CACHE" : "🔄 FRESH API CALL"}
                     </span>
                   )}
                 </div>
 
                 {result.cached_at && result.expires_at && (
                   <p className="mb-2 text-xs text-green-300">
-                    Cached: {new Date(result.cached_at).toLocaleString()} |
-                    Expires: {new Date(result.expires_at).toLocaleString()}
+                    Cached: {new Date(result.cached_at).toLocaleString()} | Expires:{" "}
+                    {new Date(result.expires_at).toLocaleString()}
                   </p>
                 )}
 
@@ -507,9 +476,7 @@ export default function AstrologyTestPage(): React.ReactElement {
 
                 {/* JSON Result */}
                 <details className="mt-2" open={!result.data?.svg_code}>
-                  <summary className="cursor-pointer font-semibold">
-                    View JSON Response
-                  </summary>
+                  <summary className="cursor-pointer font-semibold">View JSON Response</summary>
                   <pre className="mt-2 max-h-96 overflow-auto rounded-lg bg-gray-900 p-4 text-xs text-green-300">
                     {JSON.stringify(result, null, 2)}
                   </pre>
@@ -522,26 +489,18 @@ export default function AstrologyTestPage(): React.ReactElement {
         {/* Footer Info */}
         <div className="mt-8 rounded-lg bg-white/10 p-4 text-center text-sm text-purple-200">
           <p>
-            📚 Documentation:{' '}
-            <a
-              href="/FREE_ASTROLOGY_API.md"
-              className="text-purple-300 underline"
-            >
+            📚 Documentation:{" "}
+            <a href="/FREE_ASTROLOGY_API.md" className="text-purple-300 underline">
               API Reference
-            </a>{' '}
-            |{' '}
-            <a
-              href="/JYOTISHYA_INTEGRATION_PLAN.md"
-              className="text-purple-300 underline"
-            >
+            </a>{" "}
+            |{" "}
+            <a href="/JYOTISHYA_INTEGRATION_PLAN.md" className="text-purple-300 underline">
               Integration Plan
             </a>
           </p>
-          <p className="mt-2">
-            🔑 API Status: Check browser console for detailed logs
-          </p>
+          <p className="mt-2">🔑 API Status: Check browser console for detailed logs</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

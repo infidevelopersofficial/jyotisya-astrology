@@ -1,10 +1,10 @@
-'use client'
+"use client";
 
-import { useSupabaseAuth } from '@/hooks/use-supabase-auth'
-import Link from 'next/link'
+import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
+import Link from "next/link";
 
 export default function AuthTestPage(): React.ReactElement {
-  const { user, session, loading, isAuthenticated } = useSupabaseAuth()
+  const { user, session, loading, isAuthenticated } = useSupabaseAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-cosmic-blue via-purple-900 to-cosmic-blue p-6">
@@ -26,13 +26,13 @@ export default function AuthTestPage(): React.ReactElement {
               <div className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <h2 className="mb-3 text-xl font-semibold text-white">Authentication Status</h2>
                 <div className="flex items-center gap-3">
-                  <div className="text-4xl">{isAuthenticated ? '✅' : '❌'}</div>
+                  <div className="text-4xl">{isAuthenticated ? "✅" : "❌"}</div>
                   <div>
                     <p className="text-lg font-medium text-white">
-                      {isAuthenticated ? 'Logged In' : 'Not Logged In'}
+                      {isAuthenticated ? "Logged In" : "Not Logged In"}
                     </p>
                     <p className="text-sm text-slate-400">
-                      {isAuthenticated ? 'You have an active session' : 'No active session found'}
+                      {isAuthenticated ? "You have an active session" : "No active session found"}
                     </p>
                   </div>
                 </div>
@@ -49,19 +49,23 @@ export default function AuthTestPage(): React.ReactElement {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Email:</span>
-                      <span className="text-white">{user.email || 'Not set'}</span>
+                      <span className="text-white">{user.email || "Not set"}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Phone:</span>
-                      <span className="text-white">{user.phone || 'Not set'}</span>
+                      <span className="text-white">{user.phone || "Not set"}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Email Verified:</span>
-                      <span className="text-white">{user.email_confirmed_at ? '✅ Yes' : '❌ No'}</span>
+                      <span className="text-white">
+                        {user.email_confirmed_at ? "✅ Yes" : "❌ No"}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-slate-400">Phone Verified:</span>
-                      <span className="text-white">{user.phone_confirmed_at ? '✅ Yes' : '❌ No'}</span>
+                      <span className="text-white">
+                        {user.phone_confirmed_at ? "✅ Yes" : "❌ No"}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -81,7 +85,7 @@ export default function AuthTestPage(): React.ReactElement {
                     <div className="flex justify-between">
                       <span className="text-slate-400">Provider:</span>
                       <span className="text-white">
-                        {session.user?.app_metadata?.provider || 'Unknown'}
+                        {session.user?.app_metadata?.provider || "Unknown"}
                       </span>
                     </div>
                   </div>
@@ -120,13 +124,13 @@ export default function AuthTestPage(): React.ReactElement {
                 <button
                   onClick={async () => {
                     try {
-                      const response = await fetch('/api/onboarding')
-                      const data = await response.json()
-                      console.error('API Response:', data)
-                      alert(`Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`)
+                      const response = await fetch("/api/onboarding");
+                      const data = await response.json();
+                      console.error("API Response:", data);
+                      alert(`Status: ${response.status}\n\n${JSON.stringify(data, null, 2)}`);
                     } catch (err) {
-                      console.error('API Error:', err)
-                      alert('Error calling API - check console')
+                      console.error("API Error:", err);
+                      alert("Error calling API - check console");
                     }
                   }}
                   className="w-full rounded-lg border border-green-500/50 bg-green-500/10 px-6 py-3 font-semibold text-green-300 transition hover:bg-green-500/20"
@@ -165,5 +169,5 @@ export default function AuthTestPage(): React.ReactElement {
         </div>
       </div>
     </div>
-  )
+  );
 }

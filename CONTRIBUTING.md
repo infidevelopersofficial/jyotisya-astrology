@@ -88,6 +88,7 @@ git checkout -b fix/your-bug-fix
 ```
 
 **Branch naming conventions:**
+
 - `feat/` - New features
 - `fix/` - Bug fixes
 - `docs/` - Documentation updates
@@ -165,6 +166,7 @@ docs: update API documentation
 ```
 
 **Types:**
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `docs` - Documentation
@@ -179,6 +181,7 @@ docs: update API documentation
 ### PR Description
 
 Use the provided template to:
+
 - Describe what changed and why
 - Link related issues
 - Provide testing instructions
@@ -211,20 +214,20 @@ Use the provided template to:
 ```typescript
 // ✅ Good
 interface User {
-  id: string
-  email: string
-  name: string
+  id: string;
+  email: string;
+  name: string;
 }
 
 async function getUser(id: string): Promise<User> {
-  const user = await db.user.findUnique({ where: { id } })
-  if (!user) throw new Error('User not found')
-  return user
+  const user = await db.user.findUnique({ where: { id } });
+  if (!user) throw new Error("User not found");
+  return user;
 }
 
 // ❌ Bad
 function getUser(id: any) {
-  return db.user.findUnique({ where: { id } })
+  return db.user.findUnique({ where: { id } });
 }
 ```
 
@@ -233,23 +236,23 @@ function getUser(id: any) {
 ```tsx
 // ✅ Good - Named function component with proper types
 interface ButtonProps {
-  label: string
-  onClick: () => void
-  variant?: 'primary' | 'secondary'
+  label: string;
+  onClick: () => void;
+  variant?: "primary" | "secondary";
 }
 
-export function Button({ label, onClick, variant = 'primary' }: ButtonProps) {
+export function Button({ label, onClick, variant = "primary" }: ButtonProps) {
   return (
     <button className={`btn btn-${variant}`} onClick={onClick}>
       {label}
     </button>
-  )
+  );
 }
 
 // ❌ Bad - Arrow function export default
 export default ({ label, onClick }) => {
-  return <button onClick={onClick}>{label}</button>
-}
+  return <button onClick={onClick}>{label}</button>;
+};
 ```
 
 ### File Organization
@@ -286,41 +289,41 @@ apps/web/
 ### Unit Tests
 
 ```typescript
-import { describe, it, expect } from 'vitest'
-import { calculateAge } from './user-utils'
+import { describe, it, expect } from "vitest";
+import { calculateAge } from "./user-utils";
 
-describe('calculateAge', () => {
-  it('calculates age correctly', () => {
-    const birthDate = new Date('1990-01-01')
-    const age = calculateAge(birthDate)
-    expect(age).toBeGreaterThan(30)
-  })
+describe("calculateAge", () => {
+  it("calculates age correctly", () => {
+    const birthDate = new Date("1990-01-01");
+    const age = calculateAge(birthDate);
+    expect(age).toBeGreaterThan(30);
+  });
 
-  it('throws error for invalid date', () => {
-    expect(() => calculateAge(null as any)).toThrow()
-  })
-})
+  it("throws error for invalid date", () => {
+    expect(() => calculateAge(null as any)).toThrow();
+  });
+});
 ```
 
 ### Integration Tests
 
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest'
-import { createMockUser } from '@/test/factories'
+import { describe, it, expect, beforeEach } from "vitest";
+import { createMockUser } from "@/test/factories";
 
-describe('User API', () => {
+describe("User API", () => {
   beforeEach(async () => {
-    await resetDatabase()
-  })
+    await resetDatabase();
+  });
 
-  it('creates user successfully', async () => {
-    const userData = createMockUser()
-    const response = await POST('/api/users', userData)
+  it("creates user successfully", async () => {
+    const userData = createMockUser();
+    const response = await POST("/api/users", userData);
 
-    expect(response.status).toBe(201)
-    expect(response.body.email).toBe(userData.email)
-  })
-})
+    expect(response.status).toBe(201);
+    expect(response.body.email).toBe(userData.email);
+  });
+});
 ```
 
 ### Test Coverage

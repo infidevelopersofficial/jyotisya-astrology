@@ -11,6 +11,7 @@ Complete end-to-end Razorpay payment integration for consultation bookings in th
 ### Backend (API Layer)
 
 ✅ **Payment Library** (`lib/payments/razorpay.ts`)
+
 - Order creation with Razorpay API
 - HMAC SHA256 signature verification (timing-safe)
 - Webhook signature validation
@@ -18,6 +19,7 @@ Complete end-to-end Razorpay payment integration for consultation bookings in th
 - Refund support (full & partial)
 
 ✅ **API Endpoints**
+
 - `POST /api/consultations/create-order` - Create consultation with payment order
 - `POST /api/consultations/verify-payment` - Verify payment signature
 - `POST /api/webhooks/razorpay` - Handle payment webhooks
@@ -26,15 +28,18 @@ Complete end-to-end Razorpay payment integration for consultation bookings in th
 ### Frontend (UI Layer)
 
 ✅ **Components**
+
 - `AstrologerList` - Displays astrologers with availability filtering
 - `BookingModal` - Interactive booking form with Razorpay checkout
 - Consultation details page with payment status
 
 ✅ **Pages**
+
 - `/consultations` - Browse and book astrologers
 - `/consultations/[id]` - View consultation details and status
 
 ✅ **Features**
+
 - Real-time amount calculation based on duration
 - Date/time picker with validation
 - Payment success/failure states
@@ -44,14 +49,17 @@ Complete end-to-end Razorpay payment integration for consultation bookings in th
 ### Configuration & Utilities
 
 ✅ **TypeScript Declarations** (`types/razorpay.d.ts`)
+
 - Complete type definitions for Razorpay Checkout API
 - IntelliSense support for payment options
 
 ✅ **Environment Variables**
+
 - Test and production key configurations
 - Public key exposure for frontend
 
 ✅ **Seed Data** (`scripts/seed-astrologers.ts`)
+
 - 6 sample astrologers with varied specializations
 - Different availability states for testing filters
 
@@ -62,11 +70,13 @@ Complete end-to-end Razorpay payment integration for consultation bookings in th
 ### 1. Setup Razorpay Keys
 
 **Get Test Keys:**
+
 1. Sign up at [Razorpay Dashboard](https://dashboard.razorpay.com)
 2. Navigate to **Settings** → **API Keys**
 3. Generate **Test Mode** keys
 
 **Add to Environment:**
+
 ```bash
 # apps/web/.env.local
 RAZORPAY_KEY_ID=rzp_test_YOUR_KEY_HERE
@@ -199,30 +209,34 @@ apps/web/
 
 ### Test Card Numbers
 
-| Card | CVV | Expiry | Result |
-|------|-----|--------|--------|
+| Card                | CVV          | Expiry | Result     |
+| ------------------- | ------------ | ------ | ---------- |
 | 4111 1111 1111 1111 | Any 3 digits | Future | ✅ Success |
 | 4000 0000 0000 0002 | Any 3 digits | Future | ❌ Decline |
 
 ### Test Cases
 
 **✅ Successful Payment:**
+
 1. Book consultation with test card `4111 1111 1111 1111`
 2. Verify: Redirected to consultation details
 3. Check: Payment status = PAID, Status = SCHEDULED
 
 **❌ Payment Failure:**
+
 1. Book consultation with test card `4000 0000 0000 0002`
 2. Verify: Error shown in modal
 3. Check: Database consultation still PENDING
 
 **🚫 Modal Dismissed:**
+
 1. Book consultation
 2. Close Razorpay modal without paying
 3. Verify: Error message "Payment cancelled"
 4. Check: Database consultation still PENDING
 
 **🔍 Filters:**
+
 1. Test "All Experts" filter (shows 6 astrologers)
 2. Test "Available Now" filter (shows 5 astrologers)
 3. Verify "Book Consultation" disabled for unavailable astrologers
@@ -232,18 +246,22 @@ apps/web/
 ## 🔐 Security Features
 
 ✅ **Signature Verification**
+
 - HMAC SHA256 with `RAZORPAY_KEY_SECRET`
 - Timing-safe comparison to prevent timing attacks
 
 ✅ **Authentication**
+
 - Supabase session required for all booking endpoints
 - User verification before consultation access
 
 ✅ **Environment Variables**
+
 - `RAZORPAY_KEY_SECRET` never exposed to frontend
 - `NEXT_PUBLIC_RAZORPAY_KEY_ID` safe for client-side use
 
 ✅ **Webhook Security**
+
 - Signature validation for all webhook requests
 - Rejects invalid/tampered payloads
 
@@ -297,6 +315,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -327,6 +346,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -356,6 +376,7 @@ Content-Type: application/json
 
 **Cause**: Wrong secret key or signature mismatch
 **Fix**:
+
 - Verify `RAZORPAY_KEY_SECRET` is correct
 - Ensure no extra spaces in environment variables
 - Check if using test key with test payments
@@ -400,11 +421,13 @@ Content-Type: application/json
 ## 🎯 What's Next
 
 The payment system is **100% complete and ready** for:
+
 - ✅ Development testing
 - ✅ Staging deployment
 - ✅ Production launch (after adding live keys)
 
 **Future Enhancements** (optional):
+
 - Email notifications on booking confirmation
 - SMS reminders before consultation
 - Meeting link integration (Zoom/Google Meet)

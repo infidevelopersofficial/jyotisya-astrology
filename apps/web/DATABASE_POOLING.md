@@ -36,16 +36,17 @@ DATABASE_URL="postgresql://user:password@db.project.supabase.co:5432/postgres?co
 
 ## Query Parameters
 
-| Parameter | Description | Default | Recommended |
-|-----------|-------------|---------|-------------|
-| `connection_limit` | Maximum number of connections in the pool | 10 | 5-20 depending on traffic |
-| `pool_timeout` | Seconds to wait for connection from pool | 10 | 20 |
-| `connect_timeout` | Seconds to wait for new connection | 5 | 10 |
-| `pgbouncer` | Use Supabase connection pooler | false | true for Supabase |
+| Parameter          | Description                               | Default | Recommended               |
+| ------------------ | ----------------------------------------- | ------- | ------------------------- |
+| `connection_limit` | Maximum number of connections in the pool | 10      | 5-20 depending on traffic |
+| `pool_timeout`     | Seconds to wait for connection from pool  | 10      | 20                        |
+| `connect_timeout`  | Seconds to wait for new connection        | 5       | 10                        |
+| `pgbouncer`        | Use Supabase connection pooler            | false   | true for Supabase         |
 
 ## Calculating Connection Limits
 
 ### Formula
+
 ```
 Total Connections = (Number of Instances) × (connection_limit per instance)
 ```
@@ -59,11 +60,13 @@ Total Connections = (Number of Instances) × (connection_limit per instance)
 ### PostgreSQL Max Connections
 
 Check your database's max connections:
+
 ```sql
 SHOW max_connections;
 ```
 
 Most PostgreSQL databases allow 100-200 connections. Leave headroom for:
+
 - Other applications
 - Maintenance tools
 - Connection overhead
@@ -73,10 +76,10 @@ Most PostgreSQL databases allow 100-200 connections. Leave headroom for:
 ### Check Active Connections
 
 ```typescript
-import { getDatabaseStats } from '@/lib/db/prisma'
+import { getDatabaseStats } from "@/lib/db/prisma";
 
-const stats = await getDatabaseStats()
-console.log('Active connections:', stats.activeConnections)
+const stats = await getDatabaseStats();
+console.log("Active connections:", stats.activeConnections);
 ```
 
 ### Health Check
@@ -94,6 +97,7 @@ Response includes database latency and connection status.
 **Cause**: Connection limit reached
 
 **Solutions**:
+
 1. Increase `connection_limit` (if database allows)
 2. Reduce number of concurrent requests
 3. Use Supabase connection pooler (`pgbouncer=true`)
@@ -104,6 +108,7 @@ Response includes database latency and connection status.
 **Cause**: No connections available in pool
 
 **Solutions**:
+
 1. Increase `pool_timeout`
 2. Increase `connection_limit`
 3. Check for connection leaks (unclosed connections)
@@ -112,11 +117,13 @@ Response includes database latency and connection status.
 ### Slow Queries
 
 The Prisma client automatically logs queries slower than 1 second. Check logs for:
+
 ```
 "Slow database query detected"
 ```
 
 Optimize slow queries with:
+
 - Indexes
 - Query optimization
 - Caching
@@ -134,11 +141,13 @@ Optimize slow queries with:
 ## Integration with Monitoring
 
 Connection metrics are automatically sent to:
+
 - Application logs (Winston)
 - Sentry (errors only)
 - Health check endpoints (`/api/health`, `/api/ready`)
 
 Set up alerts for:
+
 - High connection usage (> 80%)
 - Connection timeouts
 - Slow queries (> 1s)

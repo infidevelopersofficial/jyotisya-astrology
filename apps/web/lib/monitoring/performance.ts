@@ -1,5 +1,5 @@
-import { logger } from './logger'
-import * as Sentry from '@sentry/nextjs'
+import { logger } from "./logger";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Performance Monitoring Utilities
@@ -12,15 +12,15 @@ import * as Sentry from '@sentry/nextjs'
  */
 
 interface PerformanceMetric {
-  name: string
-  duration: number
-  timestamp: number
-  metadata?: Record<string, unknown>
+  name: string;
+  duration: number;
+  timestamp: number;
+  metadata?: Record<string, unknown>;
 }
 
 interface TimingResult {
-  duration: number
-  metadata?: Record<string, unknown>
+  duration: number;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -28,37 +28,33 @@ interface TimingResult {
  * Keeps track of all performance measurements
  */
 class PerformanceMonitor {
-  private metrics: PerformanceMetric[] = []
-  private maxMetrics = 1000 // Prevent memory leaks
+  private metrics: PerformanceMetric[] = [];
+  private maxMetrics = 1000; // Prevent memory leaks
 
   /**
    * Record a performance metric
    */
   record(metric: PerformanceMetric) {
-    this.metrics.push(metric)
+    this.metrics.push(metric);
 
     // Log slow operations
     if (metric.duration > 1000) {
-      logger.warn('Slow operation detected', {
+      logger.warn("Slow operation detected", {
         operation: metric.name,
         duration: `${metric.duration}ms`,
         ...metric.metadata,
-      })
+      });
 
       // Report to Sentry
-      Sentry.metrics.distribution(
-        `performance.${metric.name}`,
-        metric.duration,
-        {
-          unit: 'millisecond',
-          tags: metric.metadata as Record<string, string>,
-        }
-      )
+      Sentry.metrics.distribution(`performance.${metric.name}`, metric.duration, {
+        unit: "millisecond",
+        tags: metric.metadata as Record<string, string>,
+      });
     }
 
     // Trim old metrics
     if (this.metrics.length > this.maxMetrics) {
-      this.metrics = this.metrics.slice(-this.maxMetrics)
+      this.metrics = this.metrics.slice(-this.maxMetrics);
     }
   }
 
@@ -66,34 +62,32 @@ class PerformanceMonitor {
    * Get all recorded metrics
    */
   getMetrics(filter?: { name?: string; minDuration?: number }): PerformanceMetric[] {
-    let filtered = this.metrics
+    let filtered = this.metrics;
 
     if (filter?.name) {
-      filtered = filtered.filter(m => m.name === filter.name)
+      filtered = filtered.filter((m) => m.name === filter.name);
     }
 
     if (filter?.minDuration !== undefined) {
-      const minDuration = filter.minDuration
-      filtered = filtered.filter(m => m.duration >= minDuration)
+      const minDuration = filter.minDuration;
+      filtered = filtered.filter((m) => m.duration >= minDuration);
     }
 
-    return filtered
+    return filtered;
   }
 
   /**
    * Get performance statistics
    */
   getStats(name?: string) {
-    const metrics = name
-      ? this.metrics.filter(m => m.name === name)
-      : this.metrics
+    const metrics = name ? this.metrics.filter((m) => m.name === name) : this.metrics;
 
     if (metrics.length === 0) {
-      return null
+      return null;
     }
 
-    const durations = metrics.map(m => m.duration).sort((a, b) => a - b)
-    const sum = durations.reduce((a, b) => a + b, 0)
+    const durations = metrics.map((m) => m.duration).sort((a, b) => a - b);
+    const sum = durations.reduce((a, b) => a + b, 0);
 
     return {
       count: metrics.length,
@@ -103,18 +97,18 @@ class PerformanceMonitor {
       median: durations[Math.floor(durations.length / 2)],
       p95: durations[Math.floor(durations.length * 0.95)],
       p99: durations[Math.floor(durations.length * 0.99)],
-    }
+    };
   }
 
   /**
    * Clear all metrics
    */
   clear() {
-    this.metrics = []
+    this.metrics = [];
   }
 }
 
-export const performanceMonitor = new PerformanceMonitor()
+export const performanceMonitor = new PerformanceMonitor();
 
 /**
  * Measure execution time of a function
@@ -131,89 +125,85 @@ export const performanceMonitor = new PerformanceMonitor()
 export async function measureAsync<T>(
   name: string,
   fn: () => Promise<T>,
-  metadata?: Record<string, unknown>
+  metadata?: Record<string, unknown>,
 ): Promise<T> {
-  const start = performance.now()
+  const start = performance.now();
 
   try {
-    const result = await fn()
-    const duration = performance.now() - start
+    const result = await fn();
+    const duration = performance.now() - start;
 
     performanceMonitor.record({
       name,
       duration,
       timestamp: Date.now(),
       metadata: { ...metadata, success: true },
-    })
+    });
 
     logger.debug(`Performance: ${name}`, {
       duration: `${duration.toFixed(2)}ms`,
       ...metadata,
-    })
+    });
 
-    return result
+    return result;
   } catch (error: unknown) {
-    const duration = performance.now() - start
+    const duration = performance.now() - start;
 
     performanceMonitor.record({
       name,
       duration,
       timestamp: Date.now(),
       metadata: { ...metadata, success: false },
-    })
+    });
 
     logger.error(`Performance: ${name} (failed)`, error, {
       duration: `${duration.toFixed(2)}ms`,
       ...metadata,
-    })
+    });
 
-    throw error
+    throw error;
   }
 }
 
 /**
  * Measure execution time of a synchronous function
  */
-export function measureSync<T>(
-  name: string,
-  fn: () => T,
-  metadata?: Record<string, unknown>
-): T {
-  const start = performance.now()
+export function measureSync<T>(name: string, fn: () => T, metadata?: Record<string, unknown>): T {
+  const start = performance.now();
 
   try {
-    const result = fn()
-    const duration = performance.now() - start
+    const result = fn();
+    const duration = performance.now() - start;
 
     performanceMonitor.record({
       name,
       duration,
       timestamp: Date.now(),
       metadata: { ...metadata, success: true },
-    })
+    });
 
     logger.debug(`Performance: ${name}`, {
       duration: `${duration.toFixed(2)}ms`,
       ...metadata,
-    })
+    });
 
-    return result
+    return result;
   } catch (error: unknown) {
-    const duration = performance.now() - start
+    const duration = performance.now() - start;
 
     performanceMonitor.record({
       name,
       duration,
       timestamp: Date.now(),
       metadata: { ...metadata, success: false },
-    })
+    });
 
     logger.error(`Performance: ${name} (failed)`, error, {
       duration: `${duration.toFixed(2)}ms`,
       ...metadata,
-    })
+    });
 
-    throw error
+    throw error;
   }
 }
 
@@ -229,40 +219,40 @@ export function measureSync<T>(
  * ```
  */
 export function startTimer(name: string, metadata?: Record<string, unknown>) {
-  const start = performance.now()
+  const start = performance.now();
 
   return (additionalMetadata?: Record<string, unknown>): TimingResult => {
-    const duration = performance.now() - start
-    const combinedMetadata = { ...metadata, ...additionalMetadata }
+    const duration = performance.now() - start;
+    const combinedMetadata = { ...metadata, ...additionalMetadata };
 
     performanceMonitor.record({
       name,
       duration,
       timestamp: Date.now(),
       metadata: combinedMetadata,
-    })
+    });
 
     logger.debug(`Performance: ${name}`, {
       duration: `${duration.toFixed(2)}ms`,
       ...combinedMetadata,
-    })
+    });
 
     return {
       duration,
       metadata: combinedMetadata,
-    }
-  }
+    };
+  };
 }
 
 /**
  * Performance mark (Web Performance API wrapper)
  */
 export function mark(name: string) {
-  if (typeof window !== 'undefined' && window.performance) {
+  if (typeof window !== "undefined" && window.performance) {
     try {
-      performance.mark(name)
+      performance.mark(name);
     } catch (error: unknown) {
-      logger.warn('Failed to create performance mark', { name, error })
+      logger.warn("Failed to create performance mark", { name, error });
     }
   }
 }
@@ -270,35 +260,31 @@ export function mark(name: string) {
 /**
  * Performance measure (Web Performance API wrapper)
  */
-export function measure(
-  name: string,
-  startMark: string,
-  endMark?: string
-): number | null {
-  if (typeof window !== 'undefined' && window.performance) {
+export function measure(name: string, startMark: string, endMark?: string): number | null {
+  if (typeof window !== "undefined" && window.performance) {
     try {
-      const measureResult = performance.measure(name, startMark, endMark)
-      const duration = measureResult.duration
+      const measureResult = performance.measure(name, startMark, endMark);
+      const duration = measureResult.duration;
 
       performanceMonitor.record({
         name,
         duration,
         timestamp: Date.now(),
-      })
+      });
 
-      return duration
+      return duration;
     } catch (error: unknown) {
-      logger.warn('Failed to measure performance', {
+      logger.warn("Failed to measure performance", {
         name,
         startMark,
         endMark,
         error,
-      })
-      return null
+      });
+      return null;
     }
   }
 
-  return null
+  return null;
 }
 
 /**
@@ -307,13 +293,9 @@ export function measure(
 export async function trackApiRequest<T>(
   method: string,
   url: string,
-  fn: () => Promise<T>
+  fn: () => Promise<T>,
 ): Promise<T> {
-  return measureAsync(
-    'api_request',
-    fn,
-    { method, url }
-  )
+  return measureAsync("api_request", fn, { method, url });
 }
 
 /**
@@ -330,20 +312,16 @@ export async function trackApiRequest<T>(
  * ```
  */
 export function tracked(name?: string) {
-  return function (
-    target: object,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
-    const originalMethod = descriptor.value
-    const metricName = name || `${target.constructor.name}.${propertyKey}`
+  return function (target: object, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+    const metricName = name || `${target.constructor.name}.${propertyKey}`;
 
     descriptor.value = async function (...args: unknown[]) {
-      return measureAsync(metricName, () => originalMethod.apply(this, args))
-    }
+      return measureAsync(metricName, () => originalMethod.apply(this, args));
+    };
 
-    return descriptor
-  }
+    return descriptor;
+  };
 }
 
 /**
@@ -351,43 +329,43 @@ export function tracked(name?: string) {
  * Use with Next.js app/layout.tsx
  */
 export function reportWebVitals(metric: {
-  id: string
-  name: string
-  value: number
-  label: 'web-vital' | 'custom'
-  rating?: 'good' | 'needs-improvement' | 'poor'
+  id: string;
+  name: string;
+  value: number;
+  label: "web-vital" | "custom";
+  rating?: "good" | "needs-improvement" | "poor";
 }) {
   // Log to console in development
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[Web Vitals]', metric)
+  if (process.env.NODE_ENV === "development") {
+    console.error("[Web Vitals]", metric);
   }
 
   // Send to monitoring service
-  logger.info('Web Vitals', {
+  logger.info("Web Vitals", {
     metricName: metric.name,
     value: metric.value,
     rating: metric.rating,
     id: metric.id,
-  })
+  });
 
   // Send to Sentry
   Sentry.metrics.distribution(`webvital.${metric.name}`, metric.value, {
-    unit: 'millisecond',
+    unit: "millisecond",
     tags: {
-      rating: metric.rating || 'unknown',
+      rating: metric.rating || "unknown",
     },
-  })
+  });
 
   // Send to analytics
-  if (typeof window !== 'undefined') {
-    const windowWithGtag = window as unknown as (Window & { gtag?: (...args: unknown[]) => void })
+  if (typeof window !== "undefined") {
+    const windowWithGtag = window as unknown as Window & { gtag?: (...args: unknown[]) => void };
     if (windowWithGtag.gtag) {
-      windowWithGtag.gtag('event', metric.name, {
+      windowWithGtag.gtag("event", metric.name, {
         value: Math.round(metric.value),
         metric_id: metric.id,
         metric_rating: metric.rating,
         non_interaction: true,
-      })
+      });
     }
   }
 }
@@ -404,27 +382,27 @@ export function reportWebVitals(metric: {
  * ```
  */
 export function useRenderTracking(componentName: string, props?: Record<string, unknown>) {
-  const renderCount = React.useRef(0)
+  const renderCount = React.useRef(0);
 
   React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      renderCount.current++
+    if (typeof window !== "undefined") {
+      renderCount.current++;
 
       if (renderCount.current > 1) {
-        logger.debug('Component re-render', {
+        logger.debug("Component re-render", {
           component: componentName,
           renderCount: renderCount.current,
           props: props ? Object.keys(props) : undefined,
-        })
+        });
       }
     }
-  })
+  });
 }
 
 // eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace React {
-  function useRef<T>(initialValue: T): { current: T }
-  function useEffect(effect: () => void | (() => void), deps?: unknown[]): void
+  function useRef<T>(initialValue: T): { current: T };
+  function useEffect(effect: () => void | (() => void), deps?: unknown[]): void;
 }
 
 /**
@@ -432,43 +410,43 @@ declare namespace React {
  * Warns when operations exceed thresholds
  */
 export class PerformanceBudget {
-  private budgets: Map<string, number> = new Map()
+  private budgets: Map<string, number> = new Map();
 
   /**
    * Set performance budget for an operation
    */
   setBudget(operation: string, maxDuration: number) {
-    this.budgets.set(operation, maxDuration)
+    this.budgets.set(operation, maxDuration);
   }
 
   /**
    * Check if operation is within budget
    */
   check(operation: string, duration: number): boolean {
-    const budget = this.budgets.get(operation)
+    const budget = this.budgets.get(operation);
 
     if (budget === undefined) {
-      return true // No budget set
+      return true; // No budget set
     }
 
     if (duration > budget) {
-      logger.warn('Performance budget exceeded', {
+      logger.warn("Performance budget exceeded", {
         operation,
         duration: `${duration}ms`,
         budget: `${budget}ms`,
         exceeded: `${duration - budget}ms`,
-      })
+      });
 
-      return false
+      return false;
     }
 
-    return true
+    return true;
   }
 }
 
-export const performanceBudget = new PerformanceBudget()
+export const performanceBudget = new PerformanceBudget();
 
 // Set default budgets
-performanceBudget.setBudget('api_request', 2000) // 2 seconds
-performanceBudget.setBudget('page_load', 3000) // 3 seconds
-performanceBudget.setBudget('database_query', 1000) // 1 second
+performanceBudget.setBudget("api_request", 2000); // 2 seconds
+performanceBudget.setBudget("page_load", 3000); // 3 seconds
+performanceBudget.setBudget("database_query", 1000); // 1 second

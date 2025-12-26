@@ -1,19 +1,15 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { Star, Loader2 } from 'lucide-react'
-import type { SavedChartListItem } from '@/types/savedChart.types'
-import {
-  formatBirthDate,
-  formatBirthTime,
-  getRelativeTime,
-} from '@/services/savedChartService'
+import Link from "next/link";
+import { Star, Loader2 } from "lucide-react";
+import type { SavedChartListItem } from "@/types/savedChart.types";
+import { formatBirthDate, formatBirthTime, getRelativeTime } from "@/services/savedChartService";
 
 interface SavedChartCardProps {
-  chart: SavedChartListItem
-  onToggleFavorite: (chartId: string) => Promise<void>
-  onChartClick?: (chart: SavedChartListItem) => void
-  isTogglingFavorite?: boolean
+  chart: SavedChartListItem;
+  onToggleFavorite: (chartId: string) => Promise<void>;
+  onChartClick?: (chart: SavedChartListItem) => void;
+  isTogglingFavorite?: boolean;
 }
 
 export default function SavedChartCard({
@@ -23,22 +19,22 @@ export default function SavedChartCard({
   isTogglingFavorite = false,
 }: SavedChartCardProps) {
   const handleToggleFavorite = async (e: React.MouseEvent) => {
-    e.preventDefault() // Prevent navigation
-    e.stopPropagation()
+    e.preventDefault(); // Prevent navigation
+    e.stopPropagation();
 
     // Don't toggle if already in progress
     if (isTogglingFavorite) {
-      return
+      return;
     }
 
-    await onToggleFavorite(chart.id)
-  }
+    await onToggleFavorite(chart.id);
+  };
 
   const handleCardClick = () => {
     if (onChartClick) {
-      onChartClick(chart)
+      onChartClick(chart);
     }
-  }
+  };
 
   return (
     <Link
@@ -52,17 +48,15 @@ export default function SavedChartCard({
           <h3 className="text-lg font-semibold text-white transition-colors group-hover:text-orange-300">
             {chart.name}
           </h3>
-          <p className="mt-0.5 text-xs text-slate-400">
-            {getRelativeTime(chart.createdAt)}
-          </p>
+          <p className="mt-0.5 text-xs text-slate-400">{getRelativeTime(chart.createdAt)}</p>
         </div>
 
         <button
           onClick={handleToggleFavorite}
           disabled={isTogglingFavorite}
           className="rounded-full p-2 transition-all hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
-          aria-label={chart.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-          title={chart.isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          aria-label={chart.isFavorite ? "Remove from favorites" : "Add to favorites"}
+          title={chart.isFavorite ? "Remove from favorites" : "Add to favorites"}
         >
           {isTogglingFavorite ? (
             <Loader2 className="h-5 w-5 animate-spin text-orange-400" />
@@ -70,8 +64,8 @@ export default function SavedChartCard({
             <Star
               className={`h-5 w-5 transition-all ${
                 chart.isFavorite
-                  ? 'fill-orange-400 text-orange-400'
-                  : 'text-slate-500 hover:text-orange-400'
+                  ? "fill-orange-400 text-orange-400"
+                  : "text-slate-500 hover:text-orange-400"
               }`}
             />
           )}
@@ -102,5 +96,5 @@ export default function SavedChartCard({
         <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
       </div>
     </Link>
-  )
+  );
 }

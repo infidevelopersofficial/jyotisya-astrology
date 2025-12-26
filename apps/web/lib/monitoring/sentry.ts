@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * Shared Sentry configuration for client and server runtimes
@@ -17,19 +17,19 @@ import * as Sentry from '@sentry/nextjs'
  * Runtime environment types for Sentry initialization
  * Note: 'edge' runtime is handled separately in sentry.edge.config.ts
  */
-export type SentryRuntime = 'client' | 'server'
+export type SentryRuntime = "client" | "server";
 
 /**
  * Detect the current runtime environment
  */
 function detectRuntime(): SentryRuntime {
   // Browser check
-  if (typeof window !== 'undefined') {
-    return 'client'
+  if (typeof window !== "undefined") {
+    return "client";
   }
 
   // Node.js server
-  return 'server'
+  return "server";
 }
 
 /**
@@ -40,15 +40,15 @@ function detectRuntime(): SentryRuntime {
  */
 // eslint-disable-next-line complexity, max-lines-per-function
 export function initSentry(runtime?: SentryRuntime) {
-  const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN
-  const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV
+  const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  const ENVIRONMENT = process.env.NEXT_PUBLIC_VERCEL_ENV || process.env.NODE_ENV;
 
   if (!SENTRY_DSN) {
-    console.warn('[Sentry] DSN not configured, error tracking disabled')
-    return
+    console.warn("[Sentry] DSN not configured, error tracking disabled");
+    return;
   }
 
-  const detectedRuntime = runtime || detectRuntime()
+  const detectedRuntime = runtime || detectRuntime();
 
   // Base configuration (compatible with client and server runtimes)
   const baseConfig: Sentry.BrowserOptions = {
@@ -56,46 +56,46 @@ export function initSentry(runtime?: SentryRuntime) {
     environment: ENVIRONMENT,
 
     // Performance monitoring
-    tracesSampleRate: ENVIRONMENT === 'production' ? 0.1 : 1.0,
+    tracesSampleRate: ENVIRONMENT === "production" ? 0.1 : 1.0,
 
     // Error filtering
     beforeSend(event, hint) {
-      const error = hint.originalException
+      const error = hint.originalException;
 
       // Filter out expected errors
-      if (error && typeof error === 'object' && 'message' in error) {
-        const message = String((error instanceof Error ? error.message : String(error)))
+      if (error && typeof error === "object" && "message" in error) {
+        const message = String(error instanceof Error ? error.message : String(error));
 
         // Ignore common browser errors
-        if (message.includes('ResizeObserver loop limit exceeded')) {
-          return null
+        if (message.includes("ResizeObserver loop limit exceeded")) {
+          return null;
         }
 
         // Ignore network errors (user probably lost connection)
-        if (message.includes('NetworkError') || message.includes('Failed to fetch')) {
-          return null
+        if (message.includes("NetworkError") || message.includes("Failed to fetch")) {
+          return null;
         }
 
         // Ignore auth errors (these are expected)
-        if (message.includes('Invalid or expired session')) {
-          return null
+        if (message.includes("Invalid or expired session")) {
+          return null;
         }
       }
 
-      return event
+      return event;
     },
 
     // Ignore specific errors
     ignoreErrors: [
-      'Non-Error promise rejection captured',
-      'ResizeObserver loop limit exceeded',
-      'ResizeObserver loop completed with undelivered notifications',
-      'cancelled', // User navigation
+      "Non-Error promise rejection captured",
+      "ResizeObserver loop limit exceeded",
+      "ResizeObserver loop completed with undelivered notifications",
+      "cancelled", // User navigation
     ],
-  }
+  };
 
   // Runtime-specific configuration
-  if (detectedRuntime === 'client') {
+  if (detectedRuntime === "client") {
     // Browser-only: Session replay
     Sentry.init({
       ...baseConfig,
@@ -107,10 +107,10 @@ export function initSentry(runtime?: SentryRuntime) {
           blockAllMedia: true,
         }),
       ],
-    })
+    });
   } else {
     // Server: Standard configuration without browser features
-    Sentry.init(baseConfig)
+    Sentry.init(baseConfig);
   }
 }
 
@@ -118,43 +118,43 @@ export function initSentry(runtime?: SentryRuntime) {
  * Capture an exception to Sentry
  */
 export function captureException(error: Error | unknown, context?: Record<string, unknown>) {
-  if (process.env.NODE_ENV === 'test') return
+  if (process.env.NODE_ENV === "test") return;
 
   Sentry.captureException(error, {
     extra: context,
-  })
+  });
 }
 
 /**
  * Capture a message to Sentry
  */
-export function captureMessage(message: string, level: Sentry.SeverityLevel = 'info') {
-  if (process.env.NODE_ENV === 'test') return
+export function captureMessage(message: string, level: Sentry.SeverityLevel = "info") {
+  if (process.env.NODE_ENV === "test") return;
 
-  Sentry.captureMessage(message, level)
+  Sentry.captureMessage(message, level);
 }
 
 /**
  * Set user context for error tracking
  */
 export function setUser(user: { id: string; email?: string; username?: string } | null) {
-  if (process.env.NODE_ENV === 'test') return
+  if (process.env.NODE_ENV === "test") return;
 
-  Sentry.setUser(user)
+  Sentry.setUser(user);
 }
 
 /**
  * Add breadcrumb for debugging
  */
 export function addBreadcrumb(breadcrumb: {
-  message: string
-  category?: string
-  level?: Sentry.SeverityLevel
-  data?: Record<string, unknown>
+  message: string;
+  category?: string;
+  level?: Sentry.SeverityLevel;
+  data?: Record<string, unknown>;
 }) {
-  if (process.env.NODE_ENV === 'test') return
+  if (process.env.NODE_ENV === "test") return;
 
-  Sentry.addBreadcrumb(breadcrumb)
+  Sentry.addBreadcrumb(breadcrumb);
 }
 
 /**
@@ -162,26 +162,26 @@ export function addBreadcrumb(breadcrumb: {
  */
 export function withErrorTracking<T extends (...args: unknown[]) => any>(
   fn: T,
-  context?: Record<string, unknown>
+  context?: Record<string, unknown>,
 ): T {
   return ((...args: Parameters<T>) => {
     try {
-      const result = fn(...args)
+      const result = fn(...args);
 
       // Handle async functions
       if (result instanceof Promise) {
         return result.catch((error) => {
-          captureException(error, context)
-          throw error
-        })
+          captureException(error, context);
+          throw error;
+        });
       }
 
-      return result
+      return result;
     } catch (error: unknown) {
-      captureException(error, context)
-      throw error
+      captureException(error, context);
+      throw error;
     }
-  }) as T
+  }) as T;
 }
 
 /**

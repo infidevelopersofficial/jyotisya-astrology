@@ -150,28 +150,34 @@
 ## Component Responsibilities
 
 ### 1. API Routes Layer
+
 **Location**: `apps/web/app/api/v1/astrology/`
 
 **Responsibilities**:
+
 - HTTP endpoint handling
 - Request validation (Zod schemas)
 - Response formatting
 - Error handling
 
 **Key Files**:
+
 - `birth-chart/route.ts` - Birth chart calculations
 - `status/route.ts` - Service health monitoring
 
 ### 2. Service Orchestrator
+
 **Location**: `apps/web/lib/astrology/service-orchestrator.ts`
 
 **Responsibilities**:
+
 - Backend selection logic
 - Health tracking
 - Automatic failover
 - Cost optimization
 
 **Decision Logic**:
+
 ```typescript
 1. Is Python service available & healthy?
    YES → Use Python service
@@ -183,32 +189,39 @@
 ```
 
 ### 3. Python Service Client
+
 **Location**: `apps/web/lib/astrology/python-client.ts`
 
 **Responsibilities**:
+
 - HTTP communication with Railway
 - Circuit breaker pattern
 - Retry logic with backoff
 - Health check monitoring
 
 **Circuit Breaker States**:
+
 - **Closed**: Normal operation
 - **Open**: 5+ failures, blocking requests for 1 min
 - **Half-Open**: Testing recovery
 
 ### 4. FreeAstrologyAPI Client
+
 **Location**: `apps/web/lib/astrology/client.ts`
 
 **Responsibilities**:
+
 - HTTP communication with external API
 - Rate limit tracking (50/day)
 - Request caching (24hr TTL)
 - Quota management
 
 ### 5. Middleware & Utilities
+
 **Location**: `apps/web/lib/api/`
 
 **Components**:
+
 - `route-handler.ts` - Error handling wrapper
 - `auth.ts` - Authentication helpers
 
@@ -327,6 +340,7 @@ Response:
 ### Latency Breakdown
 
 **Python Service (Railway):**
+
 ```
 Request: 1-2ms
 Network: 2-5ms (same region)
@@ -337,6 +351,7 @@ Total: 5-15ms ⚡
 ```
 
 **FreeAstrologyAPI (Fallback):**
+
 ```
 Request: 1-2ms
 Network: 50-100ms (external)
@@ -349,11 +364,13 @@ Total: 200-500ms 🐌
 ### Caching Strategy
 
 **Current:**
+
 - In-memory cache (Map-based)
 - 24-hour TTL for birth charts
 - No distributed cache yet
 
 **Future (Phase 2 Enhancement):**
+
 - Layer 1: In-memory (hot cache)
 - Layer 2: Redis (distributed)
 - Layer 3: PostgreSQL (long-term)
@@ -382,6 +399,7 @@ Total: 200-500ms 🐌
 ### Logging
 
 **Format:**
+
 ```json
 {
   "requestId": "uuid",
@@ -394,6 +412,7 @@ Total: 200-500ms 🐌
 ```
 
 **Log Levels:**
+
 - **INFO**: Successful requests (dev only)
 - **WARN**: 4xx errors, fallback events
 - **ERROR**: 5xx errors, service failures
@@ -403,17 +422,20 @@ Total: 200-500ms 🐌
 ## Security Considerations
 
 ### Authentication
+
 - Supabase session-based auth
 - JWT tokens (handled by Supabase)
 - Role-based access control
 
 ### API Security
+
 - Request validation (Zod)
 - Rate limiting per user
 - CORS configuration
 - API key management (env vars)
 
 ### Data Protection
+
 - No sensitive data logged
 - Secure env var handling
 - HTTPS only in production
@@ -425,11 +447,13 @@ Total: 200-500ms 🐌
 ### Current Capacity
 
 **Python Service (Railway):**
+
 - Handles ~1000 req/sec (single instance)
 - Auto-scales based on load
 - ~50MB memory per instance
 
 **Next.js API Routes (Vercel):**
+
 - Serverless (auto-scaling)
 - 10s max duration (configurable)
 - 1024MB memory (configurable)
@@ -452,6 +476,7 @@ Total: 200-500ms 🐌
 ## Deployment Architecture
 
 ### Development
+
 ```
 Local Machine
 ├─ Next.js (localhost:3000)
@@ -460,6 +485,7 @@ Local Machine
 ```
 
 ### Production
+
 ```
 Vercel (Next.js)
 ├─ Edge Network (CDN)
@@ -482,21 +508,25 @@ Supabase (Database)
 ## Future Enhancements
 
 ### Phase 3: Business Logic
+
 - Consultation booking API
 - Commerce/products API
 - Payment processing
 
 ### Phase 4: Chart Generation
+
 - Server-side SVG rendering
 - Multiple chart styles
 - PDF export
 
 ### Phase 5: AI Interpretations
+
 - OpenAI integration
 - Streaming responses
 - Smart caching
 
 ### Phase 6: Optimization
+
 - Redis caching layer
 - Database query optimization
 - Remove deprecated services

@@ -5,6 +5,7 @@ Security features, best practices, and implementation guide.
 ## Overview
 
 The platform implements multiple security layers:
+
 - Rate limiting
 - Security headers (OWASP recommended)
 - CORS configuration
@@ -19,12 +20,12 @@ The platform implements multiple security layers:
 ### Configuration
 
 ```typescript
-import { rateLimit, rateLimiters } from '@/lib/rate-limit'
+import { rateLimit, rateLimiters } from "@/lib/rate-limit";
 
 // Use preset limiter
 export async function POST(request: NextRequest) {
-  const limitResponse = await rateLimiters.auth(request)
-  if (limitResponse) return limitResponse
+  const limitResponse = await rateLimiters.auth(request);
+  if (limitResponse) return limitResponse;
 
   // Handle request
 }
@@ -33,17 +34,17 @@ export async function POST(request: NextRequest) {
 const limitResponse = await rateLimit(request, {
   limit: 10,
   window: 60000, // 1 minute
-})
+});
 ```
 
 ### Preset Limiters
 
-| Limiter | Limit | Window | Use Case |
-|---------|-------|--------|----------|
-| `auth` | 5 | 15 min | Authentication endpoints |
-| `api` | 100 | 1 min | General API routes |
-| `public` | 300 | 1 min | Public endpoints |
-| `sensitive` | 3 | 1 hour | Sensitive operations |
+| Limiter     | Limit | Window | Use Case                 |
+| ----------- | ----- | ------ | ------------------------ |
+| `auth`      | 5     | 15 min | Authentication endpoints |
+| `api`       | 100   | 1 min  | General API routes       |
+| `public`    | 300   | 1 min  | Public endpoints         |
+| `sensitive` | 3     | 1 hour | Sensitive operations     |
 
 ### Custom Identifiers
 
@@ -51,13 +52,14 @@ const limitResponse = await rateLimit(request, {
 await rateLimit(request, {
   limit: 10,
   window: 60000,
-  identifier: (req) => req.headers.get('x-api-key') || 'anonymous',
-})
+  identifier: (req) => req.headers.get("x-api-key") || "anonymous",
+});
 ```
 
 ### Headers
 
 Rate limit responses include:
+
 - `X-RateLimit-Limit` - Maximum requests
 - `X-RateLimit-Remaining` - Remaining requests
 - `X-RateLimit-Reset` - Reset timestamp
@@ -109,32 +111,30 @@ Modify `lib/security/headers.ts` to customize CSP for your needs.
 ### Basic CORS
 
 ```typescript
-import { handleCORS } from '@/lib/security/headers'
+import { handleCORS } from "@/lib/security/headers";
 
 export async function GET(request: NextRequest) {
-  let response = NextResponse.json(data)
+  let response = NextResponse.json(data);
 
   // Add CORS headers
-  response = handleCORS(response, request)
+  response = handleCORS(response, request);
 
-  return response
+  return response;
 }
 ```
 
 ### Custom Origins
 
 ```typescript
-const allowedOrigins = [
-  'https://example.com',
-  'https://app.example.com',
-]
+const allowedOrigins = ["https://example.com", "https://app.example.com"];
 
-response = handleCORS(response, request, allowedOrigins)
+response = handleCORS(response, request, allowedOrigins);
 ```
 
 ### Preflight Handling
 
 OPTIONS requests are automatically handled:
+
 ```
 Access-Control-Allow-Methods: GET, POST, PUT, DELETE, PATCH, OPTIONS
 Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
@@ -157,11 +157,11 @@ Access-Control-Max-Age: 86400
 ### Protected Routes
 
 ```typescript
-import { requireAuth } from '@/lib/supabase/middleware'
+import { requireAuth } from "@/lib/supabase/middleware";
 
 export async function GET(request: NextRequest) {
-  const user = await requireAuth(request)
-  if (user instanceof NextResponse) return user
+  const user = await requireAuth(request);
+  if (user instanceof NextResponse) return user;
 
   // User is authenticated
 }
@@ -170,10 +170,10 @@ export async function GET(request: NextRequest) {
 ### Optional Auth
 
 ```typescript
-import { optionalAuth } from '@/lib/supabase/middleware'
+import { optionalAuth } from "@/lib/supabase/middleware";
 
 export async function GET(request: NextRequest) {
-  const user = await optionalAuth(request)
+  const user = await optionalAuth(request);
 
   if (user) {
     // Personalized content
@@ -190,46 +190,37 @@ export async function GET(request: NextRequest) {
 ### Email Validation
 
 ```typescript
-import { validateEmail } from '@/lib/validation'
+import { validateEmail } from "@/lib/validation";
 
 if (!validateEmail(email)) {
-  return NextResponse.json(
-    { error: 'Invalid email' },
-    { status: 400 }
-  )
+  return NextResponse.json({ error: "Invalid email" }, { status: 400 });
 }
 ```
 
 ### Phone Validation
 
 ```typescript
-import { validatePhone } from '@/lib/validation'
+import { validatePhone } from "@/lib/validation";
 
 if (!validatePhone(phone)) {
-  return NextResponse.json(
-    { error: 'Invalid phone number' },
-    { status: 400 }
-  )
+  return NextResponse.json({ error: "Invalid phone number" }, { status: 400 });
 }
 ```
 
 ### Zod Schemas
 
 ```typescript
-import { z } from 'zod'
+import { z } from "zod";
 
 const schema = z.object({
   email: z.string().email(),
   name: z.string().min(1).max(100),
-})
+});
 
-const result = schema.safeParse(data)
+const result = schema.safeParse(data);
 
 if (!result.success) {
-  return NextResponse.json(
-    { errors: result.error.errors },
-    { status: 400 }
-  )
+  return NextResponse.json({ errors: result.error.errors }, { status: 400 });
 }
 ```
 
@@ -240,38 +231,35 @@ if (!result.success) {
 ### API Routes Pattern
 
 ```typescript
-import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/supabase/middleware'
-import { rateLimiters } from '@/lib/rate-limit'
-import { apiSecurityHeaders } from '@/lib/security/headers'
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuth } from "@/lib/supabase/middleware";
+import { rateLimiters } from "@/lib/rate-limit";
+import { apiSecurityHeaders } from "@/lib/security/headers";
 
 export async function POST(request: NextRequest) {
   // 1. Rate limiting
-  const limitResponse = await rateLimiters.api(request)
-  if (limitResponse) return limitResponse
+  const limitResponse = await rateLimiters.api(request);
+  if (limitResponse) return limitResponse;
 
   // 2. Authentication
-  const user = await requireAuth(request)
-  if (user instanceof NextResponse) return user
+  const user = await requireAuth(request);
+  if (user instanceof NextResponse) return user;
 
   // 3. Validation
-  const body = await request.json()
-  const result = schema.safeParse(body)
+  const body = await request.json();
+  const result = schema.safeParse(body);
   if (!result.success) {
-    return NextResponse.json(
-      { errors: result.error.errors },
-      { status: 400 }
-    )
+    return NextResponse.json({ errors: result.error.errors }, { status: 400 });
   }
 
   // 4. Business logic
-  const data = await processRequest(result.data)
+  const data = await processRequest(result.data);
 
   // 5. Response with security headers
-  let response = NextResponse.json(data)
-  response = apiSecurityHeaders(response)
+  let response = NextResponse.json(data);
+  response = apiSecurityHeaders(response);
 
-  return response
+  return response;
 }
 ```
 
@@ -283,13 +271,13 @@ export async function POST(request: NextRequest) {
 
 ```typescript
 // ❌ Bad
-const name = body.name
-await db.user.create({ name })
+const name = body.name;
+await db.user.create({ name });
 
 // ✅ Good
-const schema = z.object({ name: z.string().min(1).max(100) })
-const { name } = schema.parse(body)
-await db.user.create({ name })
+const schema = z.object({ name: z.string().min(1).max(100) });
+const { name } = schema.parse(body);
+await db.user.create({ name });
 ```
 
 ### 2. Rate Limit Sensitive Endpoints
@@ -306,9 +294,9 @@ await db.user.create({ name })
 ### 3. Sanitize User Input
 
 ```typescript
-import { sanitizeInput } from '@/lib/validation'
+import { sanitizeInput } from "@/lib/validation";
 
-const cleanEmail = sanitizeInput(email) // Trim + lowercase
+const cleanEmail = sanitizeInput(email); // Trim + lowercase
 ```
 
 ### 4. Use Secure Cookies
@@ -325,16 +313,16 @@ const cleanEmail = sanitizeInput(email) // Trim + lowercase
 ### 5. Log Security Events
 
 ```typescript
-import { logger } from '@/lib/monitoring/logger'
+import { logger } from "@/lib/monitoring/logger";
 
 // Log auth events
-logger.auth('signin.failed', undefined, { reason: 'invalid_password' })
+logger.auth("signin.failed", undefined, { reason: "invalid_password" });
 
 // Log rate limit hits
-logger.warn('Rate limit exceeded', { ip: request.ip })
+logger.warn("Rate limit exceeded", { ip: request.ip });
 
 // Log suspicious activity
-logger.error('Potential attack detected', null, { pattern: 'sql_injection' })
+logger.error("Potential attack detected", null, { pattern: "sql_injection" });
 ```
 
 ---

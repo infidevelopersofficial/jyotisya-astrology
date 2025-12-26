@@ -5,12 +5,14 @@
 Your monorepo now has a **production-ready foundation** for migrating backend services to Next.js App Router API routes, with intelligent service orchestration and automatic failover.
 
 ### ✅ Phase 1: Infrastructure (100%)
+
 - Railway deployment configuration
 - Environment management & validation
 - API framework (error handling, auth, logging)
 - Type-safe request/response handling
 
 ### ✅ Phase 2: Service Integration (80%)
+
 - Python service client with circuit breaker
 - Service orchestrator (Python → FreeAstrologyAPI fallback)
 - Enhanced API routes with validation
@@ -79,6 +81,7 @@ digital-astrology/
 ## 🚀 Quick Start
 
 ### 1. Deploy Python Service (5 min)
+
 ```bash
 # Visit Railway
 open https://railway.app/new
@@ -90,12 +93,14 @@ open https://railway.app/new
 ```
 
 ### 2. Update Environment (2 min)
+
 ```bash
 cd apps/web
 echo "ASTRO_PYTHON_SERVICE_URL=https://your-railway-url.railway.app" >> .env.local
 ```
 
 ### 3. Test (3 min)
+
 ```bash
 yarn dev
 
@@ -111,15 +116,15 @@ See [QUICK_START.md](QUICK_START.md) for full instructions.
 
 ## 📊 Progress Overview
 
-| Phase | Status | Progress | Time Spent |
-|-------|--------|----------|------------|
-| Phase 1: Setup & Foundation | ✅ Complete | 100% | ~2 days |
-| Phase 2: Core Astrology APIs | ✅ Complete | 80% | ~2 days |
-| Phase 3: Business Logic | ⏳ Pending | 0% | - |
-| Phase 4: Chart Generation | ⏳ Pending | 0% | - |
-| Phase 5: AI Interpretations | ⏳ Pending | 0% | - |
-| Phase 6: Cleanup | ⏳ Pending | 0% | - |
-| **Overall** | **🚧 In Progress** | **35%** | **4 days** |
+| Phase                        | Status             | Progress | Time Spent |
+| ---------------------------- | ------------------ | -------- | ---------- |
+| Phase 1: Setup & Foundation  | ✅ Complete        | 100%     | ~2 days    |
+| Phase 2: Core Astrology APIs | ✅ Complete        | 80%      | ~2 days    |
+| Phase 3: Business Logic      | ⏳ Pending         | 0%       | -          |
+| Phase 4: Chart Generation    | ⏳ Pending         | 0%       | -          |
+| Phase 5: AI Interpretations  | ⏳ Pending         | 0%       | -          |
+| Phase 6: Cleanup             | ⏳ Pending         | 0%       | -          |
+| **Overall**                  | **🚧 In Progress** | **35%**  | **4 days** |
 
 ---
 
@@ -128,20 +133,24 @@ See [QUICK_START.md](QUICK_START.md) for full instructions.
 You have two high-priority options:
 
 ### Option A: Chart Generation (Phase 4)
+
 **Time**: 3-4 days  
 **Value**: High user-facing impact
 
 Build:
+
 - SVG chart renderer (4 styles: N/S/E Indian, Western)
 - Divisional charts (D1-D60)
 - PDF export with branding
 - User preferences
 
 ### Option B: AI Interpretations (Phase 5)
+
 **Time**: 2-3 days  
 **Value**: High engagement & retention
 
 Build:
+
 - Birth chart interpretation with OpenAI
 - Streaming responses (real-time UX)
 - Intelligent caching (saves costs)
@@ -154,18 +163,21 @@ See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed guidance.
 ## 🔍 Key Features
 
 ### Service Orchestration
+
 - **Automatic Failover**: Python service → FreeAstrologyAPI
 - **Circuit Breaker**: Auto-opens after 5 failures, resets after 1 min
 - **Health Monitoring**: Real-time service status tracking
 - **Cost Optimization**: Prefers free Python service
 
 ### API Framework
+
 - **Consistent Error Handling**: Standardized error responses
 - **Request Validation**: Zod schema validation
 - **Performance Monitoring**: Request duration tracking
 - **Request IDs**: For debugging and tracing
 
 ### Production Ready
+
 - **Comprehensive Logging**: Info, warn, error levels
 - **Error Recovery**: Automatic retry with backoff
 - **Type Safety**: Full TypeScript coverage
@@ -175,13 +187,13 @@ See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed guidance.
 
 ## 📚 Documentation
 
-| Document | Purpose | Time to Read |
-|----------|---------|--------------|
-| [QUICK_START.md](QUICK_START.md) | Get running in 10 min | 5 min |
-| [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) | Full deployment guide | 15 min |
-| [NEXT_STEPS.md](NEXT_STEPS.md) | Choose your next feature | 10 min |
-| [REFACTORING_PROGRESS.md](REFACTORING_PROGRESS.md) | Track implementation | 5 min |
-| Plan: `~/.claude/plans/...` | Complete refactoring plan | 30 min |
+| Document                                           | Purpose                   | Time to Read |
+| -------------------------------------------------- | ------------------------- | ------------ |
+| [QUICK_START.md](QUICK_START.md)                   | Get running in 10 min     | 5 min        |
+| [IMPLEMENTATION_GUIDE.md](IMPLEMENTATION_GUIDE.md) | Full deployment guide     | 15 min       |
+| [NEXT_STEPS.md](NEXT_STEPS.md)                     | Choose your next feature  | 10 min       |
+| [REFACTORING_PROGRESS.md](REFACTORING_PROGRESS.md) | Track implementation      | 5 min        |
+| Plan: `~/.claude/plans/...`                        | Complete refactoring plan | 30 min       |
 
 ---
 
@@ -198,12 +210,14 @@ See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed guidance.
 ## 💡 Benefits Achieved
 
 ### For Users
+
 - ✅ Faster response times (5-15ms vs 200-500ms)
 - ✅ Unlimited calculations (no 50/day limit)
 - ✅ Automatic failover (99.9%+ uptime)
 - ✅ Better error messages
 
 ### For Developers
+
 - ✅ Simplified architecture (fewer services)
 - ✅ Type-safe API routes
 - ✅ Consistent error handling
@@ -211,6 +225,7 @@ See [NEXT_STEPS.md](NEXT_STEPS.md) for detailed guidance.
 - ✅ Comprehensive logging
 
 ### For Business
+
 - ✅ Lower costs ($5-10/month vs API fees)
 - ✅ Scalable to 1000s of users
 - ✅ Production-ready infrastructure

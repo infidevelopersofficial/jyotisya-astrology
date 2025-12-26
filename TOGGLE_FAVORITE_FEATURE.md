@@ -4,13 +4,13 @@
 
 All layers verified and consistent for `isFavorite` field:
 
-| Layer                    | Status                              |
-|--------------------------|-------------------------------------|
-| 1. Prisma Schema         | ✅ Boolean @default(false) (line 138) |
-| 2. Generated Client      | ✅ isFavorite: boolean              |
-| 3. TypeScript Types      | ✅ SavedChart.isFavorite: boolean   |
-| 4. TypeScript Types      | ✅ SavedChartListItem.isFavorite    |
-| 5. API GET Response      | ✅ isFavorite: true (line 137)      |
+| Layer               | Status                                |
+| ------------------- | ------------------------------------- |
+| 1. Prisma Schema    | ✅ Boolean @default(false) (line 138) |
+| 2. Generated Client | ✅ isFavorite: boolean                |
+| 3. TypeScript Types | ✅ SavedChart.isFavorite: boolean     |
+| 4. TypeScript Types | ✅ SavedChartListItem.isFavorite      |
+| 5. API GET Response | ✅ isFavorite: true (line 137)        |
 
 ---
 
@@ -23,6 +23,7 @@ All layers verified and consistent for `isFavorite` field:
 ## 📝 Files Changed
 
 ### 1. API Route - `app/api/user/kundli/route.ts`
+
 **Added**: PATCH endpoint to toggle favorite status
 
 ```typescript
@@ -39,6 +40,7 @@ export async function PATCH(request: NextRequest) {
 ```
 
 **Features**:
+
 - ✅ Authentication check
 - ✅ Ownership verification
 - ✅ Atomic toggle operation (reads current value, inverts it)
@@ -48,17 +50,22 @@ export async function PATCH(request: NextRequest) {
 ---
 
 ### 2. Hook - `hooks/useSavedCharts.ts`
+
 **Added**: `toggleFavorite()` function
 
 ```typescript
-const toggleFavorite = useCallback(async (chartId: string) => {
-  // Call PATCH API
-  // Optimistically update local state
-  // Handle errors
-}, [fetchCharts])
+const toggleFavorite = useCallback(
+  async (chartId: string) => {
+    // Call PATCH API
+    // Optimistically update local state
+    // Handle errors
+  },
+  [fetchCharts],
+);
 ```
 
 **Features**:
+
 - ✅ Optimistic UI update (instant feedback)
 - ✅ Error handling with fallback (refetches on failure)
 - ✅ Exposed via hook return value
@@ -66,6 +73,7 @@ const toggleFavorite = useCallback(async (chartId: string) => {
 ---
 
 ### 3. List Component - `components/saved-charts/SavedChartsList.tsx`
+
 **Changed**: Pass `toggleFavorite` to card components
 
 ```typescript
@@ -79,6 +87,7 @@ const toggleFavorite = useCallback(async (chartId: string) => {
 ---
 
 ### 4. Card Component - `components/saved-charts/SavedChartCard.tsx`
+
 **Added**: Interactive star button with loading state
 
 ```typescript
@@ -92,6 +101,7 @@ const toggleFavorite = useCallback(async (chartId: string) => {
 ```
 
 **Features**:
+
 - ✅ Filled star when favorited
 - ✅ Outline star when not favorited
 - ✅ Hover effects
@@ -102,6 +112,7 @@ const toggleFavorite = useCallback(async (chartId: string) => {
 ---
 
 ### 5. Tests - `__tests__/api/user/kundli-toggle-favorite.test.ts`
+
 **Created**: 7 comprehensive test cases
 
 ```typescript
@@ -127,6 +138,7 @@ Duration  1.28s
 ```
 
 **Test Coverage**:
+
 - ✅ Success cases (toggle true ↔ false)
 - ✅ Authentication errors
 - ✅ Validation errors
@@ -143,6 +155,7 @@ Duration  1.28s
 ```
 
 All type definitions consistent across:
+
 - Prisma schema
 - Generated Prisma client
 - Custom TypeScript types
@@ -154,22 +167,26 @@ All type definitions consistent across:
 ## 🚀 How to Test
 
 ### 1. Start Dev Server
+
 ```bash
 npm run dev
 ```
 
 ### 2. Navigate to Saved Charts
+
 ```
 http://localhost:3000/dashboard/saved-charts
 ```
 
 ### 3. Test Star Button
+
 - **Click empty star** → should fill with orange and update instantly
 - **Click filled star** → should become outline and update instantly
 - **While toggling** → star should pulse (loading state)
 - **Check favorites filter** → should update list immediately
 
 ### 4. Test API Manually
+
 ```bash
 # Toggle favorite
 curl -X PATCH "http://localhost:3000/api/user/kundli?id=YOUR_CHART_ID" \
@@ -184,16 +201,19 @@ curl -X PATCH "http://localhost:3000/api/user/kundli?id=YOUR_CHART_ID" \
 ## 📊 API Specification
 
 ### Endpoint
+
 ```
 PATCH /api/user/kundli?id={kundliId}
 ```
 
 ### Request
+
 - **Query Params**: `id` (required) - Kundli ID
 - **Headers**: Authentication cookie
 - **Body**: None
 
 ### Response (Success)
+
 ```json
 {
   "success": true,
@@ -202,19 +222,21 @@ PATCH /api/user/kundli?id={kundliId}
 ```
 
 ### Error Responses
-| Status | Error | Reason |
-|--------|-------|--------|
-| 401 | Unauthorized | User not logged in |
-| 400 | Kundli ID is required | Missing ID param |
-| 404 | Chart not found | Invalid chart ID |
-| 403 | Forbidden | User doesn't own chart |
-| 500 | Failed to toggle favorite | Database error |
+
+| Status | Error                     | Reason                 |
+| ------ | ------------------------- | ---------------------- |
+| 401    | Unauthorized              | User not logged in     |
+| 400    | Kundli ID is required     | Missing ID param       |
+| 404    | Chart not found           | Invalid chart ID       |
+| 403    | Forbidden                 | User doesn't own chart |
+| 500    | Failed to toggle favorite | Database error         |
 
 ---
 
 ## 🎨 UI/UX Features
 
 ### Visual Feedback
+
 - **Unfavorited**: Outline star, gray color
 - **Favorited**: Filled star, orange color
 - **Hover**: Lighter hover state
@@ -222,12 +244,14 @@ PATCH /api/user/kundli?id={kundliId}
 - **Disabled**: 50% opacity
 
 ### Accessibility
+
 - **ARIA labels**: "Add to favorites" / "Remove from favorites"
 - **Title attribute**: Tooltip on hover
 - **Keyboard accessible**: Can tab to button and press Enter/Space
 - **Focus visible**: Browser default focus ring
 
 ### Performance
+
 - **Optimistic updates**: No visual delay
 - **Debounced**: Only one toggle at a time per card
 - **Fallback**: Refetches on error to maintain consistency
@@ -277,26 +301,33 @@ UI re-renders - Star changes appearance
 ## 📚 Related Files
 
 **Types**:
+
 - `types/savedChart.types.ts` - SavedChart, SavedChartListItem
 
 **Services**:
+
 - `services/savedChartService.ts` - Pure business logic
 
 **Hooks**:
+
 - `hooks/useSavedCharts.ts` - State management + toggleFavorite
 
 **Components**:
+
 - `components/saved-charts/SavedChartsList.tsx` - List with filters
 - `components/saved-charts/SavedChartCard.tsx` - Individual card with star button
 
 **API**:
+
 - `app/api/user/kundli/route.ts` - GET, POST, PATCH, DELETE endpoints
 
 **Database**:
+
 - `packages/schemas/prisma/schema.prisma` - Kundli model with isFavorite
 - `packages/schemas/prisma/migrations/002_add_is_favorite_to_kundli.sql` - Migration
 
 **Tests**:
+
 - `__tests__/api/user/kundli-toggle-favorite.test.ts` - API tests (7 cases)
 - `__tests__/services/savedChartService.test.ts` - Service tests (32 cases)
 

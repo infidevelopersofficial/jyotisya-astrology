@@ -34,11 +34,11 @@ function SignInContent() {
     try {
       const { error } = await supabaseAuth.signInWithMagicLink(
         email,
-        `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`
+        `${window.location.origin}/auth/callback?next=${encodeURIComponent(callbackUrl)}`,
       );
 
       if (error) {
-        setError((error instanceof Error ? error.message : String(error)));
+        setError(error instanceof Error ? error.message : String(error));
       } else {
         setMessage("Magic link sent! Check your email inbox.");
         setStep("check-email");
@@ -68,10 +68,10 @@ function SignInContent() {
       const { error } = await supabaseAuth.signInWithOTP(emailOrPhone);
 
       if (error) {
-        setError((error instanceof Error ? error.message : String(error)));
+        setError(error instanceof Error ? error.message : String(error));
       } else {
         const inputType = detectInputType(emailOrPhone);
-        setMessage(`OTP sent to your ${inputType === 'email' ? 'email' : 'phone'}!`);
+        setMessage(`OTP sent to your ${inputType === "email" ? "email" : "phone"}!`);
         setStep("otp");
       }
     } catch (err: unknown) {
@@ -99,11 +99,11 @@ function SignInContent() {
       const { data, error } = await supabaseAuth.verifyOTP(
         emailOrPhone,
         otp,
-        inputType === 'email' ? "email" : "sms"
+        inputType === "email" ? "email" : "sms",
       );
 
       if (error) {
-        setError((error instanceof Error ? error.message : String(error)));
+        setError(error instanceof Error ? error.message : String(error));
       } else if (data.session) {
         setMessage("Successfully signed in!");
         router.push(callbackUrl);
@@ -176,8 +176,18 @@ function SignInContent() {
           {step === "check-email" ? (
             <div className="space-y-6 text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10">
-                <svg className="h-8 w-8 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76" />
+                <svg
+                  className="h-8 w-8 text-green-400"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 19v-8.93a2 2 0 01.89-1.664l7-4.666a2 2 0 012.22 0l7 4.666A2 2 0 0121 10.07V19M3 19a2 2 0 002 2h14a2 2 0 002-2M3 19l6.75-4.5M21 19l-6.75-4.5M3 10l6.75 4.5M21 10l-6.75 4.5m0 0l-1.14.76a2 2 0 01-2.22 0l-1.14-.76"
+                  />
                 </svg>
               </div>
               <div>
@@ -235,7 +245,10 @@ function SignInContent() {
               ) : (
                 <form onSubmit={handleSendOTP} className="space-y-6">
                   <div>
-                    <label htmlFor="emailOrPhone" className="block text-sm font-medium text-slate-200">
+                    <label
+                      htmlFor="emailOrPhone"
+                      className="block text-sm font-medium text-slate-200"
+                    >
                       Email or Phone Number
                     </label>
                     <input

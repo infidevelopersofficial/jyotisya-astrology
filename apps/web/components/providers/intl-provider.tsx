@@ -20,7 +20,7 @@ const translations = {
   en: {
     nav: {
       links: { home: "Home", consult: "Consult", dashboard: "Dashboard", shop: "Marketplace" },
-      actions: { signIn: "Sign In", book: "Book Muhurat" }
+      actions: { signIn: "Sign In", book: "Book Muhurat" },
     },
     hero: {
       alert: "Shubh Muhurat alerts daily",
@@ -30,20 +30,20 @@ const translations = {
       primaryCta: "Generate Free Kundli",
       secondaryCta: "Consult Now",
       badge1: { title: "Acharya Anjali online", subtitle: "Free first 3 mins" },
-      badge2: { title: "Festival Panchang 2024", subtitle: "Ekadashi • Chaturthi • Ekam" }
+      badge2: { title: "Festival Panchang 2024", subtitle: "Ekadashi • Chaturthi • Ekam" },
     },
     consultation: {
       title: "Live astrologers, 24x7 guidance",
       description:
         "Connect instantly via chat, voice or video. Verified experts with ratings, language preference, and specialisation filters.",
       explore: "Explore Experts",
-      book: "Book Muhurat"
-    }
+      book: "Book Muhurat",
+    },
   },
   hi: {
     nav: {
       links: { home: "होम", consult: "परामर्श", dashboard: "डैशबोर्ड", shop: "मार्केटप्लेस" },
-      actions: { signIn: "साइन इन", book: "मुहूर्त बुक करें" }
+      actions: { signIn: "साइन इन", book: "मुहूर्त बुक करें" },
     },
     hero: {
       alert: "दैनिक शुभ मुहूर्त अलर्ट",
@@ -53,20 +53,25 @@ const translations = {
       primaryCta: "फ्री कुंडली बनाएं",
       secondaryCta: "अभी सलाह लें",
       badge1: { title: "आचार्या अंजलि ऑनलाइन", subtitle: "पहले 3 मिनट मुफ्त" },
-      badge2: { title: "त्योहार पंचांग 2024", subtitle: "एकादशी • चतुर्थी • एकम" }
+      badge2: { title: "त्योहार पंचांग 2024", subtitle: "एकादशी • चतुर्थी • एकम" },
     },
     consultation: {
       title: "लाइव ज्योतिषी, 24x7 मार्गदर्शन",
       description:
         "चैट, वॉइस या वीडियो से तुरंत जुड़ें। रेटिंग और भाषा पसंद के साथ सत्यापित विशेषज्ञ।",
       explore: "विशेषज्ञ देखें",
-      book: "मुहूर्त बुक करें"
-    }
+      book: "मुहूर्त बुक करें",
+    },
   },
   ta: {
     nav: {
-      links: { home: "முகப்பு", consult: "ஆலோசனை", dashboard: "டாஷ்போர்டு", shop: "மார்க்கெட்ப்ளேஸ்" },
-      actions: { signIn: "உள்நுழை", book: "முஹூர்த்தம் புக்" }
+      links: {
+        home: "முகப்பு",
+        consult: "ஆலோசனை",
+        dashboard: "டாஷ்போர்டு",
+        shop: "மார்க்கெட்ப்ளேஸ்",
+      },
+      actions: { signIn: "உள்நுழை", book: "முஹூர்த்தம் புக்" },
     },
     hero: {
       alert: "தினமும் சுப முகூர்த்த அறிவிப்புகள்",
@@ -76,16 +81,16 @@ const translations = {
       primaryCta: "இலவச குண்டலி உருவாக்கு",
       secondaryCta: "இப்போது ஆலோசிக்க",
       badge1: { title: "ஆசாரியா அஞ்சலி ஆன்லைன்", subtitle: "முதல் 3 நிமிடங்கள் இலவசம்" },
-      badge2: { title: "திருவிழா பஞ்சாங்கம் 2024", subtitle: "ஏகாதசி • சதுர்த்தி • ஏகம்" }
+      badge2: { title: "திருவிழா பஞ்சாங்கம் 2024", subtitle: "ஏகாதசி • சதுர்த்தி • ஏகம்" },
     },
     consultation: {
       title: "நேரடி ஜோதிடர்கள், 24x7 உதவி",
       description:
         "உடனடி உரையாடல், குரல் அல்லது வீடியோ இணைப்பு. மதிப்பீடு செய்யப்பட்ட நிபுணர்கள் பல மொழிகளில் கிடைக்கின்றனர்.",
       explore: "நிபுணர்களை பார்வையிடு",
-      book: "முஹூர்த்தம் புக்"
-    }
-  }
+      book: "முஹூர்த்தம் புக்",
+    },
+  },
 } as const;
 
 function isLocale(value: unknown): value is Locale {
@@ -111,7 +116,7 @@ export function IntlProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<LocaleContextValue>(
     () => ({ locale, setLocale, copy: translations[locale] }),
-    [locale]
+    [locale],
   );
 
   return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;

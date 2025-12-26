@@ -5,6 +5,7 @@
 This guide documents the correct Vercel configuration for deploying `@digital-astrology/web` from our Turborepo monorepo.
 
 ### Project Structure
+
 ```
 digital-astrology/                 # Monorepo root
 ├── turbo.json                     # Turborepo configuration
@@ -24,18 +25,18 @@ digital-astrology/                 # Monorepo root
 
 ### **Project Settings → General**
 
-| Setting | Value | Notes |
-|---------|-------|-------|
-| **Framework Preset** | Other | ⚠️ Set to "Other" (not Next.js) to use custom commands |
-| **Root Directory** | `apps/web` | ✅ Points to the Next.js app |
-| **Build Command** | *(leave empty)* | Uses `vercel.json` instead |
-| **Output Directory** | *(leave empty)* | Uses `vercel.json` instead |
-| **Install Command** | *(leave empty)* | Uses `vercel.json` instead |
+| Setting              | Value           | Notes                                                  |
+| -------------------- | --------------- | ------------------------------------------------------ |
+| **Framework Preset** | Other           | ⚠️ Set to "Other" (not Next.js) to use custom commands |
+| **Root Directory**   | `apps/web`      | ✅ Points to the Next.js app                           |
+| **Build Command**    | _(leave empty)_ | Uses `vercel.json` instead                             |
+| **Output Directory** | _(leave empty)_ | Uses `vercel.json` instead                             |
+| **Install Command**  | _(leave empty)_ | Uses `vercel.json` instead                             |
 
 ### **Project Settings → Git**
 
-| Setting | Value |
-|---------|-------|
+| Setting                                         | Value      |
+| ----------------------------------------------- | ---------- |
 | **Include source files outside Root Directory** | ✅ Enabled |
 
 **Why?** The app needs to access workspace dependencies in `packages/` and root-level configuration files.
@@ -58,6 +59,7 @@ digital-astrology/                 # Monorepo root
 ```
 
 **Explanation:**
+
 - `buildCommand`: Navigates to monorepo root (`cd ../..`) before running Turbo
 - `installCommand`: Uses Yarn with immutable lockfile (recommended for Vercel)
 - `framework: null`: Disables auto-detection to use our custom build
@@ -88,6 +90,7 @@ digital-astrology/                 # Monorepo root
 **Cause:** `outputDirectory` was set to `apps/web/.next` instead of `.next`
 
 **Fix:**
+
 ```json
 // ❌ Wrong (when Root Directory is apps/web)
 "outputDirectory": "apps/web/.next"
@@ -105,6 +108,7 @@ digital-astrology/                 # Monorepo root
 **Cause:** Turbo is installed at root but command runs from `apps/web/`
 
 **Fix:**
+
 ```json
 // ❌ Wrong
 "buildCommand": "turbo build --filter=@digital-astrology/web"
@@ -130,11 +134,13 @@ digital-astrology/                 # Monorepo root
 ### Issue 4: Build succeeds but deployment fails
 
 **Possible causes:**
+
 1. Missing environment variables
 2. Runtime errors during SSR
 3. Prisma client not generated
 
 **Check:**
+
 ```bash
 # Verify all required env vars are set in Vercel Dashboard
 DATABASE_URL
@@ -145,21 +151,24 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 ---
 
-### Issue 5: Middleware fails with "ReferenceError: __dirname is not defined"
+### Issue 5: Middleware fails with "ReferenceError: \_\_dirname is not defined"
 
 **Cause:** Edge Runtime (middleware) doesn't support Node.js globals like `__dirname`, `__filename`, `process.cwd()`, `fs`, `path`, etc.
 
 **Common sources:**
+
 - Importing `@sentry/nextjs` in middleware or edge config
 - Importing Node.js modules in files used by middleware
 - Third-party packages that use Node.js APIs
 
 **Fix:**
+
 1. **Sentry**: Do NOT import `@sentry/nextjs` in `sentry.edge.config.ts`
    - The file should be empty or use edge-compatible packages like `@sentry/core`
    - Middleware errors will still be captured by server-side Sentry
 
 2. **Check middleware imports**: Ensure all files imported by `middleware.ts` are edge-compatible
+
    ```bash
    # Search for Node.js globals in middleware-related files
    grep -r "__dirname\|__filename\|process\.cwd\(\)\|require\(" apps/web/middleware.ts apps/web/lib/supabase/middleware.ts apps/web/lib/security/

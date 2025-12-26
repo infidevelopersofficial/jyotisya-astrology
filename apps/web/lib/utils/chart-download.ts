@@ -3,14 +3,14 @@
  * Handles PNG and PDF downloads for birth chart visualizations
  */
 
-import html2canvas from 'html2canvas'
-import { jsPDF } from 'jspdf'
+import html2canvas from "html2canvas";
+import { jsPDF } from "jspdf";
 
 interface DownloadOptions {
-  filename?: string
-  chartName?: string
-  birthDate?: string
-  birthPlace?: string
+  filename?: string;
+  chartName?: string;
+  birthDate?: string;
+  birthPlace?: string;
 }
 
 /**
@@ -20,41 +20,41 @@ interface DownloadOptions {
  */
 export async function downloadChartAsPNG(
   elementId: string,
-  options: DownloadOptions = {}
+  options: DownloadOptions = {},
 ): Promise<void> {
   try {
-    const element = document.getElementById(elementId)
+    const element = document.getElementById(elementId);
     if (!element) {
-      throw new Error(`Element with id "${elementId}" not found`)
+      throw new Error(`Element with id "${elementId}" not found`);
     }
 
     // Capture the element as canvas
     const canvas = await html2canvas(element, {
-      backgroundColor: '#ffffff',
+      backgroundColor: "#ffffff",
       scale: 2, // Higher quality
       logging: false,
       useCORS: true,
-    })
+    });
 
     // Convert canvas to blob
     canvas.toBlob((blob) => {
       if (!blob) {
-        throw new Error('Failed to create image blob')
+        throw new Error("Failed to create image blob");
       }
 
       // Create download link
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = options.filename || `birth-chart-${Date.now()}.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-      URL.revokeObjectURL(url)
-    }, 'image/png')
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = options.filename || `birth-chart-${Date.now()}.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }, "image/png");
   } catch (error: unknown) {
-    console.error('Error downloading PNG:', error)
-    throw error
+    console.error("Error downloading PNG:", error);
+    throw error;
   }
 }
 
@@ -65,72 +65,72 @@ export async function downloadChartAsPNG(
  */
 export async function downloadChartAsPDF(
   elementId: string,
-  options: DownloadOptions = {}
+  options: DownloadOptions = {},
 ): Promise<void> {
   try {
-    const element = document.getElementById(elementId)
+    const element = document.getElementById(elementId);
     if (!element) {
-      throw new Error(`Element with id "${elementId}" not found`)
+      throw new Error(`Element with id "${elementId}" not found`);
     }
 
     // Capture the element as canvas
     const canvas = await html2canvas(element, {
-      backgroundColor: '#ffffff',
+      backgroundColor: "#ffffff",
       scale: 2,
       logging: false,
       useCORS: true,
-    })
+    });
 
     // Get canvas dimensions
-    const imgWidth = 210 // A4 width in mm
-    const imgHeight = (canvas.height * imgWidth) / canvas.width
+    const imgWidth = 210; // A4 width in mm
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
     // Create PDF
     const pdf = new jsPDF({
-      orientation: imgHeight > imgWidth ? 'portrait' : 'landscape',
-      unit: 'mm',
-      format: 'a4',
-    })
+      orientation: imgHeight > imgWidth ? "portrait" : "landscape",
+      unit: "mm",
+      format: "a4",
+    });
 
     // Add title
     if (options.chartName) {
-      pdf.setFontSize(16)
-      pdf.text(options.chartName, 105, 15, { align: 'center' })
+      pdf.setFontSize(16);
+      pdf.text(options.chartName, 105, 15, { align: "center" });
     }
 
     // Add birth details
     if (options.birthDate || options.birthPlace) {
-      pdf.setFontSize(10)
-      let yPos = 25
+      pdf.setFontSize(10);
+      let yPos = 25;
       if (options.birthDate) {
-        pdf.text(`Birth Date: ${options.birthDate}`, 105, yPos, { align: 'center' })
-        yPos += 5
+        pdf.text(`Birth Date: ${options.birthDate}`, 105, yPos, { align: "center" });
+        yPos += 5;
       }
       if (options.birthPlace) {
-        pdf.text(`Birth Place: ${options.birthPlace}`, 105, yPos, { align: 'center' })
+        pdf.text(`Birth Place: ${options.birthPlace}`, 105, yPos, { align: "center" });
       }
     }
 
     // Add chart image
-    const imgData = canvas.toDataURL('image/png')
-    const yOffset = options.chartName || options.birthDate || options.birthPlace ? 35 : 10
-    pdf.addImage(imgData, 'PNG', 0, yOffset, imgWidth, imgHeight)
+    const imgData = canvas.toDataURL("image/png");
+    const yOffset = options.chartName || options.birthDate || options.birthPlace ? 35 : 10;
+    pdf.addImage(imgData, "PNG", 0, yOffset, imgWidth, imgHeight);
 
     // Add footer
-    pdf.setFontSize(8)
-    pdf.setTextColor(128, 128, 128)
+    pdf.setFontSize(8);
+    pdf.setTextColor(128, 128, 128);
     pdf.text(
-      'Generated by Jyotishya - Your Personal Astrology Guide',
+      "Generated by Jyotishya - Your Personal Astrology Guide",
       105,
       pdf.internal.pageSize.height - 10,
-      { align: 'center' }
-    )
+      { align: "center" },
+    );
 
     // Download
-    pdf.save(options.filename || `birth-chart-${Date.now()}.pdf`)
+    pdf.save(options.filename || `birth-chart-${Date.now()}.pdf`);
   } catch (error: unknown) {
-    console.error('Error downloading PDF:', error)
-    throw error
+    console.error("Error downloading PDF:", error);
+    throw error;
   }
 }
 
@@ -140,22 +140,22 @@ export async function downloadChartAsPDF(
  * @returns Shareable URL
  */
 export function generateShareLink(birthData: {
-  dateTime: string
-  latitude: number
-  longitude: number
-  timezone: number
-  location?: string
+  dateTime: string;
+  latitude: number;
+  longitude: number;
+  timezone: number;
+  location?: string;
 }): string {
-  const baseUrl = window.location.origin
+  const baseUrl = window.location.origin;
   const params = new URLSearchParams({
     dt: birthData.dateTime,
     lat: birthData.latitude.toString(),
     lon: birthData.longitude.toString(),
     tz: birthData.timezone.toString(),
     ...(birthData.location && { loc: birthData.location }),
-  })
+  });
 
-  return `${baseUrl}/dashboard/birth-chart?${params.toString()}`
+  return `${baseUrl}/dashboard/birth-chart?${params.toString()}`;
 }
 
 /**
@@ -165,20 +165,20 @@ export function generateShareLink(birthData: {
 export async function copyToClipboard(text: string): Promise<void> {
   try {
     if (navigator.clipboard && window.isSecureContext) {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(text);
     } else {
       // Fallback for older browsers
-      const textArea = document.createElement('textarea')
-      textArea.value = text
-      textArea.style.position = 'fixed'
-      textArea.style.left = '-999999px'
-      document.body.appendChild(textArea)
-      textArea.select()
-      document.execCommand('copy')
-      document.body.removeChild(textArea)
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-999999px";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
     }
   } catch (error: unknown) {
-    console.error('Error copying to clipboard:', error)
-    throw error
+    console.error("Error copying to clipboard:", error);
+    throw error;
   }
 }

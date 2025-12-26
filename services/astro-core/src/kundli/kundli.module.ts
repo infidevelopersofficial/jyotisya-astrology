@@ -5,6 +5,6 @@ import { PanchangModule } from "../panchang/panchang.module";
 @Module({
   imports: [PanchangModule],
   providers: [KundliService],
-  exports: [KundliService]
+  exports: [KundliService],
 })
 export class KundliModule {}

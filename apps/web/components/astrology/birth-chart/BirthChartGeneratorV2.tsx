@@ -1,15 +1,15 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client'
+"use client";
 
-import { useBirthChart } from '@/hooks/astrology/useBirthChart'
-import { useBirthChartActions } from '@/hooks/astrology/useBirthChartActions'
-import BirthChartForm from './BirthChartForm'
-import BirthChartDisplay from './BirthChartDisplay'
-import DivisionalChartsPanel from './DivisionalChartsPanel'
+import { useBirthChart } from "@/hooks/astrology/useBirthChart";
+import { useBirthChartActions } from "@/hooks/astrology/useBirthChartActions";
+import BirthChartForm from "./BirthChartForm";
+import BirthChartDisplay from "./BirthChartDisplay";
+import DivisionalChartsPanel from "./DivisionalChartsPanel";
 
 interface BirthChartGeneratorProps {
-  userId: string
-  userEmail: string
+  userId: string;
+  userEmail: string;
 }
 
 export default function BirthChartGeneratorV2({
@@ -28,7 +28,7 @@ export default function BirthChartGeneratorV2({
     setError,
     generateBirthChart,
     selectDivisional,
-  } = useBirthChart()
+  } = useBirthChart();
 
   const {
     downloadingPNG,
@@ -45,7 +45,7 @@ export default function BirthChartGeneratorV2({
     chartData: state.chartData,
     selectedDivisional: state.selectedDivisional,
     setError,
-  })
+  });
 
   return (
     <div className="space-y-8">
@@ -55,12 +55,12 @@ export default function BirthChartGeneratorV2({
           onClick={() => setShowHelp(!showHelp)}
           className={`group flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-medium transition-all ${
             showHelp
-              ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25'
-              : 'border border-white/20 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+              ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25"
+              : "border border-white/20 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
           }`}
         >
           <span className="text-lg">💡</span>
-          <span>{showHelp ? 'Help enabled' : 'Enable help'}</span>
+          <span>{showHelp ? "Help enabled" : "Enable help"}</span>
           {showHelp && <span className="text-xs opacity-75">✓</span>}
         </button>
       </div>
@@ -72,18 +72,18 @@ export default function BirthChartGeneratorV2({
           <div className="flex flex-col items-center gap-2">
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
-                activeTab === 'form'
-                  ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                activeTab === "form"
+                  ? "border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30"
                   : state.chartData
-                    ? 'border-green-500 bg-green-500 text-white'
-                    : 'border-slate-600 bg-slate-800 text-slate-400'
+                    ? "border-green-500 bg-green-500 text-white"
+                    : "border-slate-600 bg-slate-800 text-slate-400"
               }`}
             >
-              {state.chartData ? '✓' : '1'}
+              {state.chartData ? "✓" : "1"}
             </div>
             <span
               className={`text-sm font-medium transition-colors ${
-                activeTab === 'form' || state.chartData ? 'text-white' : 'text-slate-500'
+                activeTab === "form" || state.chartData ? "text-white" : "text-slate-500"
               }`}
             >
               Enter Details
@@ -103,18 +103,18 @@ export default function BirthChartGeneratorV2({
           <div className="flex flex-col items-center gap-2">
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
-                activeTab === 'chart' && state.chartData
-                  ? 'border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                activeTab === "chart" && state.chartData
+                  ? "border-orange-500 bg-orange-500 text-white shadow-lg shadow-orange-500/30"
                   : state.chartData
-                    ? 'border-green-500 bg-green-500 text-white'
-                    : 'border-slate-600 bg-slate-800 text-slate-400'
+                    ? "border-green-500 bg-green-500 text-white"
+                    : "border-slate-600 bg-slate-800 text-slate-400"
               }`}
             >
               2
             </div>
             <span
               className={`text-sm font-medium transition-colors ${
-                state.chartData ? 'text-white' : 'text-slate-500'
+                state.chartData ? "text-white" : "text-slate-500"
               }`}
             >
               View Chart
@@ -124,7 +124,7 @@ export default function BirthChartGeneratorV2({
           {/* Connector 2 */}
           <div className="relative flex-1 px-6">
             <div className="h-0.5 w-full bg-slate-700">
-              {activeTab === 'divisional' && state.chartData && (
+              {activeTab === "divisional" && state.chartData && (
                 <div className="h-full w-full bg-gradient-to-r from-orange-500 to-purple-500"></div>
               )}
             </div>
@@ -134,18 +134,18 @@ export default function BirthChartGeneratorV2({
           <div className="flex flex-col items-center gap-2">
             <div
               className={`flex h-12 w-12 items-center justify-center rounded-full border-2 font-bold transition-all ${
-                activeTab === 'divisional' && state.chartData
-                  ? 'border-purple-500 bg-purple-500 text-white shadow-lg shadow-purple-500/30'
+                activeTab === "divisional" && state.chartData
+                  ? "border-purple-500 bg-purple-500 text-white shadow-lg shadow-purple-500/30"
                   : state.chartData
-                    ? 'border-slate-600 bg-slate-700 text-slate-400'
-                    : 'border-slate-600 bg-slate-800 text-slate-400'
+                    ? "border-slate-600 bg-slate-700 text-slate-400"
+                    : "border-slate-600 bg-slate-800 text-slate-400"
               }`}
             >
               3
             </div>
             <span
               className={`text-sm font-medium transition-colors ${
-                activeTab === 'divisional' && state.chartData ? 'text-white' : 'text-slate-500'
+                activeTab === "divisional" && state.chartData ? "text-white" : "text-slate-500"
               }`}
             >
               Explore More
@@ -157,11 +157,11 @@ export default function BirthChartGeneratorV2({
       {/* Simplified Tabs */}
       <div className="flex gap-3">
         <button
-          onClick={() => setActiveTab('form')}
+          onClick={() => setActiveTab("form")}
           className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all ${
-            activeTab === 'form'
-              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
-              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white'
+            activeTab === "form"
+              ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
+              : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
           }`}
         >
           <span className="text-xl">📝</span>
@@ -169,12 +169,12 @@ export default function BirthChartGeneratorV2({
         </button>
 
         <button
-          onClick={() => setActiveTab('chart')}
+          onClick={() => setActiveTab("chart")}
           disabled={!state.chartData}
           className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
-            activeTab === 'chart'
-              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
-              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5'
+            activeTab === "chart"
+              ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
+              : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5"
           }`}
         >
           <span className="text-xl">🌟</span>
@@ -182,12 +182,12 @@ export default function BirthChartGeneratorV2({
         </button>
 
         <button
-          onClick={() => setActiveTab('divisional')}
+          onClick={() => setActiveTab("divisional")}
           disabled={!state.chartData}
           className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
-            activeTab === 'divisional'
-              ? 'bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25'
-              : 'border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5'
+            activeTab === "divisional"
+              ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
+              : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5"
           }`}
         >
           <span className="text-xl">📊</span>
@@ -196,7 +196,7 @@ export default function BirthChartGeneratorV2({
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'form' && (
+      {activeTab === "form" && (
         <BirthChartForm
           birthData={state.birthData}
           setBirthData={setBirthData}
@@ -208,18 +208,16 @@ export default function BirthChartGeneratorV2({
         />
       )}
 
-      {activeTab === 'chart' && state.chartData && (
+      {activeTab === "chart" && state.chartData && (
         <BirthChartDisplay
           birthData={state.birthData}
           chartData={state.chartData}
-          svgData={state.svgData['D1']}
+          svgData={state.svgData["D1"]}
           showHelp={showHelp}
           expandedPlanet={expandedPlanet}
-          onTogglePlanet={(name) =>
-            setExpandedPlanet(expandedPlanet === name ? null : name)
-          }
-          onSwitchToForm={() => setActiveTab('form')}
-          onSwitchToDivisional={() => setActiveTab('divisional')}
+          onTogglePlanet={(name) => setExpandedPlanet(expandedPlanet === name ? null : name)}
+          onSwitchToForm={() => setActiveTab("form")}
+          onSwitchToDivisional={() => setActiveTab("divisional")}
           downloadingPNG={downloadingPNG}
           downloadingPDF={downloadingPDF}
           copiedLink={copiedLink}
@@ -232,7 +230,7 @@ export default function BirthChartGeneratorV2({
         />
       )}
 
-      {activeTab === 'divisional' && state.chartData && (
+      {activeTab === "divisional" && state.chartData && (
         <DivisionalChartsPanel
           svgData={state.svgData}
           selectedDivisional={state.selectedDivisional}
@@ -240,5 +238,5 @@ export default function BirthChartGeneratorV2({
         />
       )}
     </div>
-  )
+  );
 }

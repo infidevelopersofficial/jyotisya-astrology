@@ -12,6 +12,7 @@
 **Line**: ~366
 
 ### BEFORE (Current - Missing birthTime)
+
 ```typescript
 select: {
   id: true,
@@ -25,6 +26,7 @@ select: {
 ```
 
 ### AFTER (Fixed - Includes All Fields)
+
 ```typescript
 select: {
   id: true,
@@ -54,25 +56,25 @@ select: {
 
 ```typescript
 interface UserData {
-  id: string
-  name: string
-  email: string | null
-  birthDate: string | null
-  birthTime: string | null
-  birthPlace: string | null
-  birthLatitude: number | null
-  birthLongitude: number | null
-  birthTimezone: string | null
-  preferredSystem: 'VEDIC' | 'WESTERN'
-  onboardingCompleted: boolean
+  id: string;
+  name: string;
+  email: string | null;
+  birthDate: string | null;
+  birthTime: string | null;
+  birthPlace: string | null;
+  birthLatitude: number | null;
+  birthLongitude: number | null;
+  birthTimezone: string | null;
+  preferredSystem: "VEDIC" | "WESTERN";
+  onboardingCompleted: boolean;
 }
 ```
 
 ### Step 2: Add State Variables (After line 12, before formData state)
 
 ```typescript
-const [isEditing, setIsEditing] = useState(false)
-const [dataLoaded, setDataLoaded] = useState(false)
+const [isEditing, setIsEditing] = useState(false);
+const [dataLoaded, setDataLoaded] = useState(false);
 ```
 
 ### Step 3: Add useEffect to Fetch User Data (After formData state, around line 24)
@@ -81,47 +83,45 @@ const [dataLoaded, setDataLoaded] = useState(false)
 useEffect(() => {
   const loadUserData = async () => {
     try {
-      const response = await fetch('/api/onboarding')
+      const response = await fetch("/api/onboarding");
 
       if (!response.ok) {
         // User hasn't onboarded yet - first time
-        setDataLoaded(true)
-        return
+        setDataLoaded(true);
+        return;
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.onboardingCompleted && data.user) {
         // User is editing existing profile
-        setIsEditing(true)
+        setIsEditing(true);
 
         // Parse and pre-fill form
         setFormData({
-          name: data.user.name || '',
+          name: data.user.name || "",
           birthDate: data.user.birthDate
-            ? new Date(data.user.birthDate).toISOString().split('T')[0]
-            : '',
-          birthTime: data.user.birthTime || '',
-          birthPlace: data.user.birthPlace || 'Delhi, India',
+            ? new Date(data.user.birthDate).toISOString().split("T")[0]
+            : "",
+          birthTime: data.user.birthTime || "",
+          birthPlace: data.user.birthPlace || "Delhi, India",
           birthLatitude: data.user.birthLatitude ?? 28.6139,
-          birthLongitude: data.user.birthLongitude ?? 77.2090,
-          birthTimezone: data.user.birthTimezone
-            ? parseFloat(data.user.birthTimezone)
-            : 5.5,
-          preferredSystem: data.user.preferredSystem || 'VEDIC',
-        })
+          birthLongitude: data.user.birthLongitude ?? 77.209,
+          birthTimezone: data.user.birthTimezone ? parseFloat(data.user.birthTimezone) : 5.5,
+          preferredSystem: data.user.preferredSystem || "VEDIC",
+        });
       }
 
-      setDataLoaded(true)
+      setDataLoaded(true);
     } catch (err) {
-      console.error('Failed to load user data:', err)
+      console.error("Failed to load user data:", err);
       // Continue with defaults on error
-      setDataLoaded(true)
+      setDataLoaded(true);
     }
-  }
+  };
 
-  loadUserData()
-}, [])
+  loadUserData();
+}, []);
 ```
 
 ### Step 4: Add Loading UI (Before main return statement, around line 91)

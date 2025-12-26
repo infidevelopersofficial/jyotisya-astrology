@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db/prisma'
-import { Prisma } from '@prisma/client'
-import { z } from 'zod'
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { Prisma } from "@prisma/client";
+import { z } from "zod";
 
 // Force dynamic rendering to avoid DATABASE_URL requirement at build time
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 /**
  * Save Kundli (Birth Chart) to User Account
@@ -13,45 +13,46 @@ export const dynamic = 'force-dynamic'
  */
 
 const saveKundliSchema = z.object({
-  name: z.string().min(1, 'Chart name is required').max(100),
+  name: z.string().min(1, "Chart name is required").max(100),
   birthDate: z.string().datetime(),
-  birthTime: z.string().regex(/^\d{2}:\d{2}$/, 'Invalid time format (HH:MM)'),
+  birthTime: z.string().regex(/^\d{2}:\d{2}$/, "Invalid time format (HH:MM)"),
   birthPlace: z.string().min(1),
   latitude: z.number(),
   longitude: z.number(),
   timezone: z.string(),
   chartData: z.record(z.unknown()),
-})
+});
 
 // eslint-disable-next-line complexity, max-lines-per-function
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Parse and validate request body
-    const body = await request.json() as Record<string, unknown>
-    const parsed = saveKundliSchema.safeParse(body)
+    const body = (await request.json()) as Record<string, unknown>;
+    const parsed = saveKundliSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
         {
-          error: 'Invalid request',
+          error: "Invalid request",
           details: parsed.error.flatten().fieldErrors,
         },
-        { status: 400 }
-      )
+        { status: 400 },
+      );
     }
 
-    const { name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, chartData } = parsed.data
+    const { name, birthDate, birthTime, birthPlace, latitude, longitude, timezone, chartData } =
+      parsed.data;
 
     // Save kundli to database
     const kundli = await prisma.kundli.create({
@@ -67,13 +68,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         chartData: chartData as Prisma.InputJsonValue,
         isPublic: false,
       },
-    })
+    });
 
-    console.error('[api/user/kundli] Chart saved successfully', {
+    console.error("[api/user/kundli] Chart saved successfully", {
       kundliId: kundli.id,
       userId: user.id,
       chartName: name,
-    })
+    });
 
     return NextResponse.json({
       success: true,
@@ -82,20 +83,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         name: kundli.name,
         createdAt: kundli.createdAt.toISOString(),
       },
-    })
+    });
   } catch (error: unknown) {
-    console.error('[api/user/kundli] Error saving chart', {
+    console.error("[api/user/kundli] Error saving chart", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-    })
+    });
 
     return NextResponse.json(
       {
-        error: 'Failed to save chart',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to save chart",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
@@ -108,14 +109,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 export async function GET(_request: NextRequest) {
   try {
     // Authenticate user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get all kundlis for user
@@ -124,7 +125,7 @@ export async function GET(_request: NextRequest) {
         userId: user.id,
       },
       orderBy: {
-        createdAt: 'desc',
+        createdAt: "desc",
       },
       select: {
         id: true,
@@ -141,25 +142,25 @@ export async function GET(_request: NextRequest) {
         createdAt: true,
         updatedAt: true,
       },
-    })
+    });
 
     return NextResponse.json({
       success: true,
       kundlis,
-    })
+    });
   } catch (error: unknown) {
-    console.error('[api/user/kundli] Error fetching charts', {
+    console.error("[api/user/kundli] Error fetching charts", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-    })
+    });
 
     return NextResponse.json(
       {
-        error: 'Failed to fetch charts',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch charts",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
@@ -171,73 +172,64 @@ export async function GET(_request: NextRequest) {
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get kundli ID from query params
-    const searchParams = request.nextUrl.searchParams
-    const kundliId = searchParams.get('id')
+    const searchParams = request.nextUrl.searchParams;
+    const kundliId = searchParams.get("id");
 
     if (!kundliId) {
-      return NextResponse.json(
-        { error: 'Kundli ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Kundli ID is required" }, { status: 400 });
     }
 
     // Verify ownership and delete
     const kundli = await prisma.kundli.findUnique({
       where: { id: kundliId },
       select: { userId: true },
-    })
+    });
 
     if (!kundli) {
-      return NextResponse.json(
-        { error: 'Chart not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Chart not found" }, { status: 404 });
     }
 
     if (kundli.userId !== user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     await prisma.kundli.delete({
       where: { id: kundliId },
-    })
+    });
 
-    console.error('[api/user/kundli] Chart deleted successfully', {
+    console.error("[api/user/kundli] Chart deleted successfully", {
       kundliId,
       userId: user.id,
-    })
+    });
 
     return NextResponse.json({
       success: true,
-      message: 'Chart deleted successfully',
-    })
+      message: "Chart deleted successfully",
+    });
   } catch (error: unknown) {
-    console.error('[api/user/kundli] Error deleting chart', {
+    console.error("[api/user/kundli] Error deleting chart", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-    })
+    });
 
     return NextResponse.json(
       {
-        error: 'Failed to delete chart',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to delete chart",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
@@ -249,45 +241,36 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
 export async function PATCH(request: NextRequest): Promise<NextResponse> {
   try {
     // Authenticate user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Get kundli ID from query params
-    const searchParams = request.nextUrl.searchParams
-    const kundliId = searchParams.get('id')
+    const searchParams = request.nextUrl.searchParams;
+    const kundliId = searchParams.get("id");
 
     if (!kundliId) {
-      return NextResponse.json(
-        { error: 'Kundli ID is required' },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Kundli ID is required" }, { status: 400 });
     }
 
     // Verify ownership and get current favorite status
     const kundli = await prisma.kundli.findUnique({
       where: { id: kundliId },
       select: { userId: true, isFavorite: true },
-    })
+    });
 
     if (!kundli) {
-      return NextResponse.json(
-        { error: 'Chart not found' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Chart not found" }, { status: 404 });
     }
 
     if (kundli.userId !== user.id) {
-      return NextResponse.json(
-        { error: 'Forbidden' },
-        { status: 403 }
-      )
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
     // Toggle favorite status
@@ -298,30 +281,30 @@ export async function PATCH(request: NextRequest): Promise<NextResponse> {
         id: true,
         isFavorite: true,
       },
-    })
+    });
 
-    console.error('[api/user/kundli] Favorite toggled successfully', {
+    console.error("[api/user/kundli] Favorite toggled successfully", {
       kundliId,
       userId: user.id,
       isFavorite: updatedKundli.isFavorite,
-    })
+    });
 
     return NextResponse.json({
       success: true,
       isFavorite: updatedKundli.isFavorite,
-    })
+    });
   } catch (error: unknown) {
-    console.error('[api/user/kundli] Error toggling favorite', {
+    console.error("[api/user/kundli] Error toggling favorite", {
       error: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
-    })
+    });
 
     return NextResponse.json(
       {
-        error: 'Failed to toggle favorite',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to toggle favorite",
+        message: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

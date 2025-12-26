@@ -5,6 +5,7 @@
 A production-ready foundation for your monorepo backend refactoring:
 
 ### Infrastructure
+
 - ✅ Railway deployment configuration for Python service
 - ✅ Service orchestration with automatic failover
 - ✅ Circuit breaker pattern for resilience
@@ -12,6 +13,7 @@ A production-ready foundation for your monorepo backend refactoring:
 - ✅ Environment management & validation
 
 ### API Routes
+
 - ✅ `/api/v1/astrology/birth-chart` - Enhanced with orchestrator
 - ✅ `/api/v1/astrology/status` - Service health monitoring
 - ✅ Standardized response format with request tracking
@@ -79,17 +81,20 @@ Expected: `"source": "python"` in response (using Railway service)
 **Value**: High user-facing impact
 
 **What You'll Build:**
+
 - SVG chart renderer with 4 styles (North/South/East Indian, Western)
 - Divisional charts (D1-D60 vargas)
 - PDF export with branding
 - User chart preferences
 
 **Why This First:**
+
 - Directly visible to users
 - Core astrology functionality
 - Monetization potential (premium chart styles, PDF reports)
 
 **Files to Create:**
+
 1. `apps/web/lib/astrology/chart-renderer.ts`
 2. `apps/web/app/api/v1/astrology/chart-svg/route.ts`
 3. `apps/web/app/api/v1/astrology/chart-svg/[type]/route.ts`
@@ -102,18 +107,21 @@ Expected: `"source": "python"` in response (using Railway service)
 **Value**: High engagement & retention
 
 **What You'll Build:**
+
 - Birth chart interpretation with OpenAI
 - Streaming responses (real-time UX)
 - Intelligent caching (7-day TTL, saves costs)
 - Token usage tracking & quotas
 
 **Why This First:**
+
 - Unique value proposition
 - High user engagement
 - Relatively quick to implement
 - Can monetize with premium interpretations
 
 **Files to Create:**
+
 1. `apps/web/app/api/v1/astrology/interpretation/route.ts`
 2. `apps/web/app/api/v1/astrology/interpretation/stream/route.ts`
 3. `apps/web/lib/api/streaming.ts`
@@ -126,11 +134,13 @@ Expected: `"source": "python"` in response (using Railway service)
 **Value**: Performance optimization
 
 **What You'll Build:**
+
 - Multi-layer caching (in-memory + database)
 - Cache warming strategies
 - Cache invalidation API
 
 **Why This:**
+
 - Reduces Python service load
 - Faster response times
 - Lower costs
@@ -145,17 +155,17 @@ Expected: `"source": "python"` in response (using Railway service)
 2. Test locally (now)
    ↓
 3. Choose Phase 4 OR Phase 5 based on priority:
-   
+
    • Phase 5 (AI) if you want:
      - Quick wins
      - High engagement features
      - Unique selling point
-   
+
    • Phase 4 (Charts) if you want:
      - Core astrology features
      - Visual appeal
      - Monetization options
-   
+
    ↓
 4. Complete the other phase
    ↓
@@ -221,6 +231,7 @@ A: Railway ~$5-10/month, Vercel free tier or $20/month, OpenAI ~$20-50/month (if
 ## ✨ You're Ready!
 
 You have everything needed to:
+
 1. ✅ Deploy to production
 2. ✅ Build chart generation features
 3. ✅ Add AI interpretations

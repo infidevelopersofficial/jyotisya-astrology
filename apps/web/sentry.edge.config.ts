@@ -20,4 +20,6 @@
 // Intentionally empty - no Sentry initialization for Edge Runtime
 // This prevents __dirname and other Node.js global errors
 
-console.info('[Sentry Edge] Sentry is disabled for Edge Runtime (middleware) to prevent Node.js compatibility issues')
+console.info(
+  "[Sentry Edge] Sentry is disabled for Edge Runtime (middleware) to prevent Node.js compatibility issues",
+);

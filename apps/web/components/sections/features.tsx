@@ -4,23 +4,26 @@ const FEATURES = [
   {
     title: "Authentic Jyotish",
     description: "Powered by Vedic panchang, NASA ephemeris and experienced Acharyas across India.",
-    icon: "🪔"
+    icon: "🪔",
   },
   {
     title: "Regional Languages",
-    description: "Horoscope, Kundli, and remedies available in Hindi & English with support for more Bharatiya languages coming soon.",
-    icon: "🗣️"
+    description:
+      "Horoscope, Kundli, and remedies available in Hindi & English with support for more Bharatiya languages coming soon.",
+    icon: "🗣️",
   },
   {
     title: "Secure Consultations",
-    description: "End-to-end encrypted chat, voice, video and wallet with instant UPI settlements & loyalty coins.",
-    icon: "🔐"
+    description:
+      "End-to-end encrypted chat, voice, video and wallet with instant UPI settlements & loyalty coins.",
+    icon: "🔐",
   },
   {
     title: "Temple-Energised Store",
-    description: "Certified gemstones, yantras, and puja kits energised by partner temples and Gurukuls.",
-    icon: "🕉️"
-  }
+    description:
+      "Certified gemstones, yantras, and puja kits energised by partner temples and Gurukuls.",
+    icon: "🕉️",
+  },
 ];
 
 export default function FeaturesSection(): React.ReactElement {
@@ -36,7 +39,10 @@ export default function FeaturesSection(): React.ReactElement {
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-2">
         {FEATURES.map((feature) => (
-          <Card key={feature.title} className="relative overflow-hidden border-white/5 bg-gradient-to-br from-white/5 to-white/10">
+          <Card
+            key={feature.title}
+            className="relative overflow-hidden border-white/5 bg-gradient-to-br from-white/5 to-white/10"
+          >
             <div className="absolute right-6 top-6 text-4xl opacity-70">{feature.icon}</div>
             <h3 className="text-xl font-semibold text-white">{feature.title}</h3>
             <p className="mt-3 text-sm text-slate-300">{feature.description}</p>

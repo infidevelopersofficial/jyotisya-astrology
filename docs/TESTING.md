@@ -68,18 +68,18 @@ Test individual functions and utilities:
 
 ```typescript
 // lib/validation.test.ts
-import { describe, it, expect } from 'vitest'
-import { validateEmail } from './validation'
+import { describe, it, expect } from "vitest";
+import { validateEmail } from "./validation";
 
-describe('validateEmail', () => {
-  it('validates correct email', () => {
-    expect(validateEmail('test@example.com')).toBe(true)
-  })
+describe("validateEmail", () => {
+  it("validates correct email", () => {
+    expect(validateEmail("test@example.com")).toBe(true);
+  });
 
-  it('rejects invalid email', () => {
-    expect(validateEmail('invalid-email')).toBe(false)
-  })
-})
+  it("rejects invalid email", () => {
+    expect(validateEmail("invalid-email")).toBe(false);
+  });
+});
 ```
 
 ### Component Tests
@@ -113,20 +113,20 @@ Test custom React hooks:
 
 ```typescript
 // hooks/use-user.test.ts
-import { renderHook, waitFor } from '@testing-library/react'
-import { useUser } from './use-user'
+import { renderHook, waitFor } from "@testing-library/react";
+import { useUser } from "./use-user";
 
-describe('useUser', () => {
-  it('fetches user data', async () => {
-    const { result } = renderHook(() => useUser('user-123'))
+describe("useUser", () => {
+  it("fetches user data", async () => {
+    const { result } = renderHook(() => useUser("user-123"));
 
     await waitFor(() => {
-      expect(result.current.data).toBeDefined()
-    })
+      expect(result.current.data).toBeDefined();
+    });
 
-    expect(result.current.loading).toBe(false)
-  })
-})
+    expect(result.current.loading).toBe(false);
+  });
+});
 ```
 
 ### API Route Tests
@@ -135,18 +135,18 @@ Test Next.js API routes:
 
 ```typescript
 // app/api/users/route.test.ts
-import { GET } from './route'
+import { GET } from "./route";
 
-describe('GET /api/users', () => {
-  it('returns user list', async () => {
-    const request = new Request('http://localhost/api/users')
-    const response = await GET(request)
-    const data = await response.json()
+describe("GET /api/users", () => {
+  it("returns user list", async () => {
+    const request = new Request("http://localhost/api/users");
+    const response = await GET(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(200)
-    expect(data.users).toBeDefined()
-  })
-})
+    expect(response.status).toBe(200);
+    expect(data.users).toBeDefined();
+  });
+});
 ```
 
 ---
@@ -175,6 +175,7 @@ open coverage/index.html
 ### Coverage in CI
 
 Coverage is automatically:
+
 - Generated on every PR
 - Uploaded to Codecov
 - Displayed in PR comments
@@ -205,6 +206,7 @@ Coverage is automatically:
 ## Continuous Integration
 
 Tests run automatically on:
+
 - Every pull request
 - Every push to main/develop
 - Manual workflow dispatch
@@ -232,7 +234,7 @@ Increase timeout in `vitest.config.ts`:
 ```typescript
 {
   test: {
-    testTimeout: 15000 // 15 seconds
+    testTimeout: 15000; // 15 seconds
   }
 }
 ```
@@ -242,12 +244,12 @@ Increase timeout in `vitest.config.ts`:
 Ensure mock is defined before import:
 
 ```typescript
-vi.mock('@/lib/supabase/client', () => ({
-  createClient: vi.fn()
-}))
+vi.mock("@/lib/supabase/client", () => ({
+  createClient: vi.fn(),
+}));
 
 // Then import
-import { myFunction } from './my-function'
+import { myFunction } from "./my-function";
 ```
 
 ### Coverage too low

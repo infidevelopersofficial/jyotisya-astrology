@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 export default function PanchangHighlights(): React.ReactElement {
   const { data, isLoading } = useQuery({
     queryKey: ["panchang", "today", "en"],
-    queryFn: () => getPanchangToday({ locale: "en" })
+    queryFn: () => getPanchangToday({ locale: "en" }),
   });
 
   return (
@@ -17,8 +17,8 @@ export default function PanchangHighlights(): React.ReactElement {
         <div>
           <h2 className="gradient-title">दैनिक पंचांग • Daily Panchang</h2>
           <p className="mt-3 max-w-xl text-sm text-slate-300">
-            Accurate sunrise timings, tithi and nakshatra fetched from Drik Panchang to plan your पूजा,
-            यात्रा and जीवन निर्णय.
+            Accurate sunrise timings, tithi and nakshatra fetched from Drik Panchang to plan your
+            पूजा, यात्रा and जीवन निर्णय.
           </p>
         </div>
         <div className="relative h-28 w-full max-w-xs overflow-hidden rounded-3xl border border-white/10">
@@ -36,7 +36,11 @@ export default function PanchangHighlights(): React.ReactElement {
             {isLoading ? "Loading Panchang details…" : "Auspicious timings aligned with चंद्र मास."}
           </p>
         </Card>
-        <Card className="border-white/5 bg-white/10" title="Nakshatra" subtitle={data?.nakshatra ?? "--"}>
+        <Card
+          className="border-white/5 bg-white/10"
+          title="Nakshatra"
+          subtitle={data?.nakshatra ?? "--"}
+        >
           <p className="text-sm text-slate-300">
             {isLoading ? "" : "Ideal for vastu, यात्रा, संस्कार as per today’s constellation."}
           </p>

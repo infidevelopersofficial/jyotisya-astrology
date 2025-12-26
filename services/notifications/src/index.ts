@@ -11,7 +11,7 @@ export class PushService {
     webpush.setVapidDetails(
       "mailto:support@jyotishya.in",
       process.env.VAPID_PUBLIC_KEY ?? "public-key",
-      process.env.VAPID_PRIVATE_KEY ?? "private-key"
+      process.env.VAPID_PRIVATE_KEY ?? "private-key",
     );
   }
 

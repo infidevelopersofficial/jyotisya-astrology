@@ -7,7 +7,7 @@ import { useLocaleContext } from "@components/providers/intl-provider";
 const OPTIONS = [
   { code: "en", label: "EN", icon: "🌐" },
   { code: "hi", label: "हिं", icon: "🇮🇳" },
-  { code: "ta", label: "தமிழ்", icon: "🇮🇳" }
+  { code: "ta", label: "தமிழ்", icon: "🇮🇳" },
 ] as const;
 
 export default function LocaleSwitcher(): React.ReactElement {
@@ -15,7 +15,7 @@ export default function LocaleSwitcher(): React.ReactElement {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const currentOption = OPTIONS.find(opt => opt.code === locale) || OPTIONS[0];
+  const currentOption = OPTIONS.find((opt) => opt.code === locale) || OPTIONS[0];
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function LocaleSwitcher(): React.ReactElement {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-    return undefined
+    return undefined;
   }, [isOpen]);
 
   const handleSelect = (code: "en" | "hi" | "ta") => {
@@ -50,10 +50,7 @@ export default function LocaleSwitcher(): React.ReactElement {
         <span className="text-base">{currentOption.icon}</span>
         <span className="font-medium">{currentOption.label}</span>
         <svg
-          className={clsx(
-            "h-4 w-4 transition-transform",
-            isOpen && "rotate-180"
-          )}
+          className={clsx("h-4 w-4 transition-transform", isOpen && "rotate-180")}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -75,17 +72,13 @@ export default function LocaleSwitcher(): React.ReactElement {
                   "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm transition",
                   locale === option.code
                     ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white"
-                    : "text-slate-200 hover:bg-white/10 hover:text-white"
+                    : "text-slate-200 hover:bg-white/10 hover:text-white",
                 )}
               >
                 <span className="text-base">{option.icon}</span>
                 <span className="font-medium">{option.label}</span>
                 {locale === option.code && (
-                  <svg
-                    className="ml-auto h-4 w-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
+                  <svg className="ml-auto h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                     <path
                       fillRule="evenodd"
                       d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { Clock } from 'lucide-react'
-import SavedChartCard from './SavedChartCard'
-import type { SavedChartListItem } from '@/types/savedChart.types'
+import { Clock } from "lucide-react";
+import SavedChartCard from "./SavedChartCard";
+import type { SavedChartListItem } from "@/types/savedChart.types";
 
 interface RecentlyViewedListProps {
-  charts: SavedChartListItem[]
-  onToggleFavorite: (chartId: string) => Promise<void>
-  onChartClick: (chart: SavedChartListItem) => void
-  isTogglingFavorite: (chartId: string) => boolean
+  charts: SavedChartListItem[];
+  onToggleFavorite: (chartId: string) => Promise<void>;
+  onChartClick: (chart: SavedChartListItem) => void;
+  isTogglingFavorite: (chartId: string) => boolean;
 }
 
 export default function RecentlyViewedList({
@@ -18,7 +18,7 @@ export default function RecentlyViewedList({
   isTogglingFavorite,
 }: RecentlyViewedListProps) {
   if (charts.length === 0) {
-    return null
+    return null;
   }
 
   return (
@@ -48,5 +48,5 @@ export default function RecentlyViewedList({
       {/* Divider */}
       <div className="mt-8 border-t border-white/10" />
     </div>
-  )
+  );
 }

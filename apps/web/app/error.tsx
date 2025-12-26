@@ -1,28 +1,28 @@
-'use client'
+"use client";
 
-import { useEffect } from 'react'
-import { captureException } from '@/lib/monitoring/sentry'
-import { logger } from '@/lib/monitoring/logger'
+import { useEffect } from "react";
+import { captureException } from "@/lib/monitoring/sentry";
+import { logger } from "@/lib/monitoring/logger";
 
 export default function Error({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
   useEffect(() => {
     // Log error to monitoring services
-    logger.error('Global error boundary', error, {
+    logger.error("Global error boundary", error, {
       digest: error.digest,
-      errorBoundary: 'app/error.tsx',
-    })
+      errorBoundary: "app/error.tsx",
+    });
 
     captureException(error, {
-      tags: { errorBoundary: 'global' },
+      tags: { errorBoundary: "global" },
       extra: { digest: error.digest },
-    })
-  }, [error])
+    });
+  }, [error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-b from-cosmic-blue to-gray-900 px-4">
@@ -45,18 +45,12 @@ export default function Error({
         </div>
 
         {/* Error Message */}
-        <h1 className="mb-3 text-3xl font-bold text-white">
-          Oops! Something went wrong
-        </h1>
+        <h1 className="mb-3 text-3xl font-bold text-white">Oops! Something went wrong</h1>
         <p className="mb-2 text-slate-300">
           We encountered an unexpected error. Our team has been notified and is working on it.
         </p>
 
-        {error.digest && (
-          <p className="mb-6 text-sm text-slate-400">
-            Error ID: {error.digest}
-          </p>
-        )}
+        {error.digest && <p className="mb-6 text-sm text-slate-400">Error ID: {error.digest}</p>}
 
         {/* Action Buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -64,12 +58,7 @@ export default function Error({
             onClick={reset}
             className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-6 py-3 font-semibold text-white shadow-lg transition hover:shadow-xl"
           >
-            <svg
-              className="mr-2 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -89,26 +78,22 @@ export default function Error({
         </div>
 
         {/* Error Details (Development Only) */}
-        {process.env.NODE_ENV === 'development' && (
+        {process.env.NODE_ENV === "development" && (
           <details className="mt-8 text-left">
             <summary className="cursor-pointer text-sm font-semibold text-slate-300">
               Error Details (Dev Only)
             </summary>
             <div className="mt-3 rounded-lg bg-gray-900 p-4">
               <div className="mb-2">
-                <span className="text-xs font-semibold text-red-400">
-                  Error Message:
-                </span>
-                <p className="mt-1 text-sm text-slate-300">{(error instanceof Error ? error.message : String(error))}</p>
+                <span className="text-xs font-semibold text-red-400">Error Message:</span>
+                <p className="mt-1 text-sm text-slate-300">
+                  {error instanceof Error ? error.message : String(error)}
+                </p>
               </div>
               {error.stack && (
                 <div>
-                  <span className="text-xs font-semibold text-red-400">
-                    Stack Trace:
-                  </span>
-                  <pre className="mt-1 overflow-auto text-xs text-slate-400">
-                    {error.stack}
-                  </pre>
+                  <span className="text-xs font-semibold text-red-400">Stack Trace:</span>
+                  <pre className="mt-1 overflow-auto text-xs text-slate-400">{error.stack}</pre>
                 </div>
               )}
             </div>
@@ -117,12 +102,12 @@ export default function Error({
 
         {/* Support Link */}
         <div className="mt-8 text-sm text-slate-400">
-          Need help?{' '}
+          Need help?{" "}
           <a href="/contact" className="text-orange-400 hover:text-orange-300">
             Contact Support
           </a>
         </div>
       </div>
     </div>
-  )
+  );
 }

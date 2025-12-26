@@ -1,30 +1,38 @@
 /* eslint-disable react/no-unescaped-entities */
-'use client'
+"use client";
 
-import type { BirthData, BirthChartResponse, ChartSVGResponse } from '@/types/astrology/birthChart.types'
-import { getDisplayChartName, getSignName, formatDegree } from '@/services/astrology/birthChartService'
-import { getFormattedBirthDateTime } from '@/services/astrology/birthChartService'
-import PlanetaryPositions from './PlanetaryPositions'
-import HousesGuide from './HousesGuide'
+import type {
+  BirthData,
+  BirthChartResponse,
+  ChartSVGResponse,
+} from "@/types/astrology/birthChart.types";
+import {
+  getDisplayChartName,
+  getSignName,
+  formatDegree,
+} from "@/services/astrology/birthChartService";
+import { getFormattedBirthDateTime } from "@/services/astrology/birthChartService";
+import PlanetaryPositions from "./PlanetaryPositions";
+import HousesGuide from "./HousesGuide";
 
 interface BirthChartDisplayProps {
-  birthData: BirthData
-  chartData: BirthChartResponse
-  svgData: ChartSVGResponse | undefined
-  showHelp: boolean
-  expandedPlanet: string | null
-  onTogglePlanet: (name: string) => void
-  onSwitchToForm: () => void
-  onSwitchToDivisional: () => void
-  downloadingPNG: boolean
-  downloadingPDF: boolean
-  copiedLink: boolean
-  savingChart: boolean
-  savedChartId: string | null
-  onDownloadPNG: () => void
-  onDownloadPDF: () => void
-  onCopyLink: () => void
-  onSaveChart: () => void
+  birthData: BirthData;
+  chartData: BirthChartResponse;
+  svgData: ChartSVGResponse | undefined;
+  showHelp: boolean;
+  expandedPlanet: string | null;
+  onTogglePlanet: (name: string) => void;
+  onSwitchToForm: () => void;
+  onSwitchToDivisional: () => void;
+  downloadingPNG: boolean;
+  downloadingPDF: boolean;
+  copiedLink: boolean;
+  savingChart: boolean;
+  savedChartId: string | null;
+  onDownloadPNG: () => void;
+  onDownloadPDF: () => void;
+  onCopyLink: () => void;
+  onSaveChart: () => void;
 }
 
 export default function BirthChartDisplay({
@@ -45,7 +53,7 @@ export default function BirthChartDisplay({
   onCopyLink,
   onSaveChart,
 }: BirthChartDisplayProps) {
-  const formatted = getFormattedBirthDateTime(birthData.dateTime)
+  const formatted = getFormattedBirthDateTime(birthData.dateTime);
 
   return (
     <div className="space-y-6">
@@ -68,9 +76,8 @@ export default function BirthChartDisplay({
             Understanding Your Chart
           </p>
           <p className="text-sm leading-relaxed text-blue-300/90">
-            Your birth chart is a cosmic snapshot of the sky at your birth moment. It
-            shows where planets were positioned, influencing your personality and life
-            path.
+            Your birth chart is a cosmic snapshot of the sky at your birth moment. It shows where
+            planets were positioned, influencing your personality and life path.
           </p>
         </div>
       )}
@@ -85,7 +92,7 @@ export default function BirthChartDisplay({
                 Rising Sign (Ascendant)
               </p>
               <p className="text-4xl font-bold text-white">
-                {getSignName(Math.floor(chartData.data.ascendant / 30) + 1)}{' '}
+                {getSignName(Math.floor(chartData.data.ascendant / 30) + 1)}{" "}
                 {formatDegree(chartData.data.ascendant % 30)}
               </p>
             </div>
@@ -98,12 +105,10 @@ export default function BirthChartDisplay({
 
           {showHelp && (
             <div className="mt-4 rounded-lg bg-white/10 p-4 backdrop-blur-sm">
-              <p className="mb-1 text-sm font-semibold text-white">
-                What is the Ascendant?
-              </p>
+              <p className="mb-1 text-sm font-semibold text-white">What is the Ascendant?</p>
               <p className="text-sm leading-relaxed text-slate-200">
-                How others perceive you and your approach to life, determined by your
-                exact birth time and place.
+                How others perceive you and your approach to life, determined by your exact birth
+                time and place.
               </p>
             </div>
           )}
@@ -240,8 +245,8 @@ export default function BirthChartDisplay({
           <li className="flex items-start gap-2">
             <span className="mt-0.5 text-indigo-400">•</span>
             <span>
-              Explore <strong className="text-white">Divisional Charts</strong> for
-              marriage, career, and wealth insights
+              Explore <strong className="text-white">Divisional Charts</strong> for marriage,
+              career, and wealth insights
             </span>
           </li>
           <li className="flex items-start gap-2">
@@ -262,5 +267,5 @@ export default function BirthChartDisplay({
         </button>
       </div>
     </div>
-  )
+  );
 }

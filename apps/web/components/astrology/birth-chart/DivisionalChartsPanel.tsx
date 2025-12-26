@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import type { ChartSVGResponse } from '@/types/astrology/birthChart.types'
-import { DIVISIONAL_CHARTS } from '@/services/astrology/birthChartService'
+import type { ChartSVGResponse } from "@/types/astrology/birthChart.types";
+import { DIVISIONAL_CHARTS } from "@/services/astrology/birthChartService";
 
 interface DivisionalChartsPanelProps {
-  svgData: { [key: string]: ChartSVGResponse }
-  selectedDivisional: string
-  onSelectDivisional: (code: string) => void
+  svgData: { [key: string]: ChartSVGResponse };
+  selectedDivisional: string;
+  onSelectDivisional: (code: string) => void;
 }
 
 export default function DivisionalChartsPanel({
@@ -14,9 +14,9 @@ export default function DivisionalChartsPanel({
   selectedDivisional,
   onSelectDivisional,
 }: DivisionalChartsPanelProps) {
-  const selectedChart = DIVISIONAL_CHARTS.find((c) => c.code === selectedDivisional)
-  const beginnerCharts = DIVISIONAL_CHARTS.filter((c) => c.beginner)
-  const advancedCharts = DIVISIONAL_CHARTS.filter((c) => !c.beginner)
+  const selectedChart = DIVISIONAL_CHARTS.find((c) => c.code === selectedDivisional);
+  const beginnerCharts = DIVISIONAL_CHARTS.filter((c) => c.beginner);
+  const advancedCharts = DIVISIONAL_CHARTS.filter((c) => !c.beginner);
 
   return (
     <div className="space-y-6">
@@ -47,8 +47,8 @@ export default function DivisionalChartsPanel({
                 onClick={() => onSelectDivisional(chart.code)}
                 className={`w-full rounded-xl border p-4 text-left transition-all ${
                   selectedDivisional === chart.code
-                    ? 'border-orange-500 bg-orange-500/20 shadow-lg shadow-orange-500/20'
-                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                    ? "border-orange-500 bg-orange-500/20 shadow-lg shadow-orange-500/20"
+                    : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"
                 }`}
               >
                 <div className="flex items-center gap-3.5">
@@ -80,8 +80,8 @@ export default function DivisionalChartsPanel({
                 onClick={() => onSelectDivisional(chart.code)}
                 className={`w-full rounded-xl border p-4 text-left transition-all ${
                   selectedDivisional === chart.code
-                    ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
-                    : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                    ? "border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20"
+                    : "border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10"
                 }`}
               >
                 <div className="flex items-center gap-3.5">
@@ -116,12 +116,10 @@ export default function DivisionalChartsPanel({
         ) : (
           <div className="flex flex-col items-center justify-center rounded-xl bg-white/5 py-20">
             <div className="mb-4 h-12 w-12 animate-spin rounded-full border-4 border-slate-600 border-t-orange-500"></div>
-            <p className="text-sm text-slate-400">
-              Loading {selectedDivisional} chart...
-            </p>
+            <p className="text-sm text-slate-400">Loading {selectedDivisional} chart...</p>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

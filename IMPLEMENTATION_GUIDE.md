@@ -9,6 +9,7 @@ You now have a production-ready foundation for migrating backend services to Nex
 ## ✅ What's Been Implemented
 
 ### Phase 1: Infrastructure (Complete)
+
 1. **Railway Deployment**
    - Configuration files for Python service deployment
    - Health monitoring and circuit breaker
@@ -25,6 +26,7 @@ You now have a production-ready foundation for migrating backend services to Nex
    - Standardized response format with request IDs
 
 ### Phase 2: Astrology Service Integration (Complete)
+
 1. **Python Service Client** (`lib/astrology/python-client.ts`)
    - Circuit breaker (auto-opens after 5 failures, resets after 1 min)
    - Retry logic with exponential backoff (100ms, 500ms, 2s)
@@ -106,6 +108,7 @@ curl http://localhost:3000/api/v1/astrology/status
 ```
 
 Expected response:
+
 ```json
 {
   "success": true,
@@ -230,17 +233,20 @@ Birth chart generated { source: "python", planets: 9 }
 ## 🧪 Testing Checklist
 
 ### Unit Tests (TODO - Phase 2 enhancement)
+
 - [ ] Python client circuit breaker behavior
 - [ ] Service orchestrator fallback logic
 - [ ] Route handler error responses
 
 ### Integration Tests
+
 - [ ] Birth chart calculation via Python service
 - [ ] Automatic fallback to FreeAstrologyAPI
 - [ ] Circuit breaker recovery
 - [ ] Request validation errors
 
 ### Manual Testing
+
 ```bash
 # Test Python service (primary)
 curl -X POST http://localhost:3000/api/v1/astrology/birth-chart \
@@ -264,17 +270,20 @@ curl http://localhost:3000/api/v1/astrology/status
 ## 📝 Next Steps
 
 ### Phase 2 Remaining (Optional Enhancement)
+
 - [ ] Multi-layer caching (in-memory + database)
 - [ ] More comprehensive unit tests
 - [ ] API rate limiting per user
 
 ### Phase 4: Chart Generation (Priority)
+
 - [ ] Create chart renderer (SVG with multiple styles)
 - [ ] Divisional charts endpoint (D1-D60)
 - [ ] PDF export functionality
 - [ ] User chart preferences
 
 ### Phase 5: AI Interpretations (Priority)
+
 - [ ] Birth chart interpretation with OpenAI
 - [ ] Streaming responses (SSE)
 - [ ] Interpretation caching (7-day TTL)
@@ -285,6 +294,7 @@ curl http://localhost:3000/api/v1/astrology/status
 ## 🐛 Troubleshooting
 
 ### Python Service Not Responding
+
 ```bash
 # Check Railway logs
 # Verify environment: ASTROLOGY_BACKEND=internal
@@ -293,6 +303,7 @@ curl https://your-railway-url.railway.app/health
 ```
 
 ### Circuit Breaker Stuck Open
+
 ```bash
 # Wait 1 minute for automatic reset
 # Or restart the Next.js server
@@ -300,6 +311,7 @@ curl https://your-railway-url.railway.app/health
 ```
 
 ### FreeAstrologyAPI Rate Limit
+
 ```bash
 # Check status endpoint for quota
 # Resets daily at midnight UTC
@@ -307,6 +319,7 @@ curl https://your-railway-url.railway.app/health
 ```
 
 ### Validation Errors
+
 ```bash
 # Check request matches schema:
 {
@@ -322,20 +335,24 @@ curl https://your-railway-url.railway.app/health
 ## 📚 Key Files Reference
 
 ### Configuration
+
 - `services/astro-core-python/railway.toml` - Railway deployment
 - `apps/web/.env.example` - Environment template
 - `apps/web/lib/env.ts` - Environment validation
 
 ### Core Services
+
 - `apps/web/lib/astrology/python-client.ts` - Python service client
 - `apps/web/lib/astrology/service-orchestrator.ts` - Service routing
 - `apps/web/lib/astrology/client.ts` - FreeAstrologyAPI client
 
 ### API Framework
+
 - `apps/web/lib/api/route-handler.ts` - API wrapper
 - `apps/web/lib/api/auth.ts` - Authentication helpers
 
 ### API Routes
+
 - `apps/web/app/api/v1/astrology/birth-chart/route.ts` - Birth chart endpoint
 - `apps/web/app/api/v1/astrology/status/route.ts` - Service status
 

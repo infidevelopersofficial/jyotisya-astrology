@@ -16,11 +16,13 @@
 The `net::ERR_CONNECTION_REFUSED` error occurs when the browser cannot establish a connection to the backend server. This is the **most common cause** of this error.
 
 **Symptoms**:
+
 - Console shows `Failed to fetch` errors
 - Network tab shows failed requests with status `(failed)`
 - Error message: "net::ERR_CONNECTION_REFUSED"
 
 **Solution**:
+
 ```bash
 # Start the Next.js development server
 cd /path/to/digital-astrology-2/digital-astrology
@@ -32,6 +34,7 @@ yarn dev
 ```
 
 **Verification**:
+
 ```bash
 # Check if port 3000 is in use
 lsof -i :3000
@@ -47,35 +50,39 @@ curl http://localhost:3000/api/astrologers
 #### 1. Unstable useEffect Dependency
 
 **Problem** (BEFORE):
+
 ```typescript
 useEffect(() => {
   if (!initialAstrologers.length) {
-    fetchAstrologers()
+    fetchAstrologers();
   }
-}, [initialAstrologers])  // ⚠️ Can cause infinite loops
+}, [initialAstrologers]); // ⚠️ Can cause infinite loops
 ```
 
 **Why it's problematic**:
+
 - If parent component doesn't memoize the array, it creates a new reference on every render
 - Each new array reference triggers the useEffect
 - Can cause infinite fetch loops
 
 **Solution** (AFTER):
+
 ```typescript
 useEffect(() => {
   if (!initialAstrologers.length) {
-    const abortController = new AbortController()
-    fetchAstrologers(abortController.signal)
+    const abortController = new AbortController();
+    fetchAstrologers(abortController.signal);
 
     return () => {
-      abortController.abort()
-    }
+      abortController.abort();
+    };
   }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-}, []) // Run only once on mount
+}, []); // Run only once on mount
 ```
 
 **Benefits**:
+
 - Runs only once when component mounts
 - Abort controller cancels in-flight requests on unmount
 - Prevents memory leaks and duplicate requests
@@ -85,39 +92,42 @@ useEffect(() => {
 #### 2. Missing Abort Signal Handling
 
 **Problem** (BEFORE):
+
 ```typescript
 const fetchAstrologers = async () => {
-  const response = await fetch('/api/astrologers')
+  const response = await fetch("/api/astrologers");
   // No way to cancel this request
-}
+};
 ```
 
 **Why it's problematic**:
+
 - Request continues even if component unmounts
 - Can cause memory leaks
 - Updates state on unmounted components (React warnings)
 
 **Solution** (AFTER):
+
 ```typescript
 const fetchAstrologers = async (signal?: AbortSignal) => {
   try {
-    const response = await fetch('/api/astrologers', {
+    const response = await fetch("/api/astrologers", {
       signal, // Allows cancellation
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-    })
+    });
 
     // ... rest of code
   } catch (err) {
     // Ignore abort errors
-    if (err instanceof Error && err.name === 'AbortError') {
-      console.log('Fetch aborted - component unmounted')
-      return
+    if (err instanceof Error && err.name === "AbortError") {
+      console.log("Fetch aborted - component unmounted");
+      return;
     }
     // Handle other errors
   }
-}
+};
 ```
 
 ---
@@ -125,6 +135,7 @@ const fetchAstrologers = async (signal?: AbortSignal) => {
 #### 3. Poor Error Messaging
 
 **Problem** (BEFORE):
+
 ```typescript
 catch (err) {
   setError('Failed to load astrologers. Please try again.')
@@ -132,10 +143,12 @@ catch (err) {
 ```
 
 **Why it's problematic**:
+
 - Generic error doesn't help users understand the issue
 - No distinction between server errors and network errors
 
 **Solution** (AFTER):
+
 ```typescript
 catch (err) {
   if (err instanceof Error && err.name === 'AbortError') {
@@ -170,6 +183,7 @@ This causes the error to appear **twice in the console**.
 **This is NORMAL in development** and won't happen in production builds.
 
 **Visual Example**:
+
 ```
 Console Output:
 GET http://localhost:3000/api/astrologers net::ERR_CONNECTION_REFUSED
@@ -178,6 +192,7 @@ GET http://localhost:3000/api/astrologers net::ERR_CONNECTION_REFUSED
 ```
 
 **How to verify**:
+
 1. Check if errors appear in pairs
 2. Look for "StrictMode" in React DevTools
 3. Temporarily disable StrictMode to test:
@@ -256,11 +271,13 @@ npm run seed
 4. Look for the `/api/astrologers` request
 
 **Healthy request**:
+
 - Status: `200 OK`
 - Response: JSON with astrologers array
 - Size: > 0 bytes
 
 **Failed request**:
+
 - Status: `(failed)` or `ERR_CONNECTION_REFUSED`
 - Response: Empty
 - Size: 0 bytes
@@ -275,20 +292,20 @@ Check that the fixes are in place:
 // ✅ Correct - Empty dependency array
 useEffect(() => {
   if (!initialAstrologers.length) {
-    const abortController = new AbortController()
-    fetchAstrologers(abortController.signal)
-    return () => abortController.abort()
+    const abortController = new AbortController();
+    fetchAstrologers(abortController.signal);
+    return () => abortController.abort();
   }
-}, []) // ← Should be empty array
+}, []); // ← Should be empty array
 
 // ✅ Correct - Accepts signal parameter
 const fetchAstrologers = async (signal?: AbortSignal) => {
   // ...
-  const response = await fetch('/api/astrologers', {
-    signal,  // ← Should be present
+  const response = await fetch("/api/astrologers", {
+    signal, // ← Should be present
     // ...
-  })
-}
+  });
+};
 ```
 
 ---
@@ -298,11 +315,13 @@ const fetchAstrologers = async (signal?: AbortSignal) => {
 ### Scenario 1: Server Running, Still Getting Connection Error
 
 **Possible causes**:
+
 1. Server is on different port (check console for actual port)
 2. Proxy misconfiguration
 3. Firewall blocking localhost
 
 **Solutions**:
+
 ```bash
 # 1. Check actual port from server logs
 npm run dev | grep "Local:"
@@ -317,11 +336,13 @@ fetch('/api/astrologers').then(r => r.json()).then(console.log)
 ### Scenario 2: Database Connection Errors
 
 **Error in API logs**:
+
 ```
 PrismaClientInitializationError: Can't reach database server
 ```
 
 **Solutions**:
+
 ```bash
 # 1. Check DATABASE_URL
 cat apps/web/.env.local
@@ -343,6 +364,7 @@ npx prisma db pull
 **Symptom**: Request succeeds but returns empty array
 
 **Solutions**:
+
 ```bash
 # Check if database has data
 cd packages/schemas
@@ -358,24 +380,26 @@ npm run seed
 ### Scenario 4: CORS Errors (If using separate backend)
 
 **Error**:
+
 ```
 Access to fetch at 'http://api.example.com' from origin 'http://localhost:3000'
 has been blocked by CORS policy
 ```
 
 **Solution**:
+
 ```typescript
 // apps/web/next.config.js
 module.exports = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'http://your-backend-url/api/:path*',
+        source: "/api/:path*",
+        destination: "http://your-backend-url/api/:path*",
       },
-    ]
+    ];
   },
-}
+};
 ```
 
 ---
@@ -398,6 +422,7 @@ npm run dev
 ### 2. Monitor Console
 
 Open browser DevTools and watch for:
+
 - ✅ No repeated errors
 - ✅ Successful API response
 - ✅ Astrologers rendering on page
@@ -407,21 +432,22 @@ Open browser DevTools and watch for:
 ```typescript
 // Add temporary logging
 useEffect(() => {
-  console.log('[AstrologerList] Component mounted')
+  console.log("[AstrologerList] Component mounted");
 
   if (!initialAstrologers.length) {
-    const abortController = new AbortController()
-    fetchAstrologers(abortController.signal)
+    const abortController = new AbortController();
+    fetchAstrologers(abortController.signal);
 
     return () => {
-      console.log('[AstrologerList] Component unmounting - aborting fetch')
-      abortController.abort()
-    }
+      console.log("[AstrologerList] Component unmounting - aborting fetch");
+      abortController.abort();
+    };
   }
-}, [])
+}, []);
 ```
 
 **Expected console output** (with StrictMode):
+
 ```
 [AstrologerList] Component mounted
 [AstrologerList] Component unmounting - aborting fetch
@@ -437,12 +463,12 @@ Fetch aborted - component unmounted
 
 ```typescript
 useEffect(() => {
-  const controller = new AbortController()
+  const controller = new AbortController();
 
-  fetchData(controller.signal)
+  fetchData(controller.signal);
 
-  return () => controller.abort()
-}, [])
+  return () => controller.abort();
+}, []);
 ```
 
 ### 2. Handle Abort Errors Gracefully
@@ -459,24 +485,24 @@ catch (err) {
 ```typescript
 // ✅ Good - runs once
 useEffect(() => {
-  fetchData()
-}, [])
+  fetchData();
+}, []);
 
 // ❌ Bad - can run multiple times
 useEffect(() => {
-  fetchData()
-}, [someProp])
+  fetchData();
+}, [someProp]);
 ```
 
 ### 4. Provide Helpful Error Messages
 
 ```typescript
-if (err instanceof TypeError && err.message === 'Failed to fetch') {
-  setError('Server not running. Run: npm run dev')
-} else if (err.message.includes('404')) {
-  setError('API endpoint not found')
+if (err instanceof TypeError && err.message === "Failed to fetch") {
+  setError("Server not running. Run: npm run dev");
+} else if (err.message.includes("404")) {
+  setError("API endpoint not found");
 } else {
-  setError(err.message)
+  setError(err.message);
 }
 ```
 
@@ -485,14 +511,14 @@ if (err instanceof TypeError && err.message === 'Failed to fetch') {
 Consider using a data-fetching library for production:
 
 ```typescript
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
 
 function AstrologerList() {
   const { data, error, isLoading } = useQuery({
-    queryKey: ['astrologers'],
-    queryFn: () => fetch('/api/astrologers').then(r => r.json()),
+    queryKey: ["astrologers"],
+    queryFn: () => fetch("/api/astrologers").then((r) => r.json()),
     staleTime: 60000, // Cache for 1 minute
-  })
+  });
 
   // Automatic error handling, caching, and retries! ✨
 }
@@ -535,14 +561,14 @@ npm test
 
 ## Summary of Changes Made
 
-| File | Line | Change | Purpose |
-|------|------|--------|---------|
-| `astrologer-list.tsx` | 36-48 | Updated useEffect dependencies | Prevent re-render loops |
-| `astrologer-list.tsx` | 40 | Added AbortController | Cancel requests on unmount |
-| `astrologer-list.tsx` | 50 | Added signal parameter | Support request cancellation |
-| `astrologer-list.tsx` | 55-60 | Added signal to fetch | Enable cancellation |
-| `astrologer-list.tsx` | 71-74 | Handle AbortError | Prevent error logging on cleanup |
-| `astrologer-list.tsx` | 79-81 | Improved error messages | Better developer experience |
+| File                  | Line  | Change                         | Purpose                          |
+| --------------------- | ----- | ------------------------------ | -------------------------------- |
+| `astrologer-list.tsx` | 36-48 | Updated useEffect dependencies | Prevent re-render loops          |
+| `astrologer-list.tsx` | 40    | Added AbortController          | Cancel requests on unmount       |
+| `astrologer-list.tsx` | 50    | Added signal parameter         | Support request cancellation     |
+| `astrologer-list.tsx` | 55-60 | Added signal to fetch          | Enable cancellation              |
+| `astrologer-list.tsx` | 71-74 | Handle AbortError              | Prevent error logging on cleanup |
+| `astrologer-list.tsx` | 79-81 | Improved error messages        | Better developer experience      |
 
 ---
 

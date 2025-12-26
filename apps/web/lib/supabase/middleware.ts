@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { createServerClient } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
-import { createClient } from './server'
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
+import { createClient } from "./server";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
-  })
+  });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,49 +14,41 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll() {
-          return request.cookies.getAll()
+          return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           supabaseResponse = NextResponse.next({
             request,
-          })
+          });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+            supabaseResponse.cookies.set(name, value, options),
+          );
         },
       },
-    }
-  )
+    },
+  );
 
   // IMPORTANT: Don't just check if user exists to refresh the session
   // This will cause issues with server-side rendering
   // Instead, let the session refresh happen naturally
-  await supabase.auth.getUser()
+  await supabase.auth.getUser();
 
-  return supabaseResponse
+  return supabaseResponse;
 }
 
 /**
  * Authentication error response
  */
-function unauthorizedResponse(message = 'Unauthorized') {
-  return NextResponse.json(
-    { error: 'unauthorized', message },
-    { status: 401 }
-  )
+function unauthorizedResponse(message = "Unauthorized") {
+  return NextResponse.json({ error: "unauthorized", message }, { status: 401 });
 }
 
 /**
  * Server error response
  */
-function serverErrorResponse(message = 'Authentication failed') {
-  return NextResponse.json(
-    { error: 'server_error', message },
-    { status: 500 }
-  )
+function serverErrorResponse(message = "Authentication failed") {
+  return NextResponse.json({ error: "server_error", message }, { status: 500 });
 }
 
 /**
@@ -76,22 +68,28 @@ function serverErrorResponse(message = 'Authentication failed') {
  */
 export async function requireAuth(_request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user }, error } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser();
 
     if (error) {
-      console.error('[requireAuth] Supabase auth error:', (error instanceof Error ? error.message : String(error)))
-      return unauthorizedResponse('Invalid or expired session')
+      console.error(
+        "[requireAuth] Supabase auth error:",
+        error instanceof Error ? error.message : String(error),
+      );
+      return unauthorizedResponse("Invalid or expired session");
     }
 
     if (!user) {
-      return unauthorizedResponse('No active session')
+      return unauthorizedResponse("No active session");
     }
 
-    return user
+    return user;
   } catch (error: unknown) {
-    console.error('[requireAuth] Unexpected error:', error)
-    return serverErrorResponse()
+    console.error("[requireAuth] Unexpected error:", error);
+    return serverErrorResponse();
   }
 }
 
@@ -114,12 +112,14 @@ export async function requireAuth(_request: NextRequest) {
  */
 export async function optionalAuth(_request: NextRequest) {
   try {
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    return user
+    return user;
   } catch (error: unknown) {
-    console.error('[optionalAuth] Error:', error)
-    return null
+    console.error("[optionalAuth] Error:", error);
+    return null;
   }
 }

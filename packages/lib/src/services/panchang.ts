@@ -22,7 +22,7 @@ export class MockPanchangClient implements PanchangClient {
       yoga: "Vishkambha",
       karana: "Kinstughna",
       sunrise: "06:05",
-      sunset: "18:45"
+      sunset: "18:45",
     };
   }
 
@@ -34,7 +34,7 @@ export class MockPanchangClient implements PanchangClient {
       yoga: "Sample Yoga",
       karana: "Sample Karana",
       sunrise: "06:00",
-      sunset: "18:30"
+      sunset: "18:30",
     }));
 
     return days;

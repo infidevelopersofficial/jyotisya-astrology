@@ -78,6 +78,7 @@ These files contain `console.log` statements blocked in production:
 ### Functions Exceeding 80 Lines
 
 **API Routes:**
+
 - `app/api/consultations/create-order/route.ts:18` - POST function (144 lines)
 - `app/api/consultations/verify-payment/route.ts:18` - POST function (169 lines)
 - `app/api/horoscope/daily/route.ts:32` - GET function (123 lines)
@@ -85,6 +86,7 @@ These files contain `console.log` statements blocked in production:
 - `app/api/onboarding/route.ts:154` - POST function (156 lines)
 
 **Page Components:**
+
 - `app/auth/astrology-test/page.tsx:16` - AstrologyTestPage (483 lines)
 - `app/auth/signin/page.tsx:8` - SignInContent (330 lines)
 - `app/dashboard/consultation/[id]/page.tsx:19` - ConsultationDetailsPage (196 lines)
@@ -94,6 +96,7 @@ These files contain `console.log` statements blocked in production:
 - `app/profile/page.tsx:23` - ProfilePage (191 lines)
 
 **Component Functions:**
+
 - `components/astrology/birth-chart-generator-v2.tsx:116` - BirthChartGeneratorV2 (911 lines)
 - `components/astrology/birth-chart-generator-v3.tsx:116` - BirthChartGeneratorV3 (787 lines)
 - `components/astrology/birth-chart-generator.tsx:55` - BirthChartGenerator (421 lines)
@@ -140,20 +143,21 @@ These files contain `console.log` statements blocked in production:
 
 ## 📊 Violation Statistics
 
-| Category | Count | Severity |
-|----------|-------|----------|
-| Files > 400 lines | 4 | 🔴 Critical |
-| Functions complexity > 15 | 4 | 🔴 Critical |
-| Console.log statements | 4 | 🔴 Critical |
-| Functions > 80 lines | 28 | ⚠️ Warning |
-| TypeScript errors | 43 | 🔴 Critical |
-| **Total Issues** | **83** | **Mixed** |
+| Category                  | Count  | Severity    |
+| ------------------------- | ------ | ----------- |
+| Files > 400 lines         | 4      | 🔴 Critical |
+| Functions complexity > 15 | 4      | 🔴 Critical |
+| Console.log statements    | 4      | 🔴 Critical |
+| Functions > 80 lines      | 28     | ⚠️ Warning  |
+| TypeScript errors         | 43     | 🔴 Critical |
+| **Total Issues**          | **83** | **Mixed**   |
 
 ---
 
 ## 🎯 Recommended Fix Priority
 
 ### Phase 1: Unblock Pushes (Critical)
+
 1. Fix TypeScript strict mode errors (43 errors)
 2. Replace console.log with console.warn/error (4 files)
 3. Reduce complexity in API routes (4 functions)
@@ -162,6 +166,7 @@ These files contain `console.log` statements blocked in production:
 **Estimated Effort:** 2-3 days
 
 ### Phase 2: Clean Up Warnings
+
 1. Refactor long functions (28 functions)
 2. Extract components from large page files
 3. Create custom hooks for complex logic
@@ -169,6 +174,7 @@ These files contain `console.log` statements blocked in production:
 **Estimated Effort:** 1-2 weeks
 
 ### Phase 3: Ongoing Maintenance
+
 - Monitor with `yarn validate` before pushing
 - Keep new code compliant from the start
 - Gradually improve code quality metrics
@@ -178,17 +184,19 @@ These files contain `console.log` statements blocked in production:
 ## 🛠️ Quick Fixes
 
 ### Fix Console Logs
+
 ```typescript
 // ❌ Before
-console.log('Debug info', data);
+console.log("Debug info", data);
 
 // ✅ After (development only)
-if (process.env.NODE_ENV === 'development') {
-  console.warn('Debug info', data);
+if (process.env.NODE_ENV === "development") {
+  console.warn("Debug info", data);
 }
 ```
 
 ### Fix Possibly Undefined
+
 ```typescript
 // ❌ Before
 const value = data[0];
@@ -202,6 +210,7 @@ if (value) {
 ```
 
 ### Reduce Function Complexity
+
 ```typescript
 // ❌ Before (complexity: 20)
 function process(data) {
@@ -223,10 +232,18 @@ function process(data) {
   return finalizeData(validated);
 }
 
-function isValid(data) { /* ... */ }
-function applyTransform(data) { /* ... */ }
-function validateData(data) { /* ... */ }
-function finalizeData(data) { /* ... */ }
+function isValid(data) {
+  /* ... */
+}
+function applyTransform(data) {
+  /* ... */
+}
+function validateData(data) {
+  /* ... */
+}
+function finalizeData(data) {
+  /* ... */
+}
 ```
 
 ---

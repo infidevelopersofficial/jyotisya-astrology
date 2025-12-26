@@ -6,14 +6,15 @@ This document outlines the code quality rules and enforcement mechanisms for the
 
 ### File Size Limits
 
-| Metric | Warning | Error |
-|--------|---------|-------|
-| **Max lines per file** | 300 lines | 400 lines |
-| **Max function length** | 50 lines | 80 lines |
+| Metric                  | Warning   | Error     |
+| ----------------------- | --------- | --------- |
+| **Max lines per file**  | 300 lines | 400 lines |
+| **Max function length** | 50 lines  | 80 lines  |
 
 **Why?** Large files and functions are harder to understand, test, and maintain. Split large components into smaller, focused pieces.
 
 **How to fix:**
+
 - Extract sub-components
 - Create custom hooks for logic
 - Move utilities to separate files
@@ -21,16 +22,17 @@ This document outlines the code quality rules and enforcement mechanisms for the
 
 ### Complexity Limits
 
-| Metric | Warning | Error |
-|--------|---------|-------|
-| **Cyclomatic complexity** | 10 | 15 |
-| **Max nesting depth** | 3 | 4 |
-| **Max nested callbacks** | 3 | 4 |
-| **Max function parameters** | 4 | 5 |
+| Metric                      | Warning | Error |
+| --------------------------- | ------- | ----- |
+| **Cyclomatic complexity**   | 10      | 15    |
+| **Max nesting depth**       | 3       | 4     |
+| **Max nested callbacks**    | 3       | 4     |
+| **Max function parameters** | 4       | 5     |
 
 **Why?** Complex code with many branches is error-prone and hard to test.
 
 **How to fix:**
+
 - Extract complex conditions into named functions
 - Use early returns to reduce nesting
 - Replace nested callbacks with async/await
@@ -56,6 +58,7 @@ All TypeScript strict checks are **enabled**:
 **Why?** Catch bugs at compile time, improve code reliability, better IntelliSense.
 
 **Common fixes:**
+
 ```typescript
 // ❌ Bad
 function getData(id) {
@@ -71,27 +74,30 @@ function getData(id: string): Data | undefined {
 ### Production Safety
 
 **Blocked in production:**
+
 - `console.log()` - Use `console.warn()` or `console.error()` only
 - `debugger` statements
 - `alert()` - Use toast notifications instead
 
 **How to fix:**
+
 ```typescript
 // ❌ Bad
-console.log('User logged in', user);
+console.log("User logged in", user);
 
 // ✅ Good (development only)
-if (process.env.NODE_ENV === 'development') {
-  console.warn('User logged in', user);
+if (process.env.NODE_ENV === "development") {
+  console.warn("User logged in", user);
 }
 
 // ✅ Better (use logger)
-logger.info('User logged in', { userId: user.id });
+logger.info("User logged in", { userId: user.id });
 ```
 
 ### React Best Practices
 
 **Enforced rules:**
+
 - `react-hooks/rules-of-hooks` - Hooks must be called in the right order
 - `react-hooks/exhaustive-deps` - Hook dependencies must be complete
 - `react/jsx-key` - Lists must have keys
@@ -100,6 +106,7 @@ logger.info('User logged in', { userId: user.id });
 ### Code Style
 
 **Enforced via Prettier + ESLint:**
+
 - Use `const` over `let` (prefer-const)
 - Never use `var` (no-var)
 - Use object shorthand (object-shorthand)
@@ -162,15 +169,18 @@ yarn test:coverage
 **Runs on:** `git commit`
 
 **Checks:**
+
 - ESLint on staged `.ts` and `.tsx` files
 - Prettier formatting on staged files
 - Auto-fixes issues when possible
 
 **Behavior:**
+
 - ✅ Passes → Commit proceeds
 - ❌ Fails → Commit blocked, you must fix issues
 
 **Example:**
+
 ```bash
 git add .
 git commit -m "Add new feature"
@@ -187,15 +197,18 @@ git commit -m "Add new feature"
 **Runs on:** `git push`
 
 **Checks (in order):**
+
 1. TypeScript type checking (`tsc --noEmit`)
 2. ESLint (all files)
 3. Prettier format check (all files)
 
 **Behavior:**
+
 - ✅ All pass → Push proceeds
 - ❌ Any fail → Push blocked with clear error message
 
 **Example:**
+
 ```bash
 git push origin main
 
@@ -209,6 +222,7 @@ git push origin main
 ```
 
 **If checks fail:**
+
 ```bash
 🚀 Running pre-push validation...
 📝 Type checking... ✓
@@ -278,20 +292,21 @@ if (user) {
 
 ```typescript
 // ❌ Blocked
-console.log('Debug info', data);
+console.log("Debug info", data);
 
 // ✅ Use console.warn or console.error for important logs
-console.warn('Unexpected API response', response);
+console.warn("Unexpected API response", response);
 
 // ✅ Or use conditional logging
-if (process.env.NODE_ENV === 'development') {
-  console.log('Debug:', data);
+if (process.env.NODE_ENV === "development") {
+  console.log("Debug:", data);
 }
 ```
 
 ## 📝 Configuration Files
 
 ### Root Level
+
 - `.eslintrc.json` - ESLint rules for all workspaces
 - `tsconfig.json` - TypeScript config with strict mode
 - `.prettierrc` - Code formatting rules
@@ -300,6 +315,7 @@ if (process.env.NODE_ENV === 'development') {
 - `package.json` - Scripts and lint-staged config
 
 ### Web App (`apps/web/`)
+
 - `.eslintrc.json` - Next.js and React-specific rules
 - `tsconfig.json` - Extends root config with Next.js settings
 - `package.json` - App-specific scripts
@@ -367,11 +383,13 @@ yarn test:watch
 ### 3. Use IDE Integration
 
 **VS Code Extensions:**
+
 - ESLint (dbaeumer.vscode-eslint)
 - Prettier (esbenp.prettier-vscode)
 - Error Lens (usernamehw.errorlens)
 
 Configure `.vscode/settings.json`:
+
 ```json
 {
   "editor.formatOnSave": true,
@@ -387,9 +405,12 @@ Configure `.vscode/settings.json`:
 If you hit the 400-line limit, it's a sign to refactor:
 
 **Extract components:**
+
 ```tsx
 // Before: 600-line component
-export default function BirthChart() { /* huge component */ }
+export default function BirthChart() {
+  /* huge component */
+}
 
 // After: 200 lines each
 export default function BirthChart() {
@@ -404,6 +425,7 @@ export default function BirthChart() {
 ```
 
 **Extract hooks:**
+
 ```tsx
 // Before: Logic mixed in component
 export default function Chart() {

@@ -3,38 +3,35 @@
  * Handles downloads, saves, and sharing
  */
 
-'use client'
+"use client";
 
-import { useState } from 'react'
-import type {
-  BirthData,
-  BirthChartResponse,
-} from '@/types/astrology/birthChart.types'
+import { useState } from "react";
+import type { BirthData, BirthChartResponse } from "@/types/astrology/birthChart.types";
 import {
   downloadChartAsPNG,
   downloadChartAsPDF,
   generateShareLink,
   copyToClipboard,
-} from '@/lib/utils/chart-download'
+} from "@/lib/utils/chart-download";
 import {
   trackChartSaved,
   trackChartDownloadedPNG,
   trackChartDownloadedPDF,
   trackChartShared,
-} from '@/lib/analytics/events'
+} from "@/lib/analytics/events";
 import {
   buildDownloadFilename,
   getFullChartName,
   getDisplayChartName,
   DIVISIONAL_CHARTS,
-} from '@/services/astrology/birthChartService'
-import { getFormattedBirthDateTime } from '@/services/astrology/birthChartService'
+} from "@/services/astrology/birthChartService";
+import { getFormattedBirthDateTime } from "@/services/astrology/birthChartService";
 
 interface UseBirthChartActionsParams {
-  birthData: BirthData
-  chartData: BirthChartResponse | null
-  selectedDivisional: string
-  setError: (error: string | null) => void
+  birthData: BirthData;
+  chartData: BirthChartResponse | null;
+  selectedDivisional: string;
+  setError: (error: string | null) => void;
 }
 
 export function useBirthChartActions({
@@ -43,112 +40,104 @@ export function useBirthChartActions({
   selectedDivisional,
   setError,
 }: UseBirthChartActionsParams) {
-  const [downloadingPNG, setDownloadingPNG] = useState(false)
-  const [downloadingPDF, setDownloadingPDF] = useState(false)
-  const [copiedLink, setCopiedLink] = useState(false)
-  const [savingChart, setSavingChart] = useState(false)
-  const [savedChartId, setSavedChartId] = useState<string | null>(null)
+  const [downloadingPNG, setDownloadingPNG] = useState(false);
+  const [downloadingPDF, setDownloadingPDF] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [savingChart, setSavingChart] = useState(false);
+  const [savedChartId, setSavedChartId] = useState<string | null>(null);
 
   /**
    * Download chart as PNG
    */
   const handleDownloadPNG = async (): Promise<void> => {
-    setDownloadingPNG(true)
+    setDownloadingPNG(true);
     try {
-      const fullChartName = getFullChartName(
-        birthData,
-        selectedDivisional,
-        DIVISIONAL_CHARTS
-      )
-      const filename = buildDownloadFilename(birthData, selectedDivisional, 'png')
-      const formatted = getFormattedBirthDateTime(birthData.dateTime)
+      const fullChartName = getFullChartName(birthData, selectedDivisional, DIVISIONAL_CHARTS);
+      const filename = buildDownloadFilename(birthData, selectedDivisional, "png");
+      const formatted = getFormattedBirthDateTime(birthData.dateTime);
 
-      await downloadChartAsPNG('rasi-chart', {
+      await downloadChartAsPNG("rasi-chart", {
         filename,
         chartName: fullChartName,
         birthDate: formatted.date,
         birthPlace: birthData.location,
-      })
+      });
 
-      trackChartDownloadedPNG({ chartType: selectedDivisional })
+      trackChartDownloadedPNG({ chartType: selectedDivisional });
     } catch (error: unknown) {
-      console.error('PNG download failed:', error)
-      setError('Failed to download chart as PNG. Please try again.')
+      console.error("PNG download failed:", error);
+      setError("Failed to download chart as PNG. Please try again.");
     } finally {
-      setDownloadingPNG(false)
+      setDownloadingPNG(false);
     }
-  }
+  };
 
   /**
    * Download chart as PDF
    */
   const handleDownloadPDF = async (): Promise<void> => {
-    setDownloadingPDF(true)
+    setDownloadingPDF(true);
     try {
-      const fullChartName = getFullChartName(
-        birthData,
-        selectedDivisional,
-        DIVISIONAL_CHARTS
-      )
-      const filename = buildDownloadFilename(birthData, selectedDivisional, 'pdf')
-      const formatted = getFormattedBirthDateTime(birthData.dateTime)
+      const fullChartName = getFullChartName(birthData, selectedDivisional, DIVISIONAL_CHARTS);
+      const filename = buildDownloadFilename(birthData, selectedDivisional, "pdf");
+      const formatted = getFormattedBirthDateTime(birthData.dateTime);
 
-      await downloadChartAsPDF('rasi-chart', {
+      await downloadChartAsPDF("rasi-chart", {
         filename,
         chartName: fullChartName,
         birthDate: formatted.full,
         birthPlace: birthData.location,
-      })
+      });
 
-      trackChartDownloadedPDF({ chartType: selectedDivisional })
+      trackChartDownloadedPDF({ chartType: selectedDivisional });
     } catch (error: unknown) {
-      console.error('PDF download failed:', error)
-      setError('Failed to download chart as PDF. Please try again.')
+      console.error("PDF download failed:", error);
+      setError("Failed to download chart as PDF. Please try again.");
     } finally {
-      setDownloadingPDF(false)
+      setDownloadingPDF(false);
     }
-  }
+  };
 
   /**
    * Copy shareable link to clipboard
    */
   const handleCopyShareLink = async (): Promise<void> => {
     try {
-      const shareLink = generateShareLink(birthData)
-      await copyToClipboard(shareLink)
-      setCopiedLink(true)
-      setTimeout(() => setCopiedLink(false), 3000)
+      const shareLink = generateShareLink(birthData);
+      await copyToClipboard(shareLink);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 3000);
 
-      trackChartShared({ method: 'link' })
+      trackChartShared({ method: "link" });
     } catch (error: unknown) {
-      console.error('Failed to copy link:', error)
-      setError('Failed to copy share link. Please try again.')
+      console.error("Failed to copy link:", error);
+      setError("Failed to copy share link. Please try again.");
     }
-  }
+  };
 
   /**
    * Save chart to user account
    */
   const handleSaveChart = async (): Promise<void> => {
     if (!chartData) {
-      setError('Please generate a chart first before saving')
-      return
+      setError("Please generate a chart first before saving");
+      return;
     }
 
-    setSavingChart(true)
+    setSavingChart(true);
     try {
-      const chartName = getDisplayChartName(birthData, false)
+      const chartName = getDisplayChartName(birthData, false);
 
-      const response = await fetch('/api/user/kundli', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/user/kundli", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: chartName,
           birthDate: birthData.dateTime,
-          birthTime: new Date(birthData.dateTime).toLocaleTimeString('en-US', {
+          birthTime: new Date(birthData.dateTime).toLocaleTimeString("en-US", {
             hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
           }),
           birthPlace: birthData.location,
           latitude: birthData.latitude,
@@ -156,30 +145,30 @@ export function useBirthChartActions({
           timezone: birthData.timezone.toString(),
           chartData,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.message || 'Failed to save chart')
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to save chart");
       }
 
-      const result = await response.json()
-      setSavedChartId(result.kundli.id)
+      const result = await response.json();
+      setSavedChartId(result.kundli.id);
 
       trackChartSaved({
         chartName,
         autoGenerated: !birthData.chartName?.trim(),
-      })
+      });
 
       // Reset saved message after 5 seconds
-      setTimeout(() => setSavedChartId(null), 5000)
+      setTimeout(() => setSavedChartId(null), 5000);
     } catch (error: unknown) {
-      console.error('Failed to save chart:', error)
-      setError('Failed to save chart. Please try again.')
+      console.error("Failed to save chart:", error);
+      setError("Failed to save chart. Please try again.");
     } finally {
-      setSavingChart(false)
+      setSavingChart(false);
     }
-  }
+  };
 
   return {
     downloadingPNG,
@@ -191,5 +180,5 @@ export function useBirthChartActions({
     handleDownloadPDF,
     handleCopyShareLink,
     handleSaveChart,
-  }
+  };
 }

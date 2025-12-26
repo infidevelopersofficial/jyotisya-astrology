@@ -7,66 +7,66 @@ interface RazorpayOptions {
   /**
    * Razorpay API Key ID (public key)
    */
-  key: string
+  key: string;
 
   /**
    * Amount in currency subunits (paise for INR)
    * Example: 50000 paise = ₹500
    */
-  amount: number
+  amount: number;
 
   /**
    * Currency code (ISO 4217)
    * Default: 'INR'
    */
-  currency: string
+  currency: string;
 
   /**
    * Name of your business/app
    */
-  name: string
+  name: string;
 
   /**
    * Description of the purchase
    */
-  description?: string
+  description?: string;
 
   /**
    * URL to your logo (displayed in checkout)
    */
-  image?: string
+  image?: string;
 
   /**
    * Razorpay order ID (from server-side order creation)
    */
-  order_id: string
+  order_id: string;
 
   /**
    * Callback function called when payment is successful
    */
-  handler: (response: RazorpaySuccessResponse) => void
+  handler: (response: RazorpaySuccessResponse) => void;
 
   /**
    * Prefill customer information
    */
   prefill?: {
-    name?: string
-    email?: string
-    contact?: string
-  }
+    name?: string;
+    email?: string;
+    contact?: string;
+  };
 
   /**
    * Customer notes (key-value pairs)
    */
-  notes?: Record<string, string>
+  notes?: Record<string, string>;
 
   /**
    * Theme customization
    */
   theme?: {
-    color?: string
-    backdrop_color?: string
-  }
+    color?: string;
+    backdrop_color?: string;
+  };
 
   /**
    * Modal behavior configuration
@@ -75,89 +75,89 @@ interface RazorpayOptions {
     /**
      * Called when checkout is dismissed
      */
-    ondismiss?: () => void
+    ondismiss?: () => void;
 
     /**
      * Set to false to prevent user from closing the checkout
      */
-    escape?: boolean
+    escape?: boolean;
 
     /**
      * Animation enabled/disabled
      */
-    animation?: boolean
+    animation?: boolean;
 
     /**
      * Confirm before closing checkout
      */
-    confirm_close?: boolean
-  }
+    confirm_close?: boolean;
+  };
 
   /**
    * Enable recurring payments
    */
-  recurring?: boolean
+  recurring?: boolean;
 
   /**
    * Callback URL (alternative to handler)
    */
-  callback_url?: string
+  callback_url?: string;
 
   /**
    * Redirect to this URL on payment failure
    */
-  redirect?: boolean
+  redirect?: boolean;
 
   /**
    * Remember customer for future payments
    */
-  remember_customer?: boolean
+  remember_customer?: boolean;
 
   /**
    * Timeout for checkout in seconds
    */
-  timeout?: number
+  timeout?: number;
 
   /**
    * Enable retry on payment failure
    */
   retry?: {
-    enabled: boolean
-    max_count?: number
-  }
+    enabled: boolean;
+    max_count?: number;
+  };
 }
 
 interface RazorpaySuccessResponse {
   /**
    * Razorpay payment ID
    */
-  razorpay_payment_id: string
+  razorpay_payment_id: string;
 
   /**
    * Razorpay order ID
    */
-  razorpay_order_id: string
+  razorpay_order_id: string;
 
   /**
    * HMAC signature for verification
    */
-  razorpay_signature: string
+  razorpay_signature: string;
 }
 
 interface RazorpayInstance {
   /**
    * Opens the Razorpay checkout modal
    */
-  open(): void
+  open(): void;
 
   /**
    * Event listener for payment events
    */
-  on(event: string, handler: (response: any) => void): void
+  on(event: string, handler: (response: any) => void): void;
 }
 
 interface RazorpayConstructor {
-  new (options: RazorpayOptions): RazorpayInstance
+  new (options: RazorpayOptions): RazorpayInstance;
 }
 
 declare global {
@@ -166,8 +166,8 @@ declare global {
      * Razorpay Checkout constructor
      * Available after loading https://checkout.razorpay.com/v1/checkout.js
      */
-    Razorpay: RazorpayConstructor
+    Razorpay: RazorpayConstructor;
   }
 }
 
-export {}
+export {};

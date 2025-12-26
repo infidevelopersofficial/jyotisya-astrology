@@ -1,28 +1,29 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import BirthChartGeneratorV3 from '@components/astrology/birth-chart-generator-v3'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import BirthChartGeneratorV3 from "@components/astrology/birth-chart-generator-v3";
 
 export const metadata = {
-  title: 'Birth Chart | Jyotishya',
-  description: 'Generate your Vedic birth chart (Kundli) with planetary positions',
-}
+  title: "Birth Chart | Jyotishya",
+  description: "Generate your Vedic birth chart (Kundli) with planetary positions",
+};
 
 export default async function BirthChartPageV3() {
   // Server-side authentication check
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/auth/signin?callbackUrl=/dashboard/birth-chart')
+    redirect("/auth/signin?callbackUrl=/dashboard/birth-chart");
   }
 
   return (
     <div className="mx-auto min-h-screen max-w-5xl px-4 py-6">
       {/* Header */}
       <div className="mb-8 text-center">
-        <h1 className="mb-2 text-4xl font-bold text-white">
-          Your Birth Chart (Kundli)
-        </h1>
+        <h1 className="mb-2 text-4xl font-bold text-white">Your Birth Chart (Kundli)</h1>
         <p className="text-slate-300">
           Generate your Vedic astrology birth chart with detailed planetary positions
         </p>
@@ -47,7 +48,9 @@ export default async function BirthChartPageV3() {
                   What is a Birth Chart?
                 </h4>
                 <p className="text-sm text-slate-300">
-                  A birth chart (Kundli) is a cosmic photograph of the sky at your birth moment. It captures the positions of all 9 planets (Navagraha), 12 zodiac signs (Rashis), and 12 houses (Bhavas) - revealing your personality, strengths, and life path.
+                  A birth chart (Kundli) is a cosmic photograph of the sky at your birth moment. It
+                  captures the positions of all 9 planets (Navagraha), 12 zodiac signs (Rashis), and
+                  12 houses (Bhavas) - revealing your personality, strengths, and life path.
                 </p>
               </div>
 
@@ -57,7 +60,9 @@ export default async function BirthChartPageV3() {
                   Your Rising Sign (Ascendant)
                 </h4>
                 <p className="text-sm text-slate-300">
-                  Your ascendant (Lagna) is the zodiac sign rising on the eastern horizon at your birth. It determines your physical appearance, personality, and approach to life - making accurate birth time essential.
+                  Your ascendant (Lagna) is the zodiac sign rising on the eastern horizon at your
+                  birth. It determines your physical appearance, personality, and approach to life -
+                  making accurate birth time essential.
                 </p>
               </div>
             </div>
@@ -84,7 +89,8 @@ export default async function BirthChartPageV3() {
                   Why Birth Time Matters
                 </h4>
                 <p className="text-sm text-slate-300">
-                  Your ascendant changes every ~2 hours. Even 4-5 minutes can shift house placements. Check your birth certificate for the most accurate time.
+                  Your ascendant changes every ~2 hours. Even 4-5 minutes can shift house
+                  placements. Check your birth certificate for the most accurate time.
                 </p>
               </div>
             </div>
@@ -99,15 +105,39 @@ export default async function BirthChartPageV3() {
           </h3>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {[
-              { emoji: '☀️', name: 'Sun (Surya)', meaning: 'Soul, father, authority, vitality' },
-              { emoji: '🌙', name: 'Moon (Chandra)', meaning: 'Mind, mother, emotions, peace' },
-              { emoji: '🔥', name: 'Mars (Mangal)', meaning: 'Energy, courage, siblings, property' },
-              { emoji: '💬', name: 'Mercury (Budh)', meaning: 'Intelligence, speech, communication' },
-              { emoji: '🎓', name: 'Jupiter (Guru)', meaning: 'Wisdom, children, fortune, spirituality' },
-              { emoji: '💝', name: 'Venus (Shukra)', meaning: 'Love, marriage, luxury, arts' },
-              { emoji: '⏱️', name: 'Saturn (Shani)', meaning: 'Karma, discipline, delays, longevity' },
-              { emoji: '🌑', name: 'Rahu (North Node)', meaning: 'Material desires, foreign lands, technology' },
-              { emoji: '🌑', name: 'Ketu (South Node)', meaning: 'Spirituality, detachment, past karma' },
+              { emoji: "☀️", name: "Sun (Surya)", meaning: "Soul, father, authority, vitality" },
+              { emoji: "🌙", name: "Moon (Chandra)", meaning: "Mind, mother, emotions, peace" },
+              {
+                emoji: "🔥",
+                name: "Mars (Mangal)",
+                meaning: "Energy, courage, siblings, property",
+              },
+              {
+                emoji: "💬",
+                name: "Mercury (Budh)",
+                meaning: "Intelligence, speech, communication",
+              },
+              {
+                emoji: "🎓",
+                name: "Jupiter (Guru)",
+                meaning: "Wisdom, children, fortune, spirituality",
+              },
+              { emoji: "💝", name: "Venus (Shukra)", meaning: "Love, marriage, luxury, arts" },
+              {
+                emoji: "⏱️",
+                name: "Saturn (Shani)",
+                meaning: "Karma, discipline, delays, longevity",
+              },
+              {
+                emoji: "🌑",
+                name: "Rahu (North Node)",
+                meaning: "Material desires, foreign lands, technology",
+              },
+              {
+                emoji: "🌑",
+                name: "Ketu (South Node)",
+                meaning: "Spirituality, detachment, past karma",
+              },
             ].map((planet, idx) => (
               <div key={idx} className="rounded-lg border border-white/10 bg-white/5 p-4">
                 <p className="mb-1 flex items-center gap-2 font-semibold text-white">
@@ -137,11 +167,15 @@ export default async function BirthChartPageV3() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-400">✓</span>
-              <span>You can download your chart anytime and delete your account whenever you wish</span>
+              <span>
+                You can download your chart anytime and delete your account whenever you wish
+              </span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-green-400">✓</span>
-              <span>All calculations use authentic Vedic astrology algorithms (Lahiri Ayanamsa)</span>
+              <span>
+                All calculations use authentic Vedic astrology algorithms (Lahiri Ayanamsa)
+              </span>
             </li>
           </ul>
         </div>
@@ -163,9 +197,21 @@ export default async function BirthChartPageV3() {
             <div>
               <h4 className="mb-2 font-semibold text-white">Quick Links</h4>
               <ul className="space-y-1 text-sm text-slate-400">
-                <li><a href="/dashboard" className="hover:text-orange-400 transition">Dashboard</a></li>
-                <li><a href="/dashboard/my-kundlis" className="hover:text-orange-400 transition">My Kundlis</a></li>
-                <li><a href="/help" className="hover:text-orange-400 transition">Help Center</a></li>
+                <li>
+                  <a href="/dashboard" className="hover:text-orange-400 transition">
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="/dashboard/my-kundlis" className="hover:text-orange-400 transition">
+                    My Kundlis
+                  </a>
+                </li>
+                <li>
+                  <a href="/help" className="hover:text-orange-400 transition">
+                    Help Center
+                  </a>
+                </li>
               </ul>
             </div>
 
@@ -190,5 +236,5 @@ export default async function BirthChartPageV3() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

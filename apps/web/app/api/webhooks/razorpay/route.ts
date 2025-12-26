@@ -1,9 +1,9 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db/prisma'
-import { verifyWebhookSignature } from '@/lib/payments/razorpay'
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db/prisma";
+import { verifyWebhookSignature } from "@/lib/payments/razorpay";
 
 // Force dynamic rendering to avoid DATABASE_URL requirement at build time
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/webhooks/razorpay
@@ -28,71 +28,62 @@ export const dynamic = 'force-dynamic'
 export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get raw body for signature verification
-    const rawBody = await request.text()
+    const rawBody = await request.text();
 
     // Get signature from headers
-    const signature = request.headers.get('x-razorpay-signature')
+    const signature = request.headers.get("x-razorpay-signature");
 
     if (!signature) {
-      console.error('Webhook error: Missing signature')
-      return NextResponse.json(
-        { error: 'Missing signature' },
-        { status: 400 }
-      )
+      console.error("Webhook error: Missing signature");
+      return NextResponse.json({ error: "Missing signature" }, { status: 400 });
     }
 
     // Verify webhook signature
-    const isValid = verifyWebhookSignature(rawBody, signature)
+    const isValid = verifyWebhookSignature(rawBody, signature);
 
     if (!isValid) {
-      console.error('Webhook error: Invalid signature')
-      return NextResponse.json(
-        { error: 'Invalid signature' },
-        { status: 401 }
-      )
+      console.error("Webhook error: Invalid signature");
+      return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
     // Parse webhook payload
-    const payload = JSON.parse(rawBody)
-    const event = payload.event
-    const paymentEntity = payload.payload?.payment?.entity
-    const refundEntity = payload.payload?.refund?.entity
+    const payload = JSON.parse(rawBody);
+    const event = payload.event;
+    const paymentEntity = payload.payload?.payment?.entity;
+    const refundEntity = payload.payload?.refund?.entity;
 
-    console.error(`Received Razorpay webhook: ${event}`)
+    console.error(`Received Razorpay webhook: ${event}`);
 
     // Handle different webhook events
     switch (event) {
-      case 'payment.captured':
-        await handlePaymentCaptured(paymentEntity)
-        break
+      case "payment.captured":
+        await handlePaymentCaptured(paymentEntity);
+        break;
 
-      case 'payment.failed':
-        await handlePaymentFailed(paymentEntity)
-        break
+      case "payment.failed":
+        await handlePaymentFailed(paymentEntity);
+        break;
 
-      case 'refund.created':
-      case 'refund.processed':
-        await handleRefund(refundEntity)
-        break
+      case "refund.created":
+      case "refund.processed":
+        await handleRefund(refundEntity);
+        break;
 
       default:
-        console.error(`Unhandled webhook event: ${event}`)
+        console.error(`Unhandled webhook event: ${event}`);
     }
 
-    return NextResponse.json(
-      { success: true, message: 'Webhook processed' },
-      { status: 200 }
-    )
+    return NextResponse.json({ success: true, message: "Webhook processed" }, { status: 200 });
   } catch (error: unknown) {
-    console.error('Webhook processing error:', error)
+    console.error("Webhook processing error:", error);
 
     return NextResponse.json(
       {
-        error: 'Webhook processing failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Webhook processing failed",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }
 
@@ -102,39 +93,39 @@ export async function POST(request: Request): Promise<NextResponse> {
  */
 async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
-    console.error('Invalid payment entity:', paymentEntity)
-    return
+    console.error("Invalid payment entity:", paymentEntity);
+    return;
   }
 
-  const orderId = paymentEntity.order_id
-  const paymentId = paymentEntity.id
+  const orderId = paymentEntity.order_id;
+  const paymentId = paymentEntity.id;
 
   try {
     // Find consultation by Razorpay order ID
     const consultation = await prisma.consultation.findFirst({
       where: {
         paymentId: orderId,
-      }
-    })
+      },
+    });
 
     if (!consultation) {
-      console.error(`Consultation not found for order ID: ${orderId}`)
-      return
+      console.error(`Consultation not found for order ID: ${orderId}`);
+      return;
     }
 
     // Update payment status to PAID
     await prisma.consultation.update({
       where: { id: consultation.id },
       data: {
-        paymentStatus: 'PAID',
+        paymentStatus: "PAID",
         updatedAt: new Date(),
-      }
-    })
+      },
+    });
 
-    console.error(`Payment captured for consultation ${consultation.id}, payment ID: ${paymentId}`)
+    console.error(`Payment captured for consultation ${consultation.id}, payment ID: ${paymentId}`);
   } catch (error: unknown) {
-    console.error('Error handling payment.captured:', error)
-    throw error
+    console.error("Error handling payment.captured:", error);
+    throw error;
   }
 }
 
@@ -144,40 +135,42 @@ async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
  */
 async function handlePaymentFailed(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
-    console.error('Invalid payment entity:', paymentEntity)
-    return
+    console.error("Invalid payment entity:", paymentEntity);
+    return;
   }
 
-  const orderId = paymentEntity.order_id
-  const paymentId = paymentEntity.id
-  const errorReason = paymentEntity.error_reason || 'Unknown error'
+  const orderId = paymentEntity.order_id;
+  const paymentId = paymentEntity.id;
+  const errorReason = paymentEntity.error_reason || "Unknown error";
 
   try {
     // Find consultation by Razorpay order ID
     const consultation = await prisma.consultation.findFirst({
       where: {
         paymentId: orderId,
-      }
-    })
+      },
+    });
 
     if (!consultation) {
-      console.error(`Consultation not found for order ID: ${orderId}`)
-      return
+      console.error(`Consultation not found for order ID: ${orderId}`);
+      return;
     }
 
     // Update payment status to FAILED
     await prisma.consultation.update({
       where: { id: consultation.id },
       data: {
-        paymentStatus: 'FAILED',
+        paymentStatus: "FAILED",
         updatedAt: new Date(),
-      }
-    })
+      },
+    });
 
-    console.error(`Payment failed for consultation ${consultation.id}, payment ID: ${paymentId}, reason: ${errorReason}`)
+    console.error(
+      `Payment failed for consultation ${consultation.id}, payment ID: ${paymentId}, reason: ${errorReason}`,
+    );
   } catch (error: unknown) {
-    console.error('Error handling payment.failed:', error)
-    throw error
+    console.error("Error handling payment.failed:", error);
+    throw error;
   }
 }
 
@@ -187,12 +180,12 @@ async function handlePaymentFailed(paymentEntity: any): Promise<void> {
  */
 async function handleRefund(refundEntity: any): Promise<void> {
   if (!refundEntity || !refundEntity.payment_id) {
-    console.error('Invalid refund entity:', refundEntity)
-    return
+    console.error("Invalid refund entity:", refundEntity);
+    return;
   }
 
   // const paymentId = refundEntity.payment_id // TODO: Use when razorpayPaymentId field is added
-  const refundId = refundEntity.id
+  const refundId = refundEntity.id;
 
   try {
     // Find consultation by payment ID (note: this is the Razorpay payment ID, not order ID)
@@ -200,26 +193,27 @@ async function handleRefund(refundEntity: any): Promise<void> {
     // For refunds, we'll need to search across all consultations
     const consultations = await prisma.consultation.findMany({
       where: {
-        paymentStatus: 'PAID',
-      }
-    })
+        paymentStatus: "PAID",
+      },
+    });
 
     // In a production system, you would store the Razorpay payment ID separately
     // For now, we'll just update the first matching consultation
     // This is a limitation that should be addressed by adding a razorpayPaymentId field
 
     if (consultations.length === 0) {
-      console.error(`No paid consultations found for refund ${refundId}`)
-      return
+      console.error(`No paid consultations found for refund ${refundId}`);
+      return;
     }
 
     // For now, log a warning about the limitation
-    console.warn(`Refund processing limitation: Cannot match refund ${refundId} to specific consultation without razorpayPaymentId field`)
+    console.warn(
+      `Refund processing limitation: Cannot match refund ${refundId} to specific consultation without razorpayPaymentId field`,
+    );
 
     // TODO: Add razorpayPaymentId field to Consultation model and update this logic
-
   } catch (error: unknown) {
-    console.error('Error handling refund:', error)
-    throw error
+    console.error("Error handling refund:", error);
+    throw error;
   }
 }

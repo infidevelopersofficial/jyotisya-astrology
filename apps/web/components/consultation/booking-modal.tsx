@@ -1,71 +1,71 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Button } from '@digital-astrology/ui'
+import { useState } from "react";
+import { Button } from "@digital-astrology/ui";
 
 interface BookingModalProps {
   astrologer: {
-    id: string
-    name: string
-    hourlyRate: number
-    imageUrl: string
-    specialization: string[]
-    languages: string[]
-  }
-  onClose: () => void
-  onSuccess: (consultationId: string) => void
+    id: string;
+    name: string;
+    hourlyRate: number;
+    imageUrl: string;
+    specialization: string[];
+    languages: string[];
+  };
+  onClose: () => void;
+  onSuccess: (consultationId: string) => void;
 }
 
 export default function BookingModal({ astrologer, onClose, onSuccess }: BookingModalProps) {
-  const [scheduledDate, setScheduledDate] = useState('')
-  const [scheduledTime, setScheduledTime] = useState('')
-  const [duration, setDuration] = useState(30)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [duration, setDuration] = useState(30);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   // Calculate amount based on duration
   const calculateAmount = () => {
-    return Math.ceil((astrologer.hourlyRate / 60) * duration)
-  }
+    return Math.ceil((astrologer.hourlyRate / 60) * duration);
+  };
 
   const handleBookConsultation = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     try {
       // Validate inputs
       if (!scheduledDate || !scheduledTime) {
-        setError('Please select date and time')
-        setLoading(false)
-        return
+        setError("Please select date and time");
+        setLoading(false);
+        return;
       }
 
       // Combine date and time into ISO string
-      const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString()
+      const scheduledAt = new Date(`${scheduledDate}T${scheduledTime}:00`).toISOString();
 
       // Step 1: Create order
-      const createResponse = await fetch('/api/consultations/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const createResponse = await fetch("/api/consultations/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           astrologerId: astrologer.id,
           scheduledAt,
           duration,
         }),
-      })
+      });
 
       if (!createResponse.ok) {
-        const errorData = await createResponse.json()
-        throw new Error(errorData.error || 'Failed to create order')
+        const errorData = await createResponse.json();
+        throw new Error(errorData.error || "Failed to create order");
       }
 
-      const { consultation, razorpayOrder } = await createResponse.json()
+      const { consultation, razorpayOrder } = await createResponse.json();
 
       // Step 2: Open Razorpay checkout
-      const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID
+      const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
 
       if (!razorpayKeyId) {
-        throw new Error('Razorpay configuration error. Please contact support.')
+        throw new Error("Razorpay configuration error. Please contact support.");
       }
 
       const options = {
@@ -73,71 +73,71 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         order_id: razorpayOrder.orderId,
-        name: 'Jyotishya',
+        name: "Jyotishya",
         description: `Consultation with ${astrologer.name}`,
-        image: '/logo.png',
+        image: "/logo.png",
         handler: async (response: any) => {
           try {
             // Step 3: Verify payment
-            const verifyResponse = await fetch('/api/consultations/verify-payment', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const verifyResponse = await fetch("/api/consultations/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
                 razorpay_signature: response.razorpay_signature,
               }),
-            })
+            });
 
-            const result = await verifyResponse.json()
+            const result = await verifyResponse.json();
 
             if (result.success) {
               // Payment successful!
-              onSuccess(consultation.id)
+              onSuccess(consultation.id);
             } else {
-              setError('Payment verification failed. Please contact support.')
+              setError("Payment verification failed. Please contact support.");
             }
           } catch (error: unknown) {
-            console.error('Verification error:', error)
-            setError('Payment verification failed. Please contact support.')
+            console.error("Verification error:", error);
+            setError("Payment verification failed. Please contact support.");
           } finally {
-            setLoading(false)
+            setLoading(false);
           }
         },
         modal: {
           ondismiss: () => {
-            setLoading(false)
-            setError('Payment cancelled')
-          }
+            setLoading(false);
+            setError("Payment cancelled");
+          },
         },
         theme: {
-          color: '#f97316', // Orange color from your theme
+          color: "#f97316", // Orange color from your theme
         },
-      }
+      };
 
-      const razorpay = new window.Razorpay(options)
-      razorpay.open()
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
     } catch (error: unknown) {
-      console.error('Booking error:', error)
-      setError(error instanceof Error ? error.message : 'Failed to create booking')
-      setLoading(false)
+      console.error("Booking error:", error);
+      setError(error instanceof Error ? error.message : "Failed to create booking");
+      setLoading(false);
     }
-  }
+  };
 
   // Get minimum date (today)
   const getMinDate = () => {
-    const today = new Date()
-    return today.toISOString().split('T')[0]
-  }
+    const today = new Date();
+    return today.toISOString().split("T")[0];
+  };
 
   // Get minimum time (if today is selected)
   const getMinTime = () => {
     if (scheduledDate === getMinDate()) {
-      const now = new Date()
-      return now.toTimeString().slice(0, 5)
+      const now = new Date();
+      return now.toTimeString().slice(0, 5);
     }
-    return '00:00'
-  }
+    return "00:00";
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
@@ -148,7 +148,12 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
           className="absolute top-4 right-4 text-slate-400 hover:text-white"
         >
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           </svg>
         </button>
 
@@ -162,9 +167,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
         <div className="space-y-4">
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Select Date
-            </label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Select Date</label>
             <input
               type="date"
               value={scheduledDate}
@@ -176,9 +179,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
 
           {/* Time */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Select Time
-            </label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Select Time</label>
             <input
               type="time"
               value={scheduledTime}
@@ -190,9 +191,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
 
           {/* Duration */}
           <div>
-            <label className="block text-sm font-medium text-slate-300 mb-2">
-              Duration
-            </label>
+            <label className="block text-sm font-medium text-slate-300 mb-2">Duration</label>
             <select
               value={duration}
               onChange={(e) => setDuration(Number(e.target.value))}
@@ -211,9 +210,7 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
               <span className="text-slate-300">Amount to pay</span>
               <span className="text-2xl font-bold text-white">₹{calculateAmount()}</span>
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Rate: ₹{astrologer.hourlyRate}/hour
-            </p>
+            <p className="text-xs text-slate-400 mt-1">Rate: ₹{astrologer.hourlyRate}/hour</p>
           </div>
 
           {/* Error message */}
@@ -225,24 +222,15 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
 
           {/* Actions */}
           <div className="flex gap-3 pt-2">
-            <Button
-              variant="secondary"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1"
-            >
+            <Button variant="secondary" onClick={onClose} disabled={loading} className="flex-1">
               Cancel
             </Button>
-            <Button
-              onClick={handleBookConsultation}
-              disabled={loading}
-              className="flex-1"
-            >
-              {loading ? 'Processing...' : 'Proceed to Pay'}
+            <Button onClick={handleBookConsultation} disabled={loading} className="flex-1">
+              {loading ? "Processing..." : "Proceed to Pay"}
             </Button>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

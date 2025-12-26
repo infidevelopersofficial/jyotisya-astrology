@@ -58,6 +58,7 @@ yarn test --grep "authentication"
 ### CI/CD
 
 Tests run automatically on every PR via GitHub Actions:
+
 - All test suites
 - Coverage reporting
 - Upload to Codecov
@@ -69,24 +70,24 @@ Tests run automatically on every PR via GitHub Actions:
 ### Basic Test Structure
 
 ```typescript
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach } from "vitest";
 
-describe('Feature Name', () => {
+describe("Feature Name", () => {
   beforeEach(() => {
     // Setup before each test
-  })
+  });
 
-  it('does something correctly', () => {
+  it("does something correctly", () => {
     // Arrange
-    const input = 'test'
+    const input = "test";
 
     // Act
-    const result = functionUnderTest(input)
+    const result = functionUnderTest(input);
 
     // Assert
-    expect(result).toBe('expected')
-  })
-})
+    expect(result).toBe("expected");
+  });
+});
 ```
 
 ### Component Tests
@@ -117,48 +118,48 @@ describe('UserProfile', () => {
 ### Hook Tests
 
 ```typescript
-import { renderHook, waitFor } from '@testing-library/react'
-import { useMyHook } from './useMyHook'
+import { renderHook, waitFor } from "@testing-library/react";
+import { useMyHook } from "./useMyHook";
 
-describe('useMyHook', () => {
-  it('returns expected data', async () => {
-    const { result } = renderHook(() => useMyHook())
+describe("useMyHook", () => {
+  it("returns expected data", async () => {
+    const { result } = renderHook(() => useMyHook());
 
     await waitFor(() => {
-      expect(result.current.data).toBeDefined()
-    })
+      expect(result.current.data).toBeDefined();
+    });
 
-    expect(result.current.loading).toBe(false)
-  })
-})
+    expect(result.current.loading).toBe(false);
+  });
+});
 ```
 
 ### API Route Tests
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest'
-import { GET } from './route'
+import { describe, it, expect, vi } from "vitest";
+import { GET } from "./route";
 
-describe('GET /api/users', () => {
-  it('returns user list', async () => {
-    const request = new Request('http://localhost:3000/api/users')
+describe("GET /api/users", () => {
+  it("returns user list", async () => {
+    const request = new Request("http://localhost:3000/api/users");
 
-    const response = await GET(request)
-    const data = await response.json()
+    const response = await GET(request);
+    const data = await response.json();
 
-    expect(response.status).toBe(200)
-    expect(data).toHaveProperty('users')
-  })
+    expect(response.status).toBe(200);
+    expect(data).toHaveProperty("users");
+  });
 
-  it('requires authentication', async () => {
+  it("requires authentication", async () => {
     // Mock unauthenticated state
-    const request = new Request('http://localhost:3000/api/users')
+    const request = new Request("http://localhost:3000/api/users");
 
-    const response = await GET(request)
+    const response = await GET(request);
 
-    expect(response.status).toBe(401)
-  })
-})
+    expect(response.status).toBe(401);
+  });
+});
 ```
 
 ---
@@ -180,25 +181,25 @@ renderWithProviders(<Component />)
 ### Wait Utilities
 
 ```typescript
-import { waitForCondition, flushPromises } from '@test/utils/test-utils'
+import { waitForCondition, flushPromises } from "@test/utils/test-utils";
 
 // Wait for a condition
-await waitForCondition(() => element.textContent === 'Loaded')
+await waitForCondition(() => element.textContent === "Loaded");
 
 // Wait for all promises to resolve
-await flushPromises()
+await flushPromises();
 ```
 
 ### Mock Responses
 
 ```typescript
-import { createMockResponse, createMockErrorResponse } from '@test/utils/test-utils'
+import { createMockResponse, createMockErrorResponse } from "@test/utils/test-utils";
 
 // Success response
-const response = createMockResponse({ data: 'test' })
+const response = createMockResponse({ data: "test" });
 
 // Error response
-const errorResponse = createMockErrorResponse('Not found', 404)
+const errorResponse = createMockErrorResponse("Not found", 404);
 ```
 
 ---
@@ -208,31 +209,31 @@ const errorResponse = createMockErrorResponse('Not found', 404)
 ### User Mocks
 
 ```typescript
-import { createMockUser, createMockSession } from '@test/mocks/supabase'
+import { createMockUser, createMockSession } from "@test/mocks/supabase";
 
 const user = createMockUser({
-  email: 'custom@example.com',
-  name: 'Custom Name',
-})
+  email: "custom@example.com",
+  name: "Custom Name",
+});
 
 const session = createMockSession({
   user: user,
   expires_at: Date.now() + 3600,
-})
+});
 ```
 
 ### Supabase Client Mock
 
 ```typescript
-import { mockSupabaseClient } from '@test/mocks/supabase'
+import { mockSupabaseClient } from "@test/mocks/supabase";
 
-const mockClient = mockSupabaseClient()
+const mockClient = mockSupabaseClient();
 
 // Customize behavior
 mockClient.auth.getUser.mockResolvedValue({
   data: { user: null },
-  error: { message: 'Not authenticated' },
-})
+  error: { message: "Not authenticated" },
+});
 ```
 
 ### Data Factories
@@ -243,12 +244,12 @@ import {
   createMockKundli,
   createMockProduct,
   createMockHoroscope,
-} from '@test/mocks/factories'
+} from "@test/mocks/factories";
 
-const user = createMockUserData({ name: 'John' })
-const kundli = createMockKundli({ userId: user.id })
-const product = createMockProduct({ price: 1999 })
-const horoscope = createMockHoroscope({ sunSign: 'aries' })
+const user = createMockUserData({ name: "John" });
+const kundli = createMockKundli({ userId: user.id });
+const product = createMockProduct({ price: 1999 });
+const horoscope = createMockHoroscope({ sunSign: "aries" });
 ```
 
 ---
@@ -286,20 +287,23 @@ open coverage/index.html
 ### DO
 
 ✅ **Write descriptive test names**
+
 ```typescript
-it('shows error message when login fails with invalid credentials', () => {})
+it("shows error message when login fails with invalid credentials", () => {});
 ```
 
 ✅ **Test user behavior, not implementation**
+
 ```typescript
 // Good: Test what user sees
-expect(screen.getByText('Login successful')).toBeInTheDocument()
+expect(screen.getByText("Login successful")).toBeInTheDocument();
 
 // Bad: Test implementation details
-expect(component.state.isLoggedIn).toBe(true)
+expect(component.state.isLoggedIn).toBe(true);
 ```
 
 ✅ **Use data-testid for dynamic content**
+
 ```typescript
 <div data-testid="user-name">{user.name}</div>
 
@@ -308,55 +312,65 @@ screen.getByTestId('user-name')
 ```
 
 ✅ **Clean up after tests**
+
 ```typescript
 afterEach(() => {
-  cleanup()
-  vi.clearAllMocks()
-})
+  cleanup();
+  vi.clearAllMocks();
+});
 ```
 
 ✅ **Mock external dependencies**
+
 ```typescript
-vi.mock('@/lib/supabase/client', () => ({
+vi.mock("@/lib/supabase/client", () => ({
   createClient: vi.fn(),
-}))
+}));
 ```
 
 ### DON'T
 
 ❌ **Don't test implementation details**
+
 ```typescript
 // Bad
-expect(component.state.count).toBe(1)
+expect(component.state.count).toBe(1);
 
 // Good
-expect(screen.getByText('Count: 1')).toBeInTheDocument()
+expect(screen.getByText("Count: 1")).toBeInTheDocument();
 ```
 
 ❌ **Don't make tests depend on each other**
+
 ```typescript
 // Bad: Test order matters
-it('creates user', () => { /* creates user */ })
-it('updates user', () => { /* assumes user exists */ })
+it("creates user", () => {
+  /* creates user */
+});
+it("updates user", () => {
+  /* assumes user exists */
+});
 
 // Good: Each test is independent
-it('updates user', () => {
-  const user = createMockUser()
+it("updates user", () => {
+  const user = createMockUser();
   // ... test with mock user
-})
+});
 ```
 
 ❌ **Don't use real API calls**
+
 ```typescript
 // Bad
-const data = await fetch('https://api.example.com/data')
+const data = await fetch("https://api.example.com/data");
 
 // Good
-vi.mock('fetch')
-global.fetch = vi.fn().mockResolvedValue(createMockResponse(data))
+vi.mock("fetch");
+global.fetch = vi.fn().mockResolvedValue(createMockResponse(data));
 ```
 
 ❌ **Don't ignore async operations**
+
 ```typescript
 // Bad
 it('loads data', () => {

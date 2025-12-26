@@ -2,7 +2,7 @@ const STATS = [
   { label: "Astrologers", value: "150+" },
   { label: "Cities Served", value: "400" },
   { label: "Auspicious Muhurat Alerts", value: "2M" },
-  { label: "Gemstones Certified", value: "10K" }
+  { label: "Gemstones Certified", value: "10K" },
 ];
 
 export default function TrustBar(): React.ReactElement {

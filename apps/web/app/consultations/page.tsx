@@ -1,19 +1,16 @@
-import { Metadata } from "next"
-import Script from "next/script"
-import AstrologerList from "@components/consultation/astrologer-list"
+import { Metadata } from "next";
+import Script from "next/script";
+import AstrologerList from "@components/consultation/astrologer-list";
 
 export const metadata: Metadata = {
-  title: "Consult Trusted Astrologers | Jyotishya"
-}
+  title: "Consult Trusted Astrologers | Jyotishya",
+};
 
 export default function ConsultationsPage(): React.ReactElement {
   return (
     <>
       {/* Load Razorpay Checkout Script */}
-      <Script
-        src="https://checkout.razorpay.com/v1/checkout.js"
-        strategy="lazyOnload"
-      />
+      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="lazyOnload" />
 
       <main className="px-6 pb-24 pt-16 lg:px-16">
         <div className="mx-auto max-w-6xl">
@@ -52,5 +49,5 @@ export default function ConsultationsPage(): React.ReactElement {
         </div>
       </main>
     </>
-  )
+  );
 }
