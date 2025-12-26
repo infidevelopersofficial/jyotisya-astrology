@@ -7,50 +7,50 @@
  * Documentation: https://razorpay.com/docs/api/
  */
 
-import crypto from 'crypto'
+import crypto from "crypto";
 
 // Razorpay configuration
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.warn('⚠️  Razorpay credentials not configured. Payment features will not work.')
+  console.warn("⚠️  Razorpay credentials not configured. Payment features will not work.");
 }
 
 /**
  * Payment order options
  */
 export interface CreateOrderOptions {
-  amount: number          // Amount in rupees (will be converted to paise)
-  currency?: string       // Default: INR
-  receipt?: string        // Optional receipt ID for your reference
-  notes?: Record<string, string>
+  amount: number; // Amount in rupees (will be converted to paise)
+  currency?: string; // Default: INR
+  receipt?: string; // Optional receipt ID for your reference
+  notes?: Record<string, string>;
 }
 
 /**
  * Razorpay order response
  */
 export interface RazorpayOrder {
-  id: string
-  entity: string
-  amount: number          // Amount in paise
-  amount_paid: number
-  amount_due: number
-  currency: string
-  receipt: string | null
-  status: 'created' | 'attempted' | 'paid'
-  attempts: number
-  notes: Record<string, string>
-  created_at: number
+  id: string;
+  entity: string;
+  amount: number; // Amount in paise
+  amount_paid: number;
+  amount_due: number;
+  currency: string;
+  receipt: string | null;
+  status: "created" | "attempted" | "paid";
+  attempts: number;
+  notes: Record<string, string>;
+  created_at: number;
 }
 
 /**
  * Payment verification data from frontend
  */
 export interface PaymentVerificationData {
-  razorpay_order_id: string
-  razorpay_payment_id: string
-  razorpay_signature: string
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
 }
 
 /**
@@ -59,42 +59,42 @@ export interface PaymentVerificationData {
  * @param options Order creation options
  * @returns Razorpay order object
  */
-export async function createRazorpayOrder(
-  options: CreateOrderOptions
-): Promise<RazorpayOrder> {
+export async function createRazorpayOrder(options: CreateOrderOptions): Promise<RazorpayOrder> {
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay credentials not configured')
+    throw new Error("Razorpay credentials not configured");
   }
 
   // Convert rupees to paise (Razorpay uses smallest currency unit)
-  const amountInPaise = Math.round(options.amount * 100)
+  const amountInPaise = Math.round(options.amount * 100);
 
   const orderData = {
     amount: amountInPaise,
-    currency: options.currency || 'INR',
+    currency: options.currency || "INR",
     receipt: options.receipt || `receipt_${Date.now()}`,
     notes: options.notes || {},
-  }
+  };
 
   // Create Basic Auth header
-  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64')
+  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
 
-  const response = await fetch('https://api.razorpay.com/v1/orders', {
-    method: 'POST',
+  const response = await fetch("https://api.razorpay.com/v1/orders", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${auth}`,
+      "Content-Type": "application/json",
+      Authorization: `Basic ${auth}`,
     },
     body: JSON.stringify(orderData),
-  })
+  });
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Razorpay order creation failed: ${error.error?.description || response.statusText}`)
+    const error = await response.json();
+    throw new Error(
+      `Razorpay order creation failed: ${error.error?.description || response.statusText}`,
+    );
   }
 
-  const order: RazorpayOrder = await response.json()
-  return order
+  const order: RazorpayOrder = await response.json();
+  return order;
 }
 
 /**
@@ -108,23 +108,20 @@ export async function createRazorpayOrder(
  */
 export function verifyPaymentSignature(data: PaymentVerificationData): boolean {
   if (!RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay secret not configured')
+    throw new Error("Razorpay secret not configured");
   }
 
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = data
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = data;
 
   // Generate expected signature
-  const body = `${razorpay_order_id}|${razorpay_payment_id}`
+  const body = `${razorpay_order_id}|${razorpay_payment_id}`;
   const expectedSignature = crypto
-    .createHmac('sha256', RAZORPAY_KEY_SECRET)
+    .createHmac("sha256", RAZORPAY_KEY_SECRET)
     .update(body)
-    .digest('hex')
+    .digest("hex");
 
   // Compare signatures (timing-safe comparison)
-  return crypto.timingSafeEqual(
-    Buffer.from(expectedSignature),
-    Buffer.from(razorpay_signature)
-  )
+  return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(razorpay_signature));
 }
 
 /**
@@ -139,21 +136,18 @@ export function verifyPaymentSignature(data: PaymentVerificationData): boolean {
  */
 export function verifyWebhookSignature(body: string, signature: string): boolean {
   if (!RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay webhook secret not configured')
+    throw new Error("Razorpay webhook secret not configured");
   }
 
   const expectedSignature = crypto
-    .createHmac('sha256', RAZORPAY_KEY_SECRET)
+    .createHmac("sha256", RAZORPAY_KEY_SECRET)
     .update(body)
-    .digest('hex')
+    .digest("hex");
 
   try {
-    return crypto.timingSafeEqual(
-      Buffer.from(expectedSignature),
-      Buffer.from(signature)
-    )
+    return crypto.timingSafeEqual(Buffer.from(expectedSignature), Buffer.from(signature));
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -165,24 +159,26 @@ export function verifyWebhookSignature(body: string, signature: string): boolean
  */
 export async function fetchPaymentDetails(paymentId: string): Promise<any> {
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay credentials not configured')
+    throw new Error("Razorpay credentials not configured");
   }
 
-  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64')
+  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
 
   const response = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}`, {
-    method: 'GET',
+    method: "GET",
     headers: {
-      'Authorization': `Basic ${auth}`,
+      Authorization: `Basic ${auth}`,
     },
-  })
+  });
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Failed to fetch payment details: ${error.error?.description || response.statusText}`)
+    const error = await response.json();
+    throw new Error(
+      `Failed to fetch payment details: ${error.error?.description || response.statusText}`,
+    );
   }
 
-  return response.json()
+  return response.json();
 }
 
 /**
@@ -192,36 +188,33 @@ export async function fetchPaymentDetails(paymentId: string): Promise<any> {
  * @param amount Amount to refund in rupees (optional, full refund if not specified)
  * @returns Refund object
  */
-export async function initiateRefund(
-  paymentId: string,
-  amount?: number
-): Promise<any> {
+export async function initiateRefund(paymentId: string, amount?: number): Promise<any> {
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-    throw new Error('Razorpay credentials not configured')
+    throw new Error("Razorpay credentials not configured");
   }
 
-  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString('base64')
+  const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
 
-  const refundData: any = {}
+  const refundData: any = {};
   if (amount !== undefined) {
-    refundData.amount = Math.round(amount * 100) // Convert to paise
+    refundData.amount = Math.round(amount * 100); // Convert to paise
   }
 
   const response = await fetch(`https://api.razorpay.com/v1/payments/${paymentId}/refund`, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Basic ${auth}`,
+      "Content-Type": "application/json",
+      Authorization: `Basic ${auth}`,
     },
     body: JSON.stringify(refundData),
-  })
+  });
 
   if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Refund failed: ${error.error?.description || response.statusText}`)
+    const error = await response.json();
+    throw new Error(`Refund failed: ${error.error?.description || response.statusText}`);
   }
 
-  return response.json()
+  return response.json();
 }
 
 /**
@@ -231,7 +224,7 @@ export async function initiateRefund(
  */
 export function getRazorpayKeyId(): string {
   if (!RAZORPAY_KEY_ID) {
-    throw new Error('Razorpay key ID not configured')
+    throw new Error("Razorpay key ID not configured");
   }
-  return RAZORPAY_KEY_ID
+  return RAZORPAY_KEY_ID;
 }

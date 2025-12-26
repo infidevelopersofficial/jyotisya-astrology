@@ -12,8 +12,8 @@ const MOCK_OFFERS: Offer[] = [
     title: "Navratri Special",
     description: "Flat 20% off on Devi puja kits",
     discountPercent: 20,
-    validUntil: "2024-10-10"
-  }
+    validUntil: "2024-10-10",
+  },
 ];
 
 export class OffersService {

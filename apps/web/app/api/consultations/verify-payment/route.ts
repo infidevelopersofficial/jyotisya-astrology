@@ -1,10 +1,10 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { prisma } from '@/lib/db/prisma'
-import { verifyPaymentSignature, fetchPaymentDetails } from '@/lib/payments/razorpay'
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/db/prisma";
+import { verifyPaymentSignature, fetchPaymentDetails } from "@/lib/payments/razorpay";
 
 // Force dynamic rendering for this API route
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 /**
  * POST /api/consultations/verify-payment
@@ -15,59 +15,45 @@ export const dynamic = 'force-dynamic'
  * - razorpay_payment_id: string (required)
  * - razorpay_signature: string (required)
  */
-export async function POST(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function POST(request: Request): Promise<NextResponse> {
   try {
     // Get authenticated user
-    const supabase = await createClient()
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    const supabase = await createClient();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Please sign in first.' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: "Unauthorized. Please sign in first." }, { status: 401 });
     }
 
     // Find user in database
     const dbUser = await prisma.user.findFirst({
       where: {
-        OR: [
-          { email: user.email || undefined },
-          { phone: user.phone || undefined },
-        ]
-      }
-    })
+        OR: [{ email: user.email || undefined }, { phone: user.phone || undefined }],
+      },
+    });
 
     if (!dbUser) {
-      return NextResponse.json(
-        { error: 'User not found in database' },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "User not found in database" }, { status: 404 });
     }
 
     // Parse and validate request body
-    const body = await request.json()
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body
+    const body = (await request.json()) as Record<string, unknown>;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
-    if (!razorpay_order_id || typeof razorpay_order_id !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid razorpay_order_id' },
-        { status: 400 }
-      )
+    if (!razorpay_order_id || typeof razorpay_order_id !== "string") {
+      return NextResponse.json({ error: "Invalid razorpay_order_id" }, { status: 400 });
     }
 
-    if (!razorpay_payment_id || typeof razorpay_payment_id !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid razorpay_payment_id' },
-        { status: 400 }
-      )
+    if (!razorpay_payment_id || typeof razorpay_payment_id !== "string") {
+      return NextResponse.json({ error: "Invalid razorpay_payment_id" }, { status: 400 });
     }
 
-    if (!razorpay_signature || typeof razorpay_signature !== 'string') {
-      return NextResponse.json(
-        { error: 'Invalid razorpay_signature' },
-        { status: 400 }
-      )
+    if (!razorpay_signature || typeof razorpay_signature !== "string") {
+      return NextResponse.json({ error: "Invalid razorpay_signature" }, { status: 400 });
     }
 
     // Verify payment signature
@@ -75,13 +61,13 @@ export async function POST(request: Request) {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-    })
+    });
 
     if (!isValidSignature) {
       return NextResponse.json(
-        { error: 'Payment verification failed. Invalid signature.' },
-        { status: 400 }
-      )
+        { error: "Payment verification failed. Invalid signature." },
+        { status: 400 },
+      );
     }
 
     // Find consultation by payment order ID
@@ -96,24 +82,24 @@ export async function POST(request: Request) {
             id: true,
             name: true,
             imageUrl: true,
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
 
     if (!consultation) {
       return NextResponse.json(
-        { error: 'Consultation not found for this payment order.' },
-        { status: 404 }
-      )
+        { error: "Consultation not found for this payment order." },
+        { status: 404 },
+      );
     }
 
     // Check if payment is already verified
-    if (consultation.paymentStatus === 'PAID') {
+    if (consultation.paymentStatus === "PAID") {
       return NextResponse.json(
         {
           success: true,
-          message: 'Payment already verified',
+          message: "Payment already verified",
           consultation: {
             id: consultation.id,
             paymentStatus: consultation.paymentStatus,
@@ -121,18 +107,18 @@ export async function POST(request: Request) {
             duration: consultation.duration,
             amount: consultation.amount,
             astrologer: consultation.astrologer,
-          }
+          },
         },
-        { status: 200 }
-      )
+        { status: 200 },
+      );
     }
 
     // Fetch payment details from Razorpay to get additional info
-    let paymentDetails
+    let paymentDetails;
     try {
-      paymentDetails = await fetchPaymentDetails(razorpay_payment_id)
-    } catch (error) {
-      console.error('Error fetching payment details:', error)
+      paymentDetails = await fetchPaymentDetails(razorpay_payment_id);
+    } catch (error: unknown) {
+      console.error("Error fetching payment details:", error);
       // Continue even if fetch fails - signature verification is sufficient
     }
 
@@ -140,7 +126,7 @@ export async function POST(request: Request) {
     const updatedConsultation = await prisma.consultation.update({
       where: { id: consultation.id },
       data: {
-        paymentStatus: 'PAID',
+        paymentStatus: "PAID",
         paymentId: razorpay_order_id,
         updatedAt: new Date(),
       },
@@ -152,15 +138,15 @@ export async function POST(request: Request) {
             imageUrl: true,
             specialization: true,
             languages: true,
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Payment verified successfully',
+        message: "Payment verified successfully",
         consultation: {
           id: updatedConsultation.id,
           scheduledAt: updatedConsultation.scheduledAt,
@@ -170,45 +156,52 @@ export async function POST(request: Request) {
           status: updatedConsultation.status,
           astrologer: updatedConsultation.astrologer,
         },
-        paymentDetails: paymentDetails ? {
-          paymentId: razorpay_payment_id,
-          method: paymentDetails.method,
-          email: paymentDetails.email,
-          contact: paymentDetails.contact,
-        } : undefined,
+        paymentDetails: paymentDetails
+          ? {
+              paymentId: razorpay_payment_id,
+              method: paymentDetails.method,
+              email: paymentDetails.email,
+              contact: paymentDetails.contact,
+            }
+          : undefined,
       },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Payment verification error:', error)
+      { status: 200 },
+    );
+  } catch (error: unknown) {
+    console.error("Payment verification error:", error);
 
     // If verification failed, mark payment as failed
-    const body = await request.json().catch(() => ({}))
-    const { razorpay_order_id } = body
+    let razorpay_order_id: string | undefined;
+    try {
+      const bodyRetry = (await request.json()) as Record<string, unknown>;
+      razorpay_order_id = bodyRetry.razorpay_order_id as string | undefined;
+    } catch {
+      razorpay_order_id = undefined;
+    }
 
     if (razorpay_order_id) {
       try {
         await prisma.consultation.updateMany({
           where: {
             paymentId: razorpay_order_id,
-            paymentStatus: 'PENDING',
+            paymentStatus: "PENDING",
           },
           data: {
-            paymentStatus: 'FAILED',
+            paymentStatus: "FAILED",
             updatedAt: new Date(),
-          }
-        })
+          },
+        });
       } catch (updateError) {
-        console.error('Failed to update payment status to FAILED:', updateError)
+        console.error("Failed to update payment status to FAILED:", updateError);
       }
     }
 
     return NextResponse.json(
       {
-        error: 'Payment verification failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Payment verification failed",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@digital-astrology/ui";
 
-export default function MobileAppSection() {
+export default function MobileAppSection(): React.ReactElement {
   return (
     <section className="px-6 lg:px-16">
       <div className="grid items-center gap-12 overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-[#1a1036] via-[#25174c] to-[#301d5e] px-8 py-12 shadow-astro lg:grid-cols-2">

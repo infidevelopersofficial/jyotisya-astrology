@@ -24,6 +24,7 @@ Comprehensive reliability, performance, and error handling improvements implemen
 **Purpose**: Prevent entire application crashes from component-level errors
 
 **Features**:
+
 - Catches React component errors
 - Automatic logging to Sentry and Winston
 - Graceful fallback UI with retry and navigation
@@ -31,12 +32,13 @@ Comprehensive reliability, performance, and error handling improvements implemen
 - Development mode stack traces
 
 **Usage**:
+
 ```tsx
-import { ErrorBoundary } from '@/components/error-boundary'
+import { ErrorBoundary } from "@/components/error-boundary";
 
 <ErrorBoundary fallback={<CustomError />}>
   <YourComponent />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 **Location**: `apps/web/components/error-boundary.tsx`
@@ -48,6 +50,7 @@ import { ErrorBoundary } from '@/components/error-boundary'
 **Purpose**: Handle transient failures with intelligent retry mechanisms
 
 **Features**:
+
 - Exponential backoff with jitter
 - Configurable retry count (default: 3)
 - Automatic retry on 5xx, 408, 429, 503, 504 errors
@@ -56,21 +59,19 @@ import { ErrorBoundary } from '@/components/error-boundary'
 - Network error detection (ECONNRESET, ETIMEDOUT)
 
 **Usage**:
+
 ```typescript
-import { retry, retryFetch, CircuitBreaker } from '@/lib/api/retry'
+import { retry, retryFetch, CircuitBreaker } from "@/lib/api/retry";
 
 // Retry any async function
-const data = await retry(
-  async () => fetchData(),
-  { maxRetries: 3, initialDelay: 1000 }
-)
+const data = await retry(async () => fetchData(), { maxRetries: 3, initialDelay: 1000 });
 
 // Retry fetch requests
-const response = await retryFetch('https://api.example.com/data')
+const response = await retryFetch("https://api.example.com/data");
 
 // Circuit breaker
-const breaker = new CircuitBreaker(5, 60000) // 5 failures, 1 min timeout
-const result = await breaker.execute(() => fetchData())
+const breaker = new CircuitBreaker(5, 60000); // 5 failures, 1 min timeout
+const result = await breaker.execute(() => fetchData());
 ```
 
 **Location**: `apps/web/lib/api/retry.ts`
@@ -82,6 +83,7 @@ const result = await breaker.execute(() => fetchData())
 **Purpose**: Reduce redundant API calls and improve response times
 
 **Features**:
+
 - In-memory cache with TTL (default: 5 minutes)
 - Stale-while-revalidate strategy
 - Request deduplication (prevents duplicate concurrent requests)
@@ -91,28 +93,22 @@ const result = await breaker.execute(() => fetchData())
 - LRU eviction for memoization
 
 **Usage**:
+
 ```typescript
-import { cached, memoize, deduplicated, RequestBatcher } from '@/lib/api/cache'
+import { cached, memoize, deduplicated, RequestBatcher } from "@/lib/api/cache";
 
 // Cache async functions
-const getCachedUser = cached(
-  async (id: string) => fetchUser(id),
-  { ttl: 60000 }
-)
+const getCachedUser = cached(async (id: string) => fetchUser(id), { ttl: 60000 });
 
 // Memoize sync functions
-const calculateHash = memoize((data: string) => hash(data))
+const calculateHash = memoize((data: string) => hash(data));
 
 // Deduplicate requests
-const getUser = deduplicated(
-  async (id: string) => fetchUser(id)
-)
+const getUser = deduplicated(async (id: string) => fetchUser(id));
 
 // Batch requests
-const batcher = new RequestBatcher(
-  async (ids: string[]) => fetchUsers(ids)
-)
-const user = await batcher.load('user123')
+const batcher = new RequestBatcher(async (ids: string[]) => fetchUsers(ids));
+const user = await batcher.load("user123");
 ```
 
 **Location**: `apps/web/lib/api/cache.ts`
@@ -124,6 +120,7 @@ const user = await batcher.load('user123')
 **Purpose**: Provide branded, user-friendly error pages
 
 **Features**:
+
 - **404 Page** (`app/not-found.tsx`)
   - Cosmic-themed design matching brand
   - Navigation to home, consultations, dashboard
@@ -137,6 +134,7 @@ const user = await batcher.load('user123')
   - Contact support link
 
 **Locations**:
+
 - `apps/web/app/not-found.tsx`
 - `apps/web/app/error.tsx`
 
@@ -149,6 +147,7 @@ const user = await batcher.load('user123')
 **Implementation**: Built into `lib/api/cache.ts` as `RequestDeduplicator` class
 
 **Features**:
+
 - Tracks in-flight requests by key
 - Returns same promise for duplicate requests
 - Automatic cleanup on completion
@@ -165,11 +164,13 @@ const user = await batcher.load('user123')
 **Endpoints**:
 
 #### `/api/health` - Basic Health Check
+
 - Returns 200 OK if application is running
 - Includes uptime, timestamp, environment
 - Used by: Uptime monitors, basic probes
 
 #### `/api/ready` - Readiness Check
+
 - Returns 200 OK only if all dependencies available
 - Checks: Database connectivity, environment variables, memory
 - Returns 503 if any check fails
@@ -177,6 +178,7 @@ const user = await batcher.load('user123')
 - Used by: Kubernetes probes, load balancers
 
 **Usage**:
+
 ```bash
 # Health check
 curl http://localhost:3000/api/health
@@ -186,6 +188,7 @@ curl http://localhost:3000/api/ready
 ```
 
 **Locations**:
+
 - `apps/web/app/api/health/route.ts`
 - `apps/web/app/api/ready/route.ts`
 
@@ -196,6 +199,7 @@ curl http://localhost:3000/api/ready
 **Purpose**: Optimize database connections and prevent exhaustion
 
 **Features**:
+
 - Singleton Prisma Client instance
 - Configurable connection pooling via DATABASE_URL
 - Slow query logging (> 1 second)
@@ -206,12 +210,14 @@ curl http://localhost:3000/api/ready
 - Connection pool statistics
 
 **Configuration**:
+
 ```bash
 # .env.local
 DATABASE_URL="postgresql://user:pass@host:5432/db?connection_limit=10&pool_timeout=20"
 ```
 
 **Usage**:
+
 ```typescript
 import { prisma, withTransaction, checkDatabaseConnection } from '@/lib/db/prisma'
 
@@ -240,6 +246,7 @@ console.log(health.healthy, health.latency)
 **Purpose**: Track and optimize application performance
 
 **Features**:
+
 - Async/sync function measurement
 - Start/stop timers
 - Performance marks and measures (Web Performance API)
@@ -252,6 +259,7 @@ console.log(health.healthy, health.latency)
 - Integration with Sentry metrics
 
 **Utilities**:
+
 - `measureAsync()` - Measure async operations
 - `measureSync()` - Measure sync operations
 - `startTimer()` - Start/stop timer pattern
@@ -265,24 +273,21 @@ console.log(health.healthy, health.latency)
 **Metrics API**: `/api/metrics`
 
 **Usage**:
+
 ```typescript
-import { measureAsync, startTimer, performanceBudget } from '@/lib/monitoring/performance'
+import { measureAsync, startTimer, performanceBudget } from "@/lib/monitoring/performance";
 
 // Measure async
-const data = await measureAsync(
-  'fetchUser',
-  async () => fetchUser(id),
-  { userId: id }
-)
+const data = await measureAsync("fetchUser", async () => fetchUser(id), { userId: id });
 
 // Timer
-const endTimer = startTimer('processing')
+const endTimer = startTimer("processing");
 // ... do work ...
-const { duration } = endTimer()
+const { duration } = endTimer();
 
 // Set budget
-performanceBudget.setBudget('api_request', 2000)
-performanceBudget.check('api_request', duration)
+performanceBudget.setBudget("api_request", 2000);
+performanceBudget.check("api_request", duration);
 ```
 
 **Documentation**: `apps/web/PERFORMANCE_MONITORING.md`
@@ -346,11 +351,11 @@ NEXT_PUBLIC_APP_URL="https://your-domain.com"
 Default budgets (can be customized):
 
 ```typescript
-import { performanceBudget } from '@/lib/monitoring/performance'
+import { performanceBudget } from "@/lib/monitoring/performance";
 
-performanceBudget.setBudget('api_request', 2000) // 2s
-performanceBudget.setBudget('page_load', 3000) // 3s
-performanceBudget.setBudget('database_query', 1000) // 1s
+performanceBudget.setBudget("api_request", 2000); // 2s
+performanceBudget.setBudget("page_load", 3000); // 3s
+performanceBudget.setBudget("database_query", 1000); // 1s
 ```
 
 ### Cache Configuration
@@ -358,13 +363,13 @@ performanceBudget.setBudget('database_query', 1000) // 1s
 Default cache settings:
 
 ```typescript
-import { cached } from '@/lib/api/cache'
+import { cached } from "@/lib/api/cache";
 
 const fn = cached(asyncFn, {
   ttl: 300000, // 5 minutes
   staleWhileRevalidate: true,
   cacheErrors: false,
-})
+});
 ```
 
 ### Retry Configuration
@@ -372,14 +377,14 @@ const fn = cached(asyncFn, {
 Default retry settings:
 
 ```typescript
-import { retry } from '@/lib/api/retry'
+import { retry } from "@/lib/api/retry";
 
 await retry(fn, {
   maxRetries: 3,
   initialDelay: 1000, // 1 second
   maxDelay: 10000, // 10 seconds
   backoffMultiplier: 2,
-})
+});
 ```
 
 ---
@@ -412,17 +417,17 @@ curl http://localhost:3000/sentry-test
 ### Cache Testing
 
 ```typescript
-import { cache } from '@/lib/api/cache'
+import { cache } from "@/lib/api/cache";
 
 // Set
-cache.set('key', 'value')
+cache.set("key", "value");
 
 // Get
-const value = cache.get('key')
+const value = cache.get("key");
 
 // Stats
-const stats = cache.getStats()
-console.log('Cache size:', stats.size)
+const stats = cache.getStats();
+console.log("Cache size:", stats.size);
 ```
 
 ---
@@ -456,67 +461,75 @@ console.log('Cache size:', stats.size)
 #### 1. Replace Direct Fetch with Retry
 
 **Before**:
+
 ```typescript
-const response = await fetch('/api/data')
-const data = await response.json()
+const response = await fetch("/api/data");
+const data = await response.json();
 ```
 
 **After**:
-```typescript
-import { retryFetch } from '@/lib/api/retry'
 
-const response = await retryFetch('/api/data')
-const data = await response.json()
+```typescript
+import { retryFetch } from "@/lib/api/retry";
+
+const response = await retryFetch("/api/data");
+const data = await response.json();
 ```
 
 #### 2. Add Error Boundaries
 
 **Before**:
+
 ```tsx
 <MyComponent />
 ```
 
 **After**:
+
 ```tsx
-import { ErrorBoundary } from '@/components/error-boundary'
+import { ErrorBoundary } from "@/components/error-boundary";
 
 <ErrorBoundary>
   <MyComponent />
-</ErrorBoundary>
+</ErrorBoundary>;
 ```
 
 #### 3. Cache Expensive Operations
 
 **Before**:
+
 ```typescript
 async function fetchUserData(id: string) {
-  return await fetch(`/api/users/${id}`).then(r => r.json())
+  return await fetch(`/api/users/${id}`).then((r) => r.json());
 }
 ```
 
 **After**:
+
 ```typescript
-import { cached } from '@/lib/api/cache'
+import { cached } from "@/lib/api/cache";
 
 const fetchUserData = cached(
   async (id: string) => {
-    return await fetch(`/api/users/${id}`).then(r => r.json())
+    return await fetch(`/api/users/${id}`).then((r) => r.json());
   },
-  { ttl: 60000 }
-)
+  { ttl: 60000 },
+);
 ```
 
 #### 4. Use Singleton Prisma Client
 
 **Before**:
+
 ```typescript
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import { PrismaClient } from "@prisma/client";
+const prisma = new PrismaClient();
 ```
 
 **After**:
+
 ```typescript
-import { prisma } from '@/lib/db/prisma'
+import { prisma } from "@/lib/db/prisma";
 // Use singleton instance
 ```
 
@@ -557,6 +570,7 @@ import { prisma } from '@/lib/db/prisma'
 ## Support
 
 For issues or questions:
+
 - Review logs in production environment
 - Check `/api/metrics` for performance data
 - Check `/api/ready` for dependency status

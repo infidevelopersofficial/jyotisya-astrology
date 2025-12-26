@@ -7,10 +7,12 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 ### 1. **CI (Continuous Integration)** - `ci.yml`
 
 **Triggers:**
+
 - Pull requests to `main`, `develop`, or `phase*` branches
 - Pushes to `main` and `develop`
 
 **Jobs:**
+
 - **Lint & Type Check**: Runs ESLint and TypeScript compiler
 - **Build**: Builds all apps and packages
 - **Tests**: Runs Vitest tests with coverage reporting
@@ -24,11 +26,13 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 ### 2. **Deploy** - `deploy.yml`
 
 **Triggers:**
+
 - Push to `main` (deploys to production)
 - Push to `develop` (deploys to staging)
 - Manual workflow dispatch
 
 **Jobs:**
+
 - **Setup**: Determines deployment environment
 - **Build**: Creates optimized production build
 - **Deploy Web**: Deploys web app to Vercel
@@ -39,6 +43,7 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 **Duration:** ~10-15 minutes
 
 **Environments:**
+
 - `production` - Production environment
 - `staging` - Staging environment
 - `production-admin` - Production admin
@@ -49,11 +54,13 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 ### 3. **CodeQL Security Scan** - `codeql.yml`
 
 **Triggers:**
+
 - Pull requests to `main` and `develop`
 - Pushes to `main` and `develop`
 - Scheduled: Every Monday at 00:00 UTC
 
 **Jobs:**
+
 - **Analyze**: Scans JavaScript/TypeScript code for security vulnerabilities
 
 **Duration:** ~15-20 minutes
@@ -63,9 +70,11 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 ### 4. **PR Checks** - `pr-checks.yml`
 
 **Triggers:**
+
 - PR opened, synchronized, reopened, or marked ready for review
 
 **Jobs:**
+
 - **Validate PR**: Checks PR title follows semantic commit format
 - **Dependency Review**: Reviews new/updated dependencies for vulnerabilities
 - **Secret Scan**: Scans for accidentally committed secrets
@@ -81,23 +90,27 @@ This directory contains all GitHub Actions workflows for automated testing, buil
 Configure these in GitHub repository settings → Secrets and variables → Actions:
 
 ### Supabase
+
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
 ```
 
 ### Database
+
 ```
 DATABASE_URL
 ```
 
 ### Astrology Provider
+
 ```
 JYOTISH_API_URL
 JYOTISH_API_KEY
 ```
 
 ### Vercel Deployment
+
 ```
 VERCEL_TOKEN
 VERCEL_ORG_ID
@@ -222,11 +235,13 @@ yarn test
 ### Build fails on CI but works locally
 
 **Possible causes:**
+
 - Environment variables not set
 - Different Node.js versions
 - Cached dependencies
 
 **Solution:**
+
 ```bash
 # Clear local cache
 rm -rf node_modules .yarn/cache
@@ -239,6 +254,7 @@ nvm use 20
 ### Deploy fails
 
 **Check:**
+
 1. Vercel secrets are set correctly
 2. Environment secrets match `.env.example`
 3. Database migrations are up to date
@@ -247,6 +263,7 @@ nvm use 20
 ### Tests fail on CI
 
 **Check:**
+
 1. Test files use correct imports
 2. No hardcoded paths (use relative imports)
 3. Tests don't depend on local services

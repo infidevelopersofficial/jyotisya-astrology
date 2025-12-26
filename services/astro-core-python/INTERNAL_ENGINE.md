@@ -164,7 +164,7 @@ Calculate birth chart with planetary positions.
   "minutes": 30,
   "seconds": 0,
   "latitude": 28.6139,
-  "longitude": 77.2090,
+  "longitude": 77.209,
   "timezone": 5.5,
   "observation_point": "topocentric",
   "ayanamsha": "lahiri"
@@ -175,7 +175,9 @@ Calculate birth chart with planetary positions.
 
 ```json
 {
-  "input": { /* echoes request */ },
+  "input": {
+    /* echoes request */
+  },
   "ascendant": 285.4567,
   "planets": [
     {
@@ -189,7 +191,7 @@ Calculate birth chart with planetary positions.
       "nakshatra": "Uttara Ashadha",
       "nakshatraLord": "Sun",
       "house": 3
-    },
+    }
     // ... more planets
   ],
   "houses": [
@@ -197,7 +199,7 @@ Calculate birth chart with planetary positions.
       "house": 1,
       "sign": "Capricorn",
       "degree": 270.0
-    },
+    }
     // ... 11 more houses
   ]
 }
@@ -227,7 +229,7 @@ The frontend uses the existing `AstrologyAPIClient` which already points to the 
 
 ```typescript
 // apps/web/lib/astrology/client.ts
-const BASE_URL = process.env.ASTRO_CORE_URL || 'http://localhost:4001'
+const BASE_URL = process.env.ASTRO_CORE_URL || "http://localhost:4001";
 
 // Makes requests to POST /planets (same endpoint!)
 ```
@@ -291,6 +293,7 @@ Run `python test_validation.py` to verify:
 5. ✅ Sign & nakshatra lookup
 
 Compare with:
+
 - FreeAstrologyAPI (for consistency)
 - Jhora (popular Vedic astrology software)
 - Swiss Ephemeris test data
@@ -319,12 +322,12 @@ Compare with:
 
 ## Performance
 
-| Metric | Value |
-|--------|-------|
+| Metric        | Value                                        |
+| ------------- | -------------------------------------------- |
 | Response time | 50-150ms (first request with ephemeris load) |
-| Response time | 5-15ms (subsequent requests) |
-| Memory usage | ~50MB (ephemeris data cached) |
-| Throughput | 1000+ req/sec (single instance) |
+| Response time | 5-15ms (subsequent requests)                 |
+| Memory usage  | ~50MB (ephemeris data cached)                |
+| Throughput    | 1000+ req/sec (single instance)              |
 
 **No rate limits!** Unlike FreeAstrologyAPI (50 req/day free tier).
 
@@ -490,6 +493,7 @@ APP_PORT=4001
 ## Roadmap
 
 ### Phase 1: Core Engine (✅ Complete)
+
 - [x] Planetary positions
 - [x] Ascendant calculation
 - [x] Houses (Whole Sign)
@@ -498,12 +502,14 @@ APP_PORT=4001
 - [x] FastAPI endpoints matching FreeAstrologyAPI
 
 ### Phase 2: Enhanced Calculations (Next)
+
 - [ ] Accurate Rahu/Ketu from lunar nodes
 - [ ] Full Placidus house system
 - [ ] Panchang (Tithi, Yoga, Karana)
 - [ ] Divisional charts (D2, D9, D10)
 
 ### Phase 3: Advanced Features
+
 - [ ] Dasa periods (Vimsottari)
 - [ ] Planetary strength (Shad Bala)
 - [ ] Compatibility (Ashtakoot)
@@ -511,6 +517,7 @@ APP_PORT=4001
 - [ ] Multiple ayanamsha systems
 
 ### Phase 4: Optimization
+
 - [ ] Redis caching for repeated calculations
 - [ ] Database storage for common charts
 - [ ] Multi-threading for batch requests

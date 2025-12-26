@@ -12,67 +12,63 @@ FieldInput ValueProfile ShowsStatusFull NameQA TestQA Test✅ SAVEDDate of Birth
 🚨 CRITICAL ISSUES FOUND:
 ISSUE #1: BIRTH TIME NOT PERSISTING ❌
 
-* Severity: HIGH
+- Severity: HIGH
 
-* Problem: Birth Time field shows "Not set" on the profile view despite entering "02:02 AM" during profile creation
+- Problem: Birth Time field shows "Not set" on the profile view despite entering "02:02 AM" during profile creation
 
-* Impact: Astrological calculations may be incomplete since accurate birth time is crucial for chart calculations
+- Impact: Astrological calculations may be incomplete since accurate birth time is crucial for chart calculations
 
-* Evidence:
+- Evidence:
+  - Entered: "02:02 AM" ✓ (confirmed on form)
 
-  * Entered: "02:02 AM" ✓ (confirmed on form)
+  - Saved Display: "Not set" ✗
 
-  * Saved Display: "Not set" ✗
-
-  * Edit Form: "--:-- --" (empty on reload)
+  - Edit Form: "--:-- --" (empty on reload)
 
 ISSUE #2: DATA NOT REPOPULATING IN EDIT FORM ❌
 
-* Severity: HIGH
+- Severity: HIGH
 
-* Problem: When clicking "Edit Profile", the form fields show empty/default values instead of pre-filled saved data
+- Problem: When clicking "Edit Profile", the form fields show empty/default values instead of pre-filled saved data
 
-* What we see on Edit form:
+- What we see on Edit form:
+  - Full Name: Empty (placeholder "Enter your full name")
 
-  * Full Name: Empty (placeholder "Enter your full name")
+  - Date of Birth: Empty (placeholder "dd/mm/yyyy")
 
-  * Date of Birth: Empty (placeholder "dd/mm/yyyy")
+  - Time of Birth: Empty (placeholder "--:-- --")
 
-  * Time of Birth: Empty (placeholder "--:-- --")
+  - Birth Place: Shows "Delhi, India" instead of saved "Mumbai, India"
 
-  * Birth Place: Shows "Delhi, India" instead of saved "Mumbai, India"
+  - Astrology System: Shows "Vedic Selected" instead of saved "Western"
 
-  * Astrology System: Shows "Vedic Selected" instead of saved "Western"
+- Impact: Users cannot easily verify or modify their profile information without manually re-entering everything
 
-* Impact: Users cannot easily verify or modify their profile information without manually re-entering everything
-
-* UX Impact: Confusing user experience - data appears different on view vs. edit screens
+- UX Impact: Confusing user experience - data appears different on view vs. edit screens
 
 ISSUE #3: BIRTH PLACE MISMATCH IN EDIT FORM ❌
 
-* Severity: MEDIUM
+- Severity: MEDIUM
 
-* Problem: Edit form shows "Delhi, India" (28.6139°, 77.2090°) but profile view shows "Mumbai, India" (correct)
+- Problem: Edit form shows "Delhi, India" (28.6139°, 77.2090°) but profile view shows "Mumbai, India" (correct)
 
-* Root Cause: Edit form is not properly loading the saved birth place data
+- Root Cause: Edit form is not properly loading the saved birth place data
 
-* Coordinates mismatch:
+- Coordinates mismatch:
+  - What we saved: Mumbai (19.8768°, 72.8777°)
 
-  * What we saved: Mumbai (19.8768°, 72.8777°)
-
-  * Edit form shows: Delhi (28.6139°, 77.2090°)
+  - Edit form shows: Delhi (28.6139°, 77.2090°)
 
 ISSUE #4: ASTROLOGY SYSTEM SELECTION REVERSED IN EDIT FORM ❌
 
-* Severity: MEDIUM
+- Severity: MEDIUM
 
-* Problem: When editing, the opposite astrology system appears selected
+- Problem: When editing, the opposite astrology system appears selected
+  - Profile view correctly shows: "⭐ Western"
 
-  * Profile view correctly shows: "⭐ Western"
+  - Edit form shows: "Vedic ✓ Selected" (wrong!)
 
-  * Edit form shows: "Vedic ✓ Selected" (wrong!)
-
-* Impact: If user saves from edit form, the selection might toggle to the wrong value
+- Impact: If user saves from edit form, the selection might toggle to the wrong value
 
 📝 COMPARISON TABLE - Expected vs Actual:
 Profile View (Display) - MOSTLY CORRECT ✅
@@ -89,36 +85,31 @@ text
 Likely Causes:
 
 1. Birth Time Storage Issue:
+   - Time value may not be persisting to the database
 
-   * Time value may not be persisting to the database
+   - OR Backend is processing it but frontend display logic has condition to show "Not set"
 
-   * OR Backend is processing it but frontend display logic has condition to show "Not set"
-
-   * Check database schema - time field might be nullable and not receiving the value
+   - Check database schema - time field might be nullable and not receiving the value
 
 2. Edit Form Data Binding Issue:
+   - Edit form is not properly fetching/hydrating with user's saved profile data
 
-   * Edit form is not properly fetching/hydrating with user's saved profile data
+   - Form is showing either:
+     - Fresh/reset form state with defaults
 
-   * Form is showing either:
-
-     * Fresh/reset form state with defaults
-
-     * OR User's very first profile creation data (Delhi was probably the onboarding default)
+     - OR User's very first profile creation data (Delhi was probably the onboarding default)
 
 3. Astrology System Reversal:
+   - Boolean/enum value might be flipped (0/1, true/false) on read vs write
 
-   * Boolean/enum value might be flipped (0/1, true/false) on read vs write
-
-   * OR form is reading from wrong field/variable
+   - OR form is reading from wrong field/variable
 
 4. Inconsistent State Management:
+   - Profile view and Edit form might be loading from different data sources
 
-   * Profile view and Edit form might be loading from different data sources
+   - Profile view may be showing calculated/formatted data
 
-   * Profile view may be showing calculated/formatted data
-
-   * Edit form may be showing raw database values (and failing to load them correctly)
+   - Edit form may be showing raw database values (and failing to load them correctly)
 
 ⚠️ USER-FACING PROBLEMS:
 
@@ -155,11 +146,11 @@ PRIORITY 3 - MEDIUM:
 The good news: Your profile data mostly saves to the database. The name, date, location, and astrology system preference are stored.
 The bad news:
 
-* Your birth time (02:02 AM) didn't save - it shows "Not set"
+- Your birth time (02:02 AM) didn't save - it shows "Not set"
 
-* When you go to edit your profile, the form shows empty fields instead of your saved data
+- When you go to edit your profile, the form shows empty fields instead of your saved data
 
-* There seem to be some data sync issues between what's saved and what's displayed in the edit form
+- There seem to be some data sync issues between what's saved and what's displayed in the edit form
 
 The urgent issue: Birth time is critical for astrology calculations, so this needs to be fixed before features relying on it will work correctly.
 Recommendation: Inform your development team about these data persistence issues - they likely need to debug the backend API responses and frontend form data binding logic.

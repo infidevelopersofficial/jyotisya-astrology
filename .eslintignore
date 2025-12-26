@@ -1,0 +1,25 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+dist
+build
+*.tsbuildinfo
+
+# Generated files
+.turbo
+.vercel
+
+# Environment
+.env
+.env.*
+
+# Prisma
+prisma/migrations
+
+# Test auth page (as per web config)
+apps/web/app/auth-test/**

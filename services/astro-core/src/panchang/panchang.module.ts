@@ -3,6 +3,6 @@ import { PanchangService } from "./panchang.service";
 
 @Module({
   providers: [PanchangService],
-  exports: [PanchangService]
+  exports: [PanchangService],
 })
 export class PanchangModule {}

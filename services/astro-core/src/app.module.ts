@@ -13,7 +13,7 @@ import { CacheModule } from "./shared/cache.module";
     HoroscopeModule,
     KundliModule,
     CompatibilityModule,
-    PanchangModule
-  ]
+    PanchangModule,
+  ],
 })
 export class AppModule {}

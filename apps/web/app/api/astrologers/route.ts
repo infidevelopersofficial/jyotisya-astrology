@@ -1,8 +1,9 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/db/prisma'
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db/prisma";
+import { Prisma } from "@prisma/client";
 
 // Force dynamic rendering for this API route
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/astrologers
@@ -12,26 +13,24 @@ export const dynamic = 'force-dynamic'
  * - available: 'true' to filter only available astrologers
  * - limit: number of results to return (default: 50)
  */
-export async function GET(request: Request) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: Request): Promise<NextResponse> {
   try {
-    const { searchParams } = new URL(request.url)
-    const availableOnly = searchParams.get('available') === 'true'
-    const limit = parseInt(searchParams.get('limit') || '50')
+    const { searchParams } = new URL(request.url);
+    const availableOnly = searchParams.get("available") === "true";
+    const limit = parseInt(searchParams.get("limit") || "50");
 
     // Build where clause
-    const where: any = {}
+    const where: Prisma.AstrologerWhereInput = {};
     if (availableOnly) {
-      where.available = true
+      where.available = true;
     }
 
     // Fetch astrologers
     const astrologers = await prisma.astrologer.findMany({
       where,
       take: limit,
-      orderBy: [
-        { available: 'desc' },
-        { rating: 'desc' },
-      ],
+      orderBy: [{ available: "desc" }, { rating: "desc" }],
       select: {
         id: true,
         name: true,
@@ -45,8 +44,8 @@ export async function GET(request: Request) {
         bio: true,
         verified: true,
         available: true,
-      }
-    })
+      },
+    });
 
     return NextResponse.json(
       {
@@ -54,17 +53,17 @@ export async function GET(request: Request) {
         astrologers,
         total: astrologers.length,
       },
-      { status: 200 }
-    )
-  } catch (error) {
-    console.error('Astrologers fetch error:', error)
+      { status: 200 },
+    );
+  } catch (error: unknown) {
+    console.error("Astrologers fetch error:", error);
 
     return NextResponse.json(
       {
-        error: 'Failed to fetch astrologers',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        error: "Failed to fetch astrologers",
+        details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

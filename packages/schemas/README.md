@@ -5,6 +5,7 @@ Database schemas and Prisma client for the Digital Astrology platform.
 ## Overview
 
 This package contains:
+
 - **Prisma Schema**: Database schema definition
 - **Prisma Client**: Type-safe database client
 - **Seed Data**: Sample data for development
@@ -70,7 +71,7 @@ import { prisma, User, Kundli } from "@digital-astrology/schemas";
 
 // Find user
 const user = await prisma.user.findUnique({
-  where: { email: "user@example.com" }
+  where: { email: "user@example.com" },
 });
 
 // Create kundli
@@ -84,8 +85,10 @@ const kundli = await prisma.kundli.create({
     latitude: 28.6139,
     longitude: 77.209,
     timezone: "Asia/Kolkata",
-    chartData: { /* chart data */ }
-  }
+    chartData: {
+      /* chart data */
+    },
+  },
 });
 
 // Query with relations
@@ -94,9 +97,9 @@ const userWithKundlis = await prisma.user.findUnique({
   include: {
     kundlis: true,
     consultations: {
-      include: { astrologer: true }
-    }
-  }
+      include: { astrologer: true },
+    },
+  },
 });
 ```
 
@@ -129,6 +132,7 @@ products
 ## Sample Data
 
 Running `yarn db:seed` creates:
+
 - 2 users (demo@jyotishya.com, admin@jyotishya.com)
 - 3 astrologers with different specializations
 - 4 products (Rudraksha, Yantra, Gemstone, Puja Kit)

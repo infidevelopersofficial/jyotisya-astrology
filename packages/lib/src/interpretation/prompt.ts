@@ -64,10 +64,7 @@ export function buildDailyHoroscopePrompt(input: InterpretationInput): string {
   return lines.join("\n");
 }
 
-function extractPlanetLines(
-  snapshot: Record<string, unknown>,
-  raw: unknown,
-): string[] {
+function extractPlanetLines(snapshot: Record<string, unknown>, raw: unknown): string[] {
   const candidates: unknown[] = [];
 
   if (Array.isArray(snapshot.planets)) {
@@ -112,10 +109,7 @@ function extractPlanetLines(
   return unique(formatted);
 }
 
-function extractPanchangLines(
-  snapshot: Record<string, unknown>,
-  raw: unknown,
-): string[] {
+function extractPanchangLines(snapshot: Record<string, unknown>, raw: unknown): string[] {
   const sources: unknown[] = [];
   sources.push(snapshot);
   if (raw && typeof raw === "object") {

@@ -66,6 +66,7 @@ RAZORPAY_KEY_SECRET=your_test_secret_key_here
 ```
 
 **Security Note**:
+
 - ✅ `RAZORPAY_KEY_ID` is public (safe to use in frontend)
 - ❌ `RAZORPAY_KEY_SECRET` is private (NEVER expose to frontend or git)
 
@@ -100,14 +101,14 @@ apps/web/
 
 ### Core Functions (`lib/payments/razorpay.ts`)
 
-| Function | Description |
-|----------|-------------|
-| `createRazorpayOrder()` | Creates payment order with Razorpay API |
-| `verifyPaymentSignature()` | Validates payment callback signature |
-| `verifyWebhookSignature()` | Validates webhook signature |
-| `fetchPaymentDetails()` | Fetches payment info from Razorpay |
-| `initiateRefund()` | Initiates full or partial refund |
-| `getRazorpayKeyId()` | Returns public key for frontend |
+| Function                   | Description                             |
+| -------------------------- | --------------------------------------- |
+| `createRazorpayOrder()`    | Creates payment order with Razorpay API |
+| `verifyPaymentSignature()` | Validates payment callback signature    |
+| `verifyWebhookSignature()` | Validates webhook signature             |
+| `fetchPaymentDetails()`    | Fetches payment info from Razorpay      |
+| `initiateRefund()`         | Initiates full or partial refund        |
+| `getRazorpayKeyId()`       | Returns public key for frontend         |
 
 ---
 
@@ -122,6 +123,7 @@ apps/web/
 **Authentication**: Required (Supabase session)
 
 **Request Body**:
+
 ```json
 {
   "astrologerId": "cuid-of-astrologer",
@@ -131,6 +133,7 @@ apps/web/
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -157,11 +160,13 @@ apps/web/
 ```
 
 **Amount Calculation**:
+
 - Fetches astrologer's `hourlyRate` from database
 - Formula: `(hourlyRate / 60) * duration` in rupees
 - Razorpay expects amount in **paise** (1 rupee = 100 paise)
 
 **Validations**:
+
 - Astrologer must exist and be available
 - Scheduled time must be in the future
 - Duration must be positive
@@ -177,6 +182,7 @@ apps/web/
 **Authentication**: Required (Supabase session)
 
 **Request Body**:
+
 ```json
 {
   "razorpay_order_id": "order_xxxxxxxxxxxxx",
@@ -186,6 +192,7 @@ apps/web/
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -215,11 +222,13 @@ apps/web/
 ```
 
 **Signature Verification**:
+
 1. Concatenates `order_id|payment_id`
 2. Generates HMAC SHA256 using `RAZORPAY_KEY_SECRET`
 3. Compares with received signature using timing-safe comparison
 
 **Status Updates**:
+
 - ✅ Valid signature → Consultation `paymentStatus` = `PAID`
 - ❌ Invalid signature → Return 400 error
 - ❌ Exception → Mark as `FAILED` and return 500 error
@@ -235,12 +244,14 @@ apps/web/
 **Authentication**: None (uses webhook signature verification)
 
 **Events Handled**:
+
 - `payment.captured` → Updates to `PAID`
 - `payment.failed` → Updates to `FAILED`
 - `refund.created` → Updates to `REFUNDED`
 - `refund.processed` → Updates to `REFUNDED`
 
 **Security**:
+
 - Verifies `X-Razorpay-Signature` header
 - Uses HMAC SHA256 with `RAZORPAY_KEY_SECRET`
 - Rejects requests with invalid signatures
@@ -263,34 +274,34 @@ Add Razorpay checkout script to your layout or page:
 ### 2. Create Payment Flow Component
 
 ```tsx
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Script from 'next/script'
+import { useState } from "react";
+import Script from "next/script";
 
 interface BookConsultationProps {
-  astrologerId: string
+  astrologerId: string;
 }
 
 export default function BookConsultation({ astrologerId }: BookConsultationProps) {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const handleBookConsultation = async () => {
-    setLoading(true)
+    setLoading(true);
 
     try {
       // Step 1: Create order
-      const createResponse = await fetch('/api/consultations/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const createResponse = await fetch("/api/consultations/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           astrologerId,
-          scheduledAt: '2025-12-20T15:30:00Z', // From date picker
+          scheduledAt: "2025-12-20T15:30:00Z", // From date picker
           duration: 30, // From duration selector
         }),
-      })
+      });
 
-      const { consultation, razorpayOrder } = await createResponse.json()
+      const { consultation, razorpayOrder } = await createResponse.json();
 
       // Step 2: Open Razorpay checkout
       const options = {
@@ -298,59 +309,59 @@ export default function BookConsultation({ astrologerId }: BookConsultationProps
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         order_id: razorpayOrder.orderId,
-        name: 'Digital Astrology',
+        name: "Digital Astrology",
         description: `Consultation with ${consultation.astrologer.name}`,
-        image: '/logo.png',
+        image: "/logo.png",
         handler: async (response: any) => {
           // Step 3: Verify payment
-          const verifyResponse = await fetch('/api/consultations/verify-payment', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+          const verifyResponse = await fetch("/api/consultations/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
             }),
-          })
+          });
 
-          const result = await verifyResponse.json()
+          const result = await verifyResponse.json();
 
           if (result.success) {
             // Payment successful!
-            alert('Consultation booked successfully!')
-            window.location.href = `/consultations/${consultation.id}`
+            alert("Consultation booked successfully!");
+            window.location.href = `/consultations/${consultation.id}`;
           } else {
-            alert('Payment verification failed')
+            alert("Payment verification failed");
           }
         },
         prefill: {
-          name: 'User Name',
-          email: 'user@example.com',
-          contact: '+919876543210',
+          name: "User Name",
+          email: "user@example.com",
+          contact: "+919876543210",
         },
         theme: {
-          color: '#3399cc',
+          color: "#3399cc",
         },
-      }
+      };
 
-      const razorpay = new (window as any).Razorpay(options)
-      razorpay.open()
+      const razorpay = new (window as any).Razorpay(options);
+      razorpay.open();
     } catch (error) {
-      console.error('Booking error:', error)
-      alert('Failed to create booking')
+      console.error("Booking error:", error);
+      alert("Failed to create booking");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
       <Script src="https://checkout.razorpay.com/v1/checkout.js" />
       <button onClick={handleBookConsultation} disabled={loading}>
-        {loading ? 'Processing...' : 'Book Consultation'}
+        {loading ? "Processing..." : "Book Consultation"}
       </button>
     </>
-  )
+  );
 }
 ```
 
@@ -409,14 +420,15 @@ Razorpay Dashboard → Webhooks → Your webhook → Test webhook
 
 Razorpay provides test cards for payment testing:
 
-| Card Number | CVV | Expiry | Result |
-|-------------|-----|--------|--------|
+| Card Number         | CVV          | Expiry          | Result  |
+| ------------------- | ------------ | --------------- | ------- |
 | 4111 1111 1111 1111 | Any 3 digits | Any future date | Success |
 | 4000 0000 0000 0002 | Any 3 digits | Any future date | Decline |
 
 ### Test Flow
 
 1. **Create Order**:
+
    ```bash
    curl -X POST http://localhost:3000/api/consultations/create-order \
      -H "Content-Type: application/json" \
@@ -445,20 +457,20 @@ Create tests using Jest or Vitest:
 
 ```typescript
 // __tests__/payments/razorpay.test.ts
-import { verifyPaymentSignature } from '@/lib/payments/razorpay'
+import { verifyPaymentSignature } from "@/lib/payments/razorpay";
 
-describe('Razorpay Payment Verification', () => {
-  it('should verify valid signature', () => {
+describe("Razorpay Payment Verification", () => {
+  it("should verify valid signature", () => {
     const data = {
-      razorpay_order_id: 'order_test123',
-      razorpay_payment_id: 'pay_test456',
-      razorpay_signature: 'valid_signature_here',
-    }
+      razorpay_order_id: "order_test123",
+      razorpay_payment_id: "pay_test456",
+      razorpay_signature: "valid_signature_here",
+    };
 
-    const isValid = verifyPaymentSignature(data)
-    expect(isValid).toBe(true)
-  })
-})
+    const isValid = verifyPaymentSignature(data);
+    expect(isValid).toBe(true);
+  });
+});
 ```
 
 ---
@@ -472,6 +484,7 @@ describe('Razorpay Payment Verification', () => {
   - Update production environment variables
 
 - [ ] **Update Environment Variables**
+
   ```bash
   RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxxxxxxxx
   RAZORPAY_KEY_SECRET=your_live_secret_key
@@ -514,6 +527,7 @@ describe('Razorpay Payment Verification', () => {
 **Cause**: Environment variables not set
 
 **Fix**:
+
 ```bash
 # Check if variables are set
 echo $RAZORPAY_KEY_ID
@@ -531,6 +545,7 @@ RAZORPAY_KEY_SECRET=your_secret_key
 **Cause**: Signature mismatch or wrong secret key
 
 **Fix**:
+
 1. Verify you're using the correct `RAZORPAY_KEY_SECRET`
 2. Check order_id and payment_id match exactly
 3. Ensure no extra spaces or characters in signature
@@ -540,6 +555,7 @@ RAZORPAY_KEY_SECRET=your_secret_key
 **Cause**: Webhook URL not accessible or incorrect secret
 
 **Fix**:
+
 1. Verify webhook URL is publicly accessible
 2. Check webhook secret matches `RAZORPAY_KEY_SECRET`
 3. Test webhook from Razorpay Dashboard
@@ -550,6 +566,7 @@ RAZORPAY_KEY_SECRET=your_secret_key
 **Cause**: Frontend passing rupees instead of paise
 
 **Fix**:
+
 - Backend returns amount in **paise** (multiply by 100)
 - Frontend should use the amount from API response directly
 - Don't convert on frontend
@@ -568,6 +585,7 @@ RAZORPAY_KEY_SECRET=your_secret_key
 ## Support
 
 For issues related to:
+
 - **Integration code**: Check this documentation or repository issues
 - **Razorpay API**: Contact [Razorpay Support](https://razorpay.com/support/)
 - **Database/Schema**: Check Prisma schema documentation

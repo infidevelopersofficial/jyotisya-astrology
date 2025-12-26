@@ -7,7 +7,7 @@ export class PanchangService {
       tithi: "Shukla Paksha Ekadashi",
       nakshatra: "Mrighashira",
       sunrise: "06:02",
-      sunset: "18:41"
+      sunset: "18:41",
     };
   }
 }

@@ -1,162 +1,163 @@
-'use client'
+"use client";
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from "react";
 
 interface Location {
-  display_name: string
-  lat: string
-  lon: string
+  display_name: string;
+  lat: string;
+  lon: string;
   address?: {
-    city?: string
-    town?: string
-    village?: string
-    state?: string
-    country?: string
-  }
+    city?: string;
+    town?: string;
+    village?: string;
+    state?: string;
+    country?: string;
+  };
 }
 
 interface LocationPickerProps {
   value: {
-    city: string
-    latitude: number
-    longitude: number
-    timezone: number
-  }
+    city: string;
+    latitude: number;
+    longitude: number;
+    timezone: number;
+  };
   onChange: (location: {
-    city: string
-    latitude: number
-    longitude: number
-    timezone: number
-  }) => void
+    city: string;
+    latitude: number;
+    longitude: number;
+    timezone: number;
+  }) => void;
 }
 
 // Helper to estimate timezone from longitude (rough approximation)
 function estimateTimezone(longitude: number): number {
   // Basic timezone estimation: longitude / 15 (each timezone is ~15 degrees)
   // Round to nearest 0.5 (for half-hour timezones like India's 5.5)
-  const offset = longitude / 15
-  return Math.round(offset * 2) / 2
+  const offset = longitude / 15;
+  return Math.round(offset * 2) / 2;
 }
 
 // Helper to get timezone from city name (for common cities)
 const cityTimezones: { [key: string]: number } = {
-  'Delhi': 5.5,
-  'Mumbai': 5.5,
-  'Bangalore': 5.5,
-  'Bengaluru': 5.5,
-  'Kolkata': 5.5,
-  'Chennai': 5.5,
-  'Hyderabad': 5.5,
-  'Ahmedabad': 5.5,
-  'Pune': 5.5,
-  'Jaipur': 5.5,
-  'India': 5.5,
-  'London': 0,
-  'New York': -5,
-  'Los Angeles': -8,
-  'Dubai': 4,
-  'Singapore': 8,
-  'Tokyo': 9,
-  'Sydney': 10,
-}
+  Delhi: 5.5,
+  Mumbai: 5.5,
+  Bangalore: 5.5,
+  Bengaluru: 5.5,
+  Kolkata: 5.5,
+  Chennai: 5.5,
+  Hyderabad: 5.5,
+  Ahmedabad: 5.5,
+  Pune: 5.5,
+  Jaipur: 5.5,
+  India: 5.5,
+  London: 0,
+  "New York": -5,
+  "Los Angeles": -8,
+  Dubai: 4,
+  Singapore: 8,
+  Tokyo: 9,
+  Sydney: 10,
+};
 
 export default function LocationPicker({ value, onChange }: LocationPickerProps) {
-  const [searchQuery, setSearchQuery] = useState(value.city || '')
-  const [suggestions, setSuggestions] = useState<Location[]>([])
-  const [loading, setLoading] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(false)
-  const [showManual, setShowManual] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const wrapperRef = useRef<HTMLDivElement>(null)
+  const [searchQuery, setSearchQuery] = useState(value.city || "");
+  const [suggestions, setSuggestions] = useState<Location[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showManual, setShowManual] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   // Click outside to close suggestions
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setShowSuggestions(false)
+        setShowSuggestions(false);
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   // 🔧 FIX: Use Next.js API route instead of direct Nominatim call
   // This solves the CSP issue by keeping all frontend requests to same-origin
   const searchLocation = async (query: string) => {
     if (!query || query.length < 3) {
-      setSuggestions([])
-      setError(null)
-      return
+      setSuggestions([]);
+      setError(null);
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
       // ✅ Call our own API route instead of external Nominatim
       // This complies with CSP because it's same-origin
-      const response = await fetch(
-        `/api/geocode?q=${encodeURIComponent(query)}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      )
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(query)}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      const result = await response.json()
+      const result = await response.json();
 
       // Log cache status for debugging
       if (result.from_cache) {
-        console.log('📦 Geocode results from cache')
+        console.error("📦 Geocode results from cache");
       } else {
-        console.log('🌐 Geocode results from API')
+        console.error("🌐 Geocode results from API");
       }
 
-      setSuggestions(result.data || [])
-    } catch (error) {
-      console.error('Geocoding error:', error)
-      setError(error instanceof Error ? error.message : 'Failed to search location')
-      setSuggestions([])
+      setSuggestions(result.data || []);
+    } catch (error: unknown) {
+      console.error("Geocoding error:", error);
+      setError(error instanceof Error ? error.message : "Failed to search location");
+      setSuggestions([]);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Debounce search when typing
   useEffect(() => {
     const timer = setTimeout(() => {
-      searchLocation(searchQuery)
-    }, 500)
+      searchLocation(searchQuery);
+    }, 500);
 
-    return () => clearTimeout(timer)
-  }, [searchQuery])
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleSelectLocation = (location: Location) => {
-    const lat = parseFloat(location.lat)
-    const lon = parseFloat(location.lon)
+    const lat = parseFloat(location.lat);
+    const lon = parseFloat(location.lon);
 
     // Get city name from address or display name
-    const cityName = location.address?.city ||
-                     location.address?.town ||
-                     location.address?.village ||
-                     location.address?.state ||
-                     location.display_name.split(',')[0]
+    const cityName =
+      location.address?.city ||
+      location.address?.town ||
+      location.address?.village ||
+      location.address?.state ||
+      location.display_name.split(",")[0] ||
+      "";
 
     // Try to get timezone from known cities, otherwise estimate
-    let timezone = cityTimezones[cityName] || estimateTimezone(lon)
+    let timezone = (cityName && cityTimezones[cityName]) || estimateTimezone(lon);
 
     // Special handling for India
-    if (location.address?.country?.toLowerCase().includes('india') ||
-        location.display_name.toLowerCase().includes('india')) {
-      timezone = 5.5
+    if (
+      location.address?.country?.toLowerCase().includes("india") ||
+      location.display_name.toLowerCase().includes("india")
+    ) {
+      timezone = 5.5;
     }
 
     const newLocation = {
@@ -164,19 +165,19 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
       latitude: lat,
       longitude: lon,
       timezone,
-    }
+    };
 
-    console.log('📍 Location selected:', newLocation)
+    console.error("📍 Location selected:", newLocation);
 
     // Update parent component
-    onChange(newLocation)
+    onChange(newLocation);
 
     // Update local state
-    setSearchQuery(location.display_name)
-    setShowSuggestions(false)
-    setSuggestions([])
-    setError(null)
-  }
+    setSearchQuery(location.display_name);
+    setShowSuggestions(false);
+    setSuggestions([]);
+    setError(null);
+  };
 
   return (
     <div className="space-y-4">
@@ -192,9 +193,9 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
             type="text"
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setShowSuggestions(true)
-              setError(null)
+              setSearchQuery(e.target.value);
+              setShowSuggestions(true);
+              setError(null);
             }}
             onFocus={() => setShowSuggestions(true)}
             placeholder="Search for your city... (e.g., Delhi, Mumbai, London)"
@@ -227,7 +228,8 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
               >
                 <div className="font-medium">{location.display_name}</div>
                 <div className="mt-1 text-xs text-slate-400">
-                  Lat: {parseFloat(location.lat).toFixed(4)}, Lon: {parseFloat(location.lon).toFixed(4)}
+                  Lat: {parseFloat(location.lat).toFixed(4)}, Lon:{" "}
+                  {parseFloat(location.lon).toFixed(4)}
                 </div>
               </button>
             ))}
@@ -248,7 +250,10 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
           </div>
           <div>
             <span className="text-xs text-slate-400">Timezone:</span>
-            <div className="font-mono text-white">UTC{value.timezone >= 0 ? '+' : ''}{value.timezone}</div>
+            <div className="font-mono text-white">
+              UTC{value.timezone >= 0 ? "+" : ""}
+              {value.timezone}
+            </div>
           </div>
           <div>
             <button
@@ -256,7 +261,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
               onClick={() => setShowManual(!showManual)}
               className="text-xs text-orange-400 hover:text-orange-300"
             >
-              {showManual ? '▼ Hide Manual' : '▶ Manual Override'}
+              {showManual ? "▼ Hide Manual" : "▶ Manual Override"}
             </button>
           </div>
         </div>
@@ -309,12 +314,12 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
         <p className="mb-2 text-sm font-medium text-purple-200">Quick Select (India):</p>
         <div className="flex flex-wrap gap-2">
           {[
-            { name: 'Delhi', lat: 28.6139, lon: 77.2090 },
-            { name: 'Mumbai', lat: 19.0760, lon: 72.8777 },
-            { name: 'Bangalore', lat: 12.9716, lon: 77.5946 },
-            { name: 'Kolkata', lat: 22.5726, lon: 88.3639 },
-            { name: 'Chennai', lat: 13.0827, lon: 80.2707 },
-            { name: 'Hyderabad', lat: 17.3850, lon: 78.4867 },
+            { name: "Delhi", lat: 28.6139, lon: 77.209 },
+            { name: "Mumbai", lat: 19.076, lon: 72.8777 },
+            { name: "Bangalore", lat: 12.9716, lon: 77.5946 },
+            { name: "Kolkata", lat: 22.5726, lon: 88.3639 },
+            { name: "Chennai", lat: 13.0827, lon: 80.2707 },
+            { name: "Hyderabad", lat: 17.385, lon: 78.4867 },
           ].map((city) => (
             <button
               key={city.name}
@@ -325,14 +330,14 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                   latitude: city.lat,
                   longitude: city.lon,
                   timezone: 5.5,
-                })
-                setSearchQuery(`${city.name}, India`)
-                setError(null)
+                });
+                setSearchQuery(`${city.name}, India`);
+                setError(null);
               }}
               className={`rounded-lg border px-3 py-1.5 text-sm transition ${
                 searchQuery?.includes(city.name)
-                  ? 'border-orange-500 bg-orange-500/20 text-orange-200'
-                  : 'border-white/20 bg-white/5 text-slate-300 hover:bg-white/10'
+                  ? "border-orange-500 bg-orange-500/20 text-orange-200"
+                  : "border-white/20 bg-white/5 text-slate-300 hover:bg-white/10"
               }`}
             >
               {city.name}
@@ -341,5 +346,5 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
         </div>
       </div>
     </div>
-  )
+  );
 }

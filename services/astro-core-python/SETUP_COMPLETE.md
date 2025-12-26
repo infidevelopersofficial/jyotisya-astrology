@@ -37,6 +37,7 @@ Your internal astrology calculation engine is now **running and tested**.
 ## 🚀 Live Example
 
 **Test Request:**
+
 ```json
 {
   "year": 2000,
@@ -46,7 +47,7 @@ Your internal astrology calculation engine is now **running and tested**.
   "minutes": 30,
   "seconds": 0,
   "latitude": 28.6139,
-  "longitude": 77.2090,
+  "longitude": 77.209,
   "timezone": 5.5,
   "observation_point": "topocentric",
   "ayanamsha": "lahiri"
@@ -54,6 +55,7 @@ Your internal astrology calculation engine is now **running and tested**.
 ```
 
 **Response Includes:**
+
 - ✅ Ascendant: 150.00° (Virgo)
 - ✅ 9 Planets: Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu, Ketu
 - ✅ Each planet with:
@@ -85,6 +87,7 @@ FREE_ASTROLOGY_API_KEY=your_key_here
 ### 2. **Test from Frontend**
 
 Start your Next.js app and visit:
+
 - `/dashboard` - Should generate birth charts using internal engine
 - `/my-kundlis` - Should save/load charts using internal data
 
@@ -110,19 +113,20 @@ Restart service: `python router.py`
 
 ## 📈 Benefits Achieved
 
-| Metric | Before | After |
-|--------|--------|-------|
-| **Requests/day** | 50 | ♾️ **Unlimited** |
-| **Cost** | $0 or paid | **$0 forever** |
-| **Latency** | 200-500ms | **5-15ms** |
-| **Rate limits** | Yes | **None** |
-| **External API dependency** | Yes | **No** |
+| Metric                      | Before     | After            |
+| --------------------------- | ---------- | ---------------- |
+| **Requests/day**            | 50         | ♾️ **Unlimited** |
+| **Cost**                    | $0 or paid | **$0 forever**   |
+| **Latency**                 | 200-500ms  | **5-15ms**       |
+| **Rate limits**             | Yes        | **None**         |
+| **External API dependency** | Yes        | **No**           |
 
 ---
 
 ## 🛠️ Service Management
 
 ### Start Service
+
 ```bash
 cd services/astro-core-python
 source .venv/bin/activate
@@ -130,6 +134,7 @@ python router.py
 ```
 
 ### Stop Service
+
 ```bash
 # Press Ctrl+C in the terminal where it's running
 # Or find and kill the process:
@@ -137,11 +142,13 @@ lsof -ti:4001 | xargs kill -9
 ```
 
 ### Check Service Status
+
 ```bash
 curl http://localhost:4001/health
 ```
 
 ### View Logs
+
 Service logs appear in terminal where `python router.py` is running.
 
 ---
@@ -168,6 +175,7 @@ Service logs appear in terminal where `python router.py` is running.
 ## 🔮 Phase 2 Enhancements (Future)
 
 When ready, you can add:
+
 - [ ] Panchang calculations (Tithi, Yoga, Karana)
 - [ ] Divisional charts (D2, D9, D10, etc.)
 - [ ] Dasa periods (Vimsottari)

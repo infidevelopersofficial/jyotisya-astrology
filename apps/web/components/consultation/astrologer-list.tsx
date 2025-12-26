@@ -1,100 +1,102 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { useState, useEffect } from 'react'
-import { Button, Card } from '@digital-astrology/ui'
-import BookingModal from './booking-modal'
+import Image from "next/image";
+import { useState, useEffect } from "react";
+import { Button, Card } from "@digital-astrology/ui";
+import BookingModal from "./booking-modal";
 
 interface Astrologer {
-  id: string
-  name: string
-  specialization: string[]
-  languages: string[]
-  experience: number
-  rating: number
-  totalReviews: number
-  hourlyRate: number
-  imageUrl: string
-  bio: string
-  verified: boolean
-  available: boolean
+  id: string;
+  name: string;
+  specialization: string[];
+  languages: string[];
+  experience: number;
+  rating: number;
+  totalReviews: number;
+  hourlyRate: number;
+  imageUrl: string;
+  bio: string;
+  verified: boolean;
+  available: boolean;
 }
 
 interface AstrologerListProps {
-  initialAstrologers?: Astrologer[]
+  initialAstrologers?: Astrologer[];
 }
 
 export default function AstrologerList({ initialAstrologers = [] }: AstrologerListProps) {
-  const [astrologers, setAstrologers] = useState<Astrologer[]>(initialAstrologers)
-  const [loading, setLoading] = useState(!initialAstrologers.length)
-  const [error, setError] = useState('')
-  const [filter, setFilter] = useState<'all' | 'available'>('all')
-  const [selectedAstrologer, setSelectedAstrologer] = useState<Astrologer | null>(null)
-  const [bookingSuccess, setBookingSuccess] = useState(false)
-  const [successConsultationId, setSuccessConsultationId] = useState<string | null>(null)
+  const [astrologers, setAstrologers] = useState<Astrologer[]>(initialAstrologers);
+  const [loading, setLoading] = useState(!initialAstrologers.length);
+  const [error, setError] = useState("");
+  const [filter, setFilter] = useState<"all" | "available">("all");
+  const [selectedAstrologer, setSelectedAstrologer] = useState<Astrologer | null>(null);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+  const [successConsultationId, setSuccessConsultationId] = useState<string | null>(null);
 
   useEffect(() => {
     // Only fetch if we don't have initial data
     if (!initialAstrologers.length) {
-      const abortController = new AbortController()
-      fetchAstrologers(abortController.signal)
+      const abortController = new AbortController();
+      fetchAstrologers(abortController.signal);
 
       // Cleanup: abort fetch on unmount
       return () => {
-        abortController.abort()
-      }
+        abortController.abort();
+      };
     }
+    return undefined;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []) // Run only once on mount
+  }, []); // Run only once on mount
 
   const fetchAstrologers = async (signal?: AbortSignal) => {
     try {
-      setLoading(true)
-      setError('') // Clear previous errors
+      setLoading(true);
+      setError(""); // Clear previous errors
 
-      const response = await fetch('/api/astrologers', {
+      const response = await fetch("/api/astrologers", {
         signal, // Pass abort signal to fetch
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch astrologers: ${response.status} ${response.statusText}`)
+        throw new Error(`Failed to fetch astrologers: ${response.status} ${response.statusText}`);
       }
 
-      const data = await response.json()
-      setAstrologers(data.astrologers || [])
-      setError('') // Clear error on success
+      const data = await response.json();
+      setAstrologers(data.astrologers || []);
+      setError(""); // Clear error on success
     } catch (err) {
       // Don't set error if request was aborted (component unmounted)
-      if (err instanceof Error && err.name === 'AbortError') {
-        console.log('Fetch aborted - component unmounted')
-        return
+      if (err instanceof Error && err.name === "AbortError") {
+        console.error("Fetch aborted - component unmounted");
+        return;
       }
 
-      console.error('Error fetching astrologers:', err)
+      console.error("Error fetching astrologers:", err);
 
       // Provide more specific error messages
-      if (err instanceof TypeError && err.message === 'Failed to fetch') {
-        setError('Cannot connect to server. Please ensure the development server is running.')
+      if (err instanceof TypeError && err.message === "Failed to fetch") {
+        setError("Cannot connect to server. Please ensure the development server is running.");
       } else {
-        setError(err instanceof Error ? err.message : 'Failed to load astrologers. Please try again.')
+        setError(
+          err instanceof Error ? err.message : "Failed to load astrologers. Please try again.",
+        );
       }
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const filteredAstrologers = filter === 'available'
-    ? astrologers.filter(a => a.available)
-    : astrologers
+  const filteredAstrologers =
+    filter === "available" ? astrologers.filter((a) => a.available) : astrologers;
 
   const handleBookingSuccess = (consultationId: string) => {
-    setSelectedAstrologer(null)
-    setSuccessConsultationId(consultationId)
-    setBookingSuccess(true)
-  }
+    setSelectedAstrologer(null);
+    setSuccessConsultationId(consultationId);
+    setBookingSuccess(true);
+  };
 
   if (loading) {
     return (
@@ -102,7 +104,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent"></div>
         <p className="mt-4 text-slate-300">Loading astrologers...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -113,7 +115,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
           Try Again
         </Button>
       </div>
-    )
+    );
   }
 
   if (astrologers.length === 0) {
@@ -123,7 +125,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
         <h3 className="text-xl font-semibold text-white mb-2">No Astrologers Available</h3>
         <p className="text-slate-300">Check back soon for expert consultations.</p>
       </div>
-    )
+    );
   }
 
   return (
@@ -138,7 +140,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
           </p>
           {successConsultationId && (
             <Button
-              onClick={() => window.location.href = `/consultations/${successConsultationId}`}
+              onClick={() => (window.location.href = `/consultations/${successConsultationId}`)}
             >
               View Details
             </Button>
@@ -149,16 +151,16 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
       {/* Filters */}
       <div className="flex gap-4 mb-6">
         <Button
-          variant={filter === 'all' ? 'primary' : 'secondary'}
-          onClick={() => setFilter('all')}
+          variant={filter === "all" ? "primary" : "secondary"}
+          onClick={() => setFilter("all")}
         >
           All Experts ({astrologers.length})
         </Button>
         <Button
-          variant={filter === 'available' ? 'primary' : 'secondary'}
-          onClick={() => setFilter('available')}
+          variant={filter === "available" ? "primary" : "secondary"}
+          onClick={() => setFilter("available")}
         >
-          Available Now ({astrologers.filter(a => a.available).length})
+          Available Now ({astrologers.filter((a) => a.available).length})
         </Button>
       </div>
 
@@ -167,7 +169,7 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
         {filteredAstrologers.map((astrologer) => (
           <Card
             key={astrologer.id}
-            title={`${astrologer.name}${astrologer.verified ? ' ✓' : ''}`}
+            title={`${astrologer.name}${astrologer.verified ? " ✓" : ""}`}
             subtitle={`${astrologer.experience} years • ₹${astrologer.hourlyRate}/hour`}
           >
             <div className="flex items-start gap-4">
@@ -184,29 +186,28 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
                   <span>⭐ {astrologer.rating.toFixed(1)}</span>
                   <span>
                     Status:
-                    <span className={astrologer.available ? 'text-green-400 ml-1' : 'text-red-400 ml-1'}>
-                      {astrologer.available ? 'Available' : 'Busy'}
+                    <span
+                      className={astrologer.available ? "text-green-400 ml-1" : "text-red-400 ml-1"}
+                    >
+                      {astrologer.available ? "Available" : "Busy"}
                     </span>
                   </span>
-                  {astrologer.totalReviews > 0 && (
-                    <span>{astrologer.totalReviews} reviews</span>
-                  )}
+                  {astrologer.totalReviews > 0 && <span>{astrologer.totalReviews} reviews</span>}
                 </div>
                 <p className="text-[13px] text-slate-200">
-                  Specialties: {astrologer.specialization.slice(0, 3).join(', ')}
-                  {astrologer.specialization.length > 3 && ` +${astrologer.specialization.length - 3} more`}
+                  Specialties: {astrologer.specialization.slice(0, 3).join(", ")}
+                  {astrologer.specialization.length > 3 &&
+                    ` +${astrologer.specialization.length - 3} more`}
                 </p>
                 <p className="text-[13px] text-slate-300">
-                  Languages: {astrologer.languages.join(', ')}
+                  Languages: {astrologer.languages.join(", ")}
                 </p>
               </div>
             </div>
 
             {/* Bio preview */}
             {astrologer.bio && (
-              <p className="mt-3 text-sm text-slate-300 line-clamp-2">
-                {astrologer.bio}
-              </p>
+              <p className="mt-3 text-sm text-slate-300 line-clamp-2">{astrologer.bio}</p>
             )}
 
             {/* Actions */}
@@ -241,5 +242,5 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
         />
       )}
     </>
-  )
+  );
 }

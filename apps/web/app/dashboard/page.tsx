@@ -1,19 +1,22 @@
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import Link from 'next/link'
-import DailyHoroscopeGrid from '@components/horoscope/daily-grid'
-import PanchangHighlights from '@components/sections/panchang-highlights'
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import DailyHoroscopeGrid from "@components/horoscope/daily-grid";
+import PanchangHighlights from "@components/sections/panchang-highlights";
 
 export default async function DashboardPage() {
   // Server-side authentication check
-  const supabase = await createClient()
-  const { data: { user }, error } = await supabase.auth.getUser()
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
 
   if (error || !user) {
-    redirect('/auth/signin?callbackUrl=/dashboard')
+    redirect("/auth/signin?callbackUrl=/dashboard");
   }
 
-  const displayName = user.user_metadata?.name || user.email?.split('@')[0] || 'there'
+  const displayName = user.user_metadata?.name || user.email?.split("@")[0] || "there";
 
   return (
     <div className="mx-auto min-h-screen max-w-7xl px-6 py-12 lg:px-16">
@@ -47,6 +50,13 @@ export default async function DashboardPage() {
             icon="🌟"
           />
           <ActionCard
+            title="Saved Charts"
+            description="View and manage your saved birth charts"
+            href="/dashboard/saved-charts"
+            gradient="from-blue-500 to-cyan-500"
+            icon="📊"
+          />
+          <ActionCard
             title="View All Horoscopes"
             description="Explore daily, weekly, and monthly predictions"
             href="/#daily-horoscope"
@@ -67,7 +77,7 @@ export default async function DashboardPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function ActionCard({
@@ -75,23 +85,25 @@ function ActionCard({
   description,
   href,
   gradient,
-  icon
+  icon,
 }: {
-  title: string
-  description: string
-  href: string
-  gradient: string
-  icon?: string
+  title: string;
+  description: string;
+  href: string;
+  gradient: string;
+  icon?: string;
 }) {
   return (
     <Link href={href} className="group">
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
-        <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-2xl`}>
+        <div
+          className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-2xl`}
+        >
           {icon}
         </div>
         <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
         <p className="text-sm text-slate-400">{description}</p>
       </div>
     </Link>
-  )
+  );
 }

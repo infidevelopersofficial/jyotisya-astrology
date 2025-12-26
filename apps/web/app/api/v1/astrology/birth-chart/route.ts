@@ -7,12 +7,12 @@
  * - Includes source tracking and deprecation headers
  */
 
-import { NextRequest, NextResponse } from 'next/server'
-import { z } from 'zod'
-import { withRouteHandler, ApiErrors } from '@/lib/api/route-handler'
-import { astrologyOrchestrator } from '@/lib/astrology/service-orchestrator'
-import { createAstrologyRequest } from '@/lib/astrology/client'
-import { logger } from '@/lib/monitoring/logger'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { withRouteHandler, ApiErrors } from "@/lib/api/route-handler";
+import { astrologyOrchestrator } from "@/lib/astrology/service-orchestrator";
+import { createAstrologyRequest } from "@/lib/astrology/client";
+import { logger } from "@/lib/monitoring/logger";
 
 // Request validation schema
 const BirthChartRequestSchema = z.object({
@@ -20,23 +20,21 @@ const BirthChartRequestSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   timezone: z.number().min(-12).max(14),
-  ayanamsha: z.enum(['lahiri', 'raman', 'krishnamurti', 'thirukanitham']).optional(),
-  observation_point: z.enum(['topocentric', 'geocentric']).optional(),
-})
+  ayanamsha: z.enum(["lahiri", "raman", "krishnamurti", "thirukanitham"]).optional(),
+  observation_point: z.enum(["topocentric", "geocentric"]).optional(),
+});
 
 export const POST = withRouteHandler(async (req: NextRequest) => {
   // Parse and validate request
-  const body = await req.json()
-  const validationResult = BirthChartRequestSchema.safeParse(body)
+  const body = await req.json();
+  const validationResult = BirthChartRequestSchema.safeParse(body);
 
   if (!validationResult.success) {
-    throw ApiErrors.validation(
-      'Invalid request body',
-      validationResult.error.errors
-    )
+    throw ApiErrors.validation("Invalid request body", validationResult.error.errors);
   }
 
-  const { dateTime, latitude, longitude, timezone, ayanamsha, observation_point } = validationResult.data
+  const { dateTime, latitude, longitude, timezone, ayanamsha, observation_point } =
+    validationResult.data;
 
   // Create astrology request
   const astrologyRequest = createAstrologyRequest(
@@ -49,21 +47,21 @@ export const POST = withRouteHandler(async (req: NextRequest) => {
     {
       ayanamsha,
       observation_point,
-    }
-  )
+    },
+  );
 
-  logger.debug('Birth chart request', {
+  logger.debug("Birth chart request", {
     date: dateTime,
     location: { latitude, longitude },
-  })
+  });
 
   // Get birth chart using orchestrator (auto-fallback)
-  const { data, source } = await astrologyOrchestrator.getBirthChart(astrologyRequest)
+  const { data, source } = await astrologyOrchestrator.getBirthChart(astrologyRequest);
 
-  logger.info('Birth chart generated', {
+  logger.info("Birth chart generated", {
     source,
     planets: data.planets?.length || 0,
-  })
+  });
 
   // Return with source information
   return NextResponse.json(
@@ -79,12 +77,12 @@ export const POST = withRouteHandler(async (req: NextRequest) => {
     {
       status: 200,
       headers: {
-        'X-Service-Source': source,
-        'Cache-Control': 'public, max-age=86400, s-maxage=86400', // 24 hours
+        "X-Service-Source": source,
+        "Cache-Control": "public, max-age=86400, s-maxage=86400", // 24 hours
       },
-    }
-  )
-})
+    },
+  );
+});
 
-export const runtime = 'nodejs'
-export const maxDuration = 30
+export const runtime = "nodejs";
+export const maxDuration = 30;

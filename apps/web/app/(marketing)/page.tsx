@@ -8,7 +8,7 @@ import FeaturesSection from "@components/sections/features";
 import TestimonialsSection from "@components/sections/testimonials";
 import MobileAppSection from "@components/sections/mobile-app";
 
-export default function HomePage() {
+export default function HomePage(): React.ReactElement {
   return (
     <main className="flex flex-col gap-24 pb-24">
       <Hero />

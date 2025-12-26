@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function AdminHome() {
+export default function AdminHome(): React.ReactElement {
   return (
     <main className="px-10 py-16">
       <h1 className="text-3xl font-bold">Admin Control Centre</h1>

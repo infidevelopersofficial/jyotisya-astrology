@@ -38,7 +38,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isPanchangResponse(value: unknown): value is PanchangResponse {
   if (!isRecord(value)) return false;
 
-  const record = value as Record<string, unknown>;
+  const record = value;
   return (
     typeof record.date === "string" &&
     typeof record.tithi === "string" &&
@@ -52,6 +52,6 @@ function isPanchangResponse(value: unknown): value is PanchangResponse {
 
 function isPanchangApiResponse(value: unknown): value is PanchangApiResponse {
   if (!isRecord(value)) return false;
-  const record = value as Record<string, unknown>;
+  const record = value;
   return isPanchangResponse(record.panchang);
 }

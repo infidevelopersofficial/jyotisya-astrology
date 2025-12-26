@@ -1,56 +1,27 @@
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
-import { updateSession } from './lib/supabase/middleware'
-import { addSecurityHeaders } from './lib/security/headers'
-import { createServerClient } from '@supabase/ssr'
-
-// Routes that require completed onboarding
-const PROTECTED_ROUTES = [
-  '/dashboard',
-  '/profile',
-  '/settings',
-  '/consultations',
-  '/my-kundlis',
-  '/orders',
-  '/favorites',
-]
+import type { NextRequest } from "next/server";
+import { updateSession } from "./lib/supabase/middleware";
+import { addSecurityHeaders } from "./lib/security/headers";
 
 // Routes that don't require onboarding (public or auth)
-const PUBLIC_ROUTES = [
-  '/',
-  '/auth',
-  '/onboarding',
-  '/shop',
-]
-
-/**
- * Check if a path is protected and requires onboarding
- */
-function isProtectedRoute(pathname: string): boolean {
-  return PROTECTED_ROUTES.some(route =>
-    pathname === route || pathname.startsWith(`${route}/`)
-  )
-}
+const PUBLIC_ROUTES = ["/", "/auth", "/onboarding", "/shop"];
 
 /**
  * Check if a path is public or auth-related
  */
 function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some(route =>
-    pathname === route || pathname.startsWith(`${route}/`)
-  )
+  return PUBLIC_ROUTES.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  const { pathname } = request.nextUrl;
 
   // Update Supabase session
-  let response = await updateSession(request)
+  let response = await updateSession(request);
 
   // Skip onboarding check for API routes and public routes
-  if (pathname.startsWith('/api') || isPublicRoute(pathname)) {
-    response = addSecurityHeaders(response, request)
-    return response
+  if (pathname.startsWith("/api") || isPublicRoute(pathname)) {
+    response = addSecurityHeaders(response, request);
+    return response;
   }
 
   // For protected routes, onboarding check is handled in the page components
@@ -58,9 +29,9 @@ export async function middleware(request: NextRequest) {
   // Pages will redirect to /onboarding if needed using client-side logic
 
   // Add security headers
-  response = addSecurityHeaders(response, request)
+  response = addSecurityHeaders(response, request);
 
-  return response
+  return response;
 }
 
 export const config = {
@@ -73,6 +44,6 @@ export const config = {
      * - api routes
      * - public folder
      */
-    '/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    "/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
-}
+};

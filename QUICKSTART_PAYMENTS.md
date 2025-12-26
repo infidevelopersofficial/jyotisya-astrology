@@ -58,6 +58,7 @@ npm run dev
 ### 3. Complete Payment (Test Mode)
 
 **Razorpay modal will open:**
+
 - **Card Number**: `4111 1111 1111 1111`
 - **CVV**: `123`
 - **Expiry**: `12/25` (any future date)
@@ -74,8 +75,8 @@ npm run dev
 
 ## 🧪 Test Cards
 
-| Card Number | Result |
-|-------------|--------|
+| Card Number         | Result     |
+| ------------------- | ---------- |
 | 4111 1111 1111 1111 | ✅ Success |
 | 4000 0000 0000 0002 | ❌ Decline |
 
@@ -84,21 +85,25 @@ npm run dev
 ## 📂 Key Files
 
 **Backend:**
+
 - `apps/web/lib/payments/razorpay.ts` - Payment functions
 - `apps/web/app/api/consultations/create-order/route.ts` - Create order
 - `apps/web/app/api/consultations/verify-payment/route.ts` - Verify payment
 - `apps/web/app/api/webhooks/razorpay/route.ts` - Webhook handler
 
 **Frontend:**
+
 - `apps/web/app/consultations/page.tsx` - Astrologers list
 - `apps/web/components/consultation/booking-modal.tsx` - Booking form
 - `apps/web/app/consultations/[id]/page.tsx` - Consultation details
 
 **Config:**
+
 - `apps/web/.env.local` - Razorpay keys
 - `apps/web/types/razorpay.d.ts` - TypeScript types
 
 **Utilities:**
+
 - `apps/web/scripts/seed-astrologers.ts` - Sample data
 
 ---

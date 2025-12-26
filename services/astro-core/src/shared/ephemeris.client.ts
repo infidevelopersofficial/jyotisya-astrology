@@ -12,8 +12,8 @@ export class EphemerisClient {
         summary: `Placeholder horoscope for Aries (${params.system})`,
         mood: "Optimistic",
         luckyNumber: "5",
-        luckyColor: "Gold"
-      }
+        luckyColor: "Gold",
+      },
     };
   }
 }

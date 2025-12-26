@@ -3,8 +3,8 @@
  * Handles conversion between UTC and local timezones for birth time display
  */
 
-import { format, parseISO } from 'date-fns'
-import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
+import { format, parseISO } from "date-fns";
+import { formatInTimeZone, toZonedTime } from "date-fns-tz";
 
 /**
  * Format birth time for display
@@ -18,66 +18,71 @@ import { formatInTimeZone, toZonedTime } from 'date-fns-tz'
  * @param timezone - Target timezone (default: "Asia/Kolkata" for IST)
  * @returns Formatted time string (e.g., "01:10 AM") or null
  */
+// eslint-disable-next-line complexity, max-lines-per-function
 export function formatBirthTime(
   birthTime: string | Date | null | undefined,
   birthDate?: string | Date | null,
-  timezone: string = 'Asia/Kolkata'
+  timezone: string = "Asia/Kolkata",
 ): string | null {
-  if (!birthTime) return null
+  if (!birthTime) return null;
 
   try {
     // Case 1: birthTime is already in "HH:MM" format (expected format)
-    if (typeof birthTime === 'string' && /^\d{1,2}:\d{2}$/.test(birthTime)) {
+    if (typeof birthTime === "string" && /^\d{1,2}:\d{2}$/.test(birthTime)) {
       // Parse HH:MM and format to 12-hour with AM/PM
-      const [hours, minutes] = birthTime.split(':').map(Number)
-      const date = new Date()
-      date.setHours(hours, minutes, 0, 0)
-      return format(date, 'hh:mm a') // e.g., "01:10 AM"
+      const [hours, minutes] = birthTime.split(":").map(Number);
+      if (hours !== undefined && minutes !== undefined) {
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return format(date, "hh:mm a"); // e.g., "01:10 AM"
+      }
     }
 
     // Case 2: birthTime contains UTC timestamp (e.g., "19:40:00.000Z")
-    if (typeof birthTime === 'string' && birthTime.includes('Z')) {
+    if (typeof birthTime === "string" && birthTime.includes("Z")) {
       // Handle time-only UTC strings (missing date part)
-      let dateTimeStr = birthTime
+      let dateTimeStr = birthTime;
 
       // If birthTime is just time with Z (e.g., "19:40:00.000Z"), prepend today's date
       if (/^\d{2}:\d{2}:\d{2}(\.\d{3})?Z$/.test(birthTime)) {
         // Use provided birthDate or today's date
         const datePrefix = birthDate
-          ? (typeof birthDate === 'string' ? birthDate.split('T')[0] : format(birthDate, 'yyyy-MM-dd'))
-          : format(new Date(), 'yyyy-MM-dd')
-        dateTimeStr = `${datePrefix}T${birthTime}`
+          ? typeof birthDate === "string"
+            ? (birthDate.split("T")[0] ?? "")
+            : format(birthDate, "yyyy-MM-dd")
+          : format(new Date(), "yyyy-MM-dd");
+        dateTimeStr = `${datePrefix}T${birthTime}`;
       }
 
       // Parse ISO string and convert to target timezone
-      const utcDate = parseISO(dateTimeStr)
+      const utcDate = parseISO(dateTimeStr);
       if (isNaN(utcDate.getTime())) {
-        return null // Invalid date
+        return null; // Invalid date
       }
-      return formatInTimeZone(utcDate, timezone, 'hh:mm a')
+      return formatInTimeZone(utcDate, timezone, "hh:mm a");
     }
 
     // Case 3: birthTime is a Date object
     if (birthTime instanceof Date) {
-      return formatInTimeZone(birthTime, timezone, 'hh:mm a')
+      return formatInTimeZone(birthTime, timezone, "hh:mm a");
     }
 
     // Case 4: birthTime is ISO string with date (e.g., "2025-12-01T19:40:00.000Z")
-    if (typeof birthTime === 'string') {
+    if (typeof birthTime === "string") {
       try {
-        const parsed = parseISO(birthTime)
+        const parsed = parseISO(birthTime);
         if (!isNaN(parsed.getTime())) {
-          return formatInTimeZone(parsed, timezone, 'hh:mm a')
+          return formatInTimeZone(parsed, timezone, "hh:mm a");
         }
       } catch {
         // Fall through to return null
       }
     }
 
-    return null
-  } catch (error) {
-    console.error('Error formatting birth time:', error, { birthTime, timezone })
-    return null
+    return null;
+  } catch (error: unknown) {
+    console.error("Error formatting birth time:", error, { birthTime, timezone });
+    return null;
   }
 }
 
@@ -93,24 +98,24 @@ export function formatBirthTime(
 export function formatBirthDateTime(
   birthDate: string | Date | null | undefined,
   birthTime: string | Date | null | undefined,
-  timezone: string = 'Asia/Kolkata'
+  timezone: string = "Asia/Kolkata",
 ): string | null {
-  if (!birthDate) return null
+  if (!birthDate) return null;
 
   try {
-    const date = typeof birthDate === 'string' ? parseISO(birthDate) : birthDate
-    const formattedDate = format(date, 'MMMM d, yyyy')
-    const formattedTime = formatBirthTime(birthTime, birthDate, timezone)
+    const date = typeof birthDate === "string" ? parseISO(birthDate) : birthDate;
+    const formattedDate = format(date, "MMMM d, yyyy");
+    const formattedTime = formatBirthTime(birthTime, birthDate, timezone);
 
     if (formattedTime) {
-      const tzAbbr = getTimezoneAbbreviation(timezone)
-      return `${formattedDate} at ${formattedTime} ${tzAbbr}`
+      const tzAbbr = getTimezoneAbbreviation(timezone);
+      return `${formattedDate} at ${formattedTime} ${tzAbbr}`;
     }
 
-    return formattedDate
-  } catch (error) {
-    console.error('Error formatting birth date time:', error)
-    return null
+    return formattedDate;
+  } catch (error: unknown) {
+    console.error("Error formatting birth date time:", error);
+    return null;
   }
 }
 
@@ -123,18 +128,18 @@ export function formatBirthDateTime(
  */
 export function getTimezoneAbbreviation(timezone: string): string {
   const abbreviations: Record<string, string> = {
-    'Asia/Kolkata': 'IST',
-    'Asia/Calcutta': 'IST',
-    'America/New_York': 'EST',
-    'America/Los_Angeles': 'PST',
-    'Europe/London': 'GMT',
-    'Europe/Paris': 'CET',
-    'Asia/Dubai': 'GST',
-    'Asia/Singapore': 'SGT',
-    'Australia/Sydney': 'AEDT',
-  }
+    "Asia/Kolkata": "IST",
+    "Asia/Calcutta": "IST",
+    "America/New_York": "EST",
+    "America/Los_Angeles": "PST",
+    "Europe/London": "GMT",
+    "Europe/Paris": "CET",
+    "Asia/Dubai": "GST",
+    "Asia/Singapore": "SGT",
+    "Australia/Sydney": "AEDT",
+  };
 
-  return abbreviations[timezone] || ''
+  return abbreviations[timezone] || "";
 }
 
 /**
@@ -145,37 +150,44 @@ export function getTimezoneAbbreviation(timezone: string): string {
  * @returns 24-hour format string (e.g., "01:10", "13:30") or null
  */
 export function parseTimeTo24Hour(timeString: string | null | undefined): string | null {
-  if (!timeString) return null
+  if (!timeString) return null;
 
   try {
     // Already in 24-hour format (HH:MM or H:MM)
     if (/^\d{1,2}:\d{2}$/.test(timeString)) {
-      const [hours, minutes] = timeString.split(':').map(Number)
-      if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
-        return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+      const [hours, minutes] = timeString.split(":").map(Number);
+      if (
+        hours !== undefined &&
+        minutes !== undefined &&
+        hours >= 0 &&
+        hours < 24 &&
+        minutes >= 0 &&
+        minutes < 60
+      ) {
+        return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
       }
     }
 
     // 12-hour format with AM/PM
-    const match = timeString.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i)
-    if (match) {
-      let hours = parseInt(match[1], 10)
-      const minutes = parseInt(match[2], 10)
-      const meridiem = match[3].toLowerCase()
+    const match = timeString.match(/^(\d{1,2}):(\d{2})\s*(am|pm)$/i);
+    if (match && match[1] && match[2] && match[3]) {
+      let hours = parseInt(match[1], 10);
+      const minutes = parseInt(match[2], 10);
+      const meridiem = match[3].toLowerCase();
 
-      if (meridiem === 'pm' && hours !== 12) {
-        hours += 12
-      } else if (meridiem === 'am' && hours === 12) {
-        hours = 0
+      if (meridiem === "pm" && hours !== 12) {
+        hours += 12;
+      } else if (meridiem === "am" && hours === 12) {
+        hours = 0;
       }
 
-      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+      return `${hours.toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
     }
 
-    return null
-  } catch (error) {
-    console.error('Error parsing time to 24-hour format:', error, { timeString })
-    return null
+    return null;
+  } catch (error: unknown) {
+    console.error("Error parsing time to 24-hour format:", error, { timeString });
+    return null;
   }
 }
 
@@ -191,20 +203,20 @@ export function parseTimeTo24Hour(timeString: string | null | undefined): string
 export function convertLocalTimeToUTC(
   date: string | Date,
   time: string,
-  timezone: string = 'Asia/Kolkata'
+  timezone: string = "Asia/Kolkata",
 ): string {
   try {
-    const dateStr = typeof date === 'string' ? date : format(date, 'yyyy-MM-dd')
-    const dateTimeStr = `${dateStr}T${time}:00`
+    const dateStr = typeof date === "string" ? date : format(date, "yyyy-MM-dd");
+    const dateTimeStr = `${dateStr}T${time}:00`;
 
     // Create a date in the specified timezone
-    const zonedDate = toZonedTime(dateTimeStr, timezone)
+    const zonedDate = toZonedTime(dateTimeStr, timezone);
 
     // Return as ISO string (UTC)
-    return zonedDate.toISOString()
-  } catch (error) {
-    console.error('Error converting local time to UTC:', error)
-    throw error
+    return zonedDate.toISOString();
+  } catch (error: unknown) {
+    console.error("Error converting local time to UTC:", error);
+    throw error;
   }
 }
 
@@ -218,13 +230,13 @@ export function convertLocalTimeToUTC(
  */
 export function extractTimeFromUTC(
   utcDateTime: string | Date,
-  timezone: string = 'Asia/Kolkata'
+  timezone: string = "Asia/Kolkata",
 ): string | null {
   try {
-    const date = typeof utcDateTime === 'string' ? parseISO(utcDateTime) : utcDateTime
-    return formatInTimeZone(date, timezone, 'HH:mm')
-  } catch (error) {
-    console.error('Error extracting time from UTC:', error)
-    return null
+    const date = typeof utcDateTime === "string" ? parseISO(utcDateTime) : utcDateTime;
+    return formatInTimeZone(date, timezone, "HH:mm");
+  } catch (error: unknown) {
+    console.error("Error extracting time from UTC:", error);
+    return null;
   }
 }

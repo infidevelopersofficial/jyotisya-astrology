@@ -9,42 +9,42 @@ Comprehensive performance monitoring utilities for tracking and optimizing appli
 ### 1. Measure Async Operations
 
 ```typescript
-import { measureAsync } from '@/lib/monitoring/performance'
+import { measureAsync } from "@/lib/monitoring/performance";
 
 const data = await measureAsync(
-  'fetchUserProfile',
+  "fetchUserProfile",
   async () => {
-    return await fetch('/api/user/profile').then(r => r.json())
+    return await fetch("/api/user/profile").then((r) => r.json());
   },
-  { userId: user.id }
-)
+  { userId: user.id },
+);
 ```
 
 ### 2. Measure Sync Operations
 
 ```typescript
-import { measureSync } from '@/lib/monitoring/performance'
+import { measureSync } from "@/lib/monitoring/performance";
 
 const result = measureSync(
-  'calculateHoroscope',
+  "calculateHoroscope",
   () => {
-    return performComplexCalculation(birthData)
+    return performComplexCalculation(birthData);
   },
-  { operation: 'vedic-calculation' }
-)
+  { operation: "vedic-calculation" },
+);
 ```
 
 ### 3. Start/Stop Timer
 
 ```typescript
-import { startTimer } from '@/lib/monitoring/performance'
+import { startTimer } from "@/lib/monitoring/performance";
 
-const endTimer = startTimer('dataProcessing', { batchSize: 1000 })
+const endTimer = startTimer("dataProcessing", { batchSize: 1000 });
 
 // ... perform operations ...
 
-const { duration } = endTimer({ recordsProcessed: 1000 })
-console.log(`Processed 1000 records in ${duration}ms`)
+const { duration } = endTimer({ recordsProcessed: 1000 });
+console.log(`Processed 1000 records in ${duration}ms`);
 ```
 
 ## API Tracking
@@ -52,13 +52,13 @@ console.log(`Processed 1000 records in ${duration}ms`)
 ### Track HTTP Requests
 
 ```typescript
-import { trackApiRequest } from '@/lib/monitoring/performance'
+import { trackApiRequest } from "@/lib/monitoring/performance";
 
 export async function GET(request: Request) {
-  return trackApiRequest('GET', '/api/horoscope', async () => {
-    const data = await fetchHoroscopeData()
-    return NextResponse.json(data)
-  })
+  return trackApiRequest("GET", "/api/horoscope", async () => {
+    const data = await fetchHoroscopeData();
+    return NextResponse.json(data);
+  });
 }
 ```
 
@@ -68,19 +68,19 @@ Wrap all API routes:
 
 ```typescript
 // middleware.ts
-import { measureAsync } from '@/lib/monitoring/performance'
+import { measureAsync } from "@/lib/monitoring/performance";
 
 export async function middleware(request: NextRequest) {
   return measureAsync(
-    'api_request',
+    "api_request",
     async () => {
-      return NextResponse.next()
+      return NextResponse.next();
     },
     {
       method: request.method,
       path: request.nextUrl.pathname,
-    }
-  )
+    },
+  );
 }
 ```
 
@@ -89,26 +89,26 @@ export async function middleware(request: NextRequest) {
 Database queries are automatically tracked via the Prisma client:
 
 ```typescript
-import { prisma } from '@/lib/db/prisma'
+import { prisma } from "@/lib/db/prisma";
 
 // Automatically logged if query takes > 1 second
-const users = await prisma.user.findMany()
+const users = await prisma.user.findMany();
 ```
 
 Custom tracking:
 
 ```typescript
-import { measureAsync } from '@/lib/monitoring/performance'
+import { measureAsync } from "@/lib/monitoring/performance";
 
 const result = await measureAsync(
-  'complex_database_query',
+  "complex_database_query",
   async () => {
     return await prisma.$queryRaw`
       SELECT * FROM users WHERE created_at > NOW() - INTERVAL '1 day'
-    `
+    `;
   },
-  { queryType: 'recent_users' }
-)
+  { queryType: "recent_users" },
+);
 ```
 
 ## React Component Tracking
@@ -156,9 +156,9 @@ export function DataFetchingComponent() {
 Add to `app/layout.tsx`:
 
 ```typescript
-import { reportWebVitals } from '@/lib/monitoring/performance'
+import { reportWebVitals } from "@/lib/monitoring/performance";
 
-export { reportWebVitals }
+export { reportWebVitals };
 ```
 
 Or use Next.js built-in:
@@ -166,7 +166,7 @@ Or use Next.js built-in:
 ```typescript
 // app/layout.tsx
 export function reportWebVitals(metric: any) {
-  console.log(metric)
+  console.log(metric);
   // Send to analytics
 }
 ```
@@ -184,26 +184,26 @@ export function reportWebVitals(metric: any) {
 Set maximum acceptable durations for operations:
 
 ```typescript
-import { performanceBudget } from '@/lib/monitoring/performance'
+import { performanceBudget } from "@/lib/monitoring/performance";
 
 // Set custom budgets
-performanceBudget.setBudget('fetchUserData', 500) // 500ms max
-performanceBudget.setBudget('renderDashboard', 1000) // 1 second max
+performanceBudget.setBudget("fetchUserData", 500); // 500ms max
+performanceBudget.setBudget("renderDashboard", 1000); // 1 second max
 
 // Check against budget (automatically logs warnings)
-const endTimer = startTimer('fetchUserData')
-const data = await fetchData()
-const { duration } = endTimer()
+const endTimer = startTimer("fetchUserData");
+const data = await fetchData();
+const { duration } = endTimer();
 
-performanceBudget.check('fetchUserData', duration)
+performanceBudget.check("fetchUserData", duration);
 ```
 
 ### Default Budgets
 
-| Operation | Budget | Description |
-|-----------|--------|-------------|
-| `api_request` | 2000ms | Maximum API response time |
-| `page_load` | 3000ms | Maximum page load time |
+| Operation        | Budget | Description                 |
+| ---------------- | ------ | --------------------------- |
+| `api_request`    | 2000ms | Maximum API response time   |
+| `page_load`      | 3000ms | Maximum page load time      |
 | `database_query` | 1000ms | Maximum database query time |
 
 ## Metrics API
@@ -269,10 +269,10 @@ Performance metrics are automatically sent to Sentry:
 // - Web Vitals
 // - Custom metrics
 
-Sentry.metrics.distribution('performance.api_request', duration, {
-  unit: 'millisecond',
-  tags: { endpoint: '/api/users' }
-})
+Sentry.metrics.distribution("performance.api_request", duration, {
+  unit: "millisecond",
+  tags: { endpoint: "/api/users" },
+});
 ```
 
 ### Logs
@@ -283,16 +283,16 @@ All performance measurements are logged:
 // Development: Pretty-printed console logs
 // Production: JSON logs for aggregation
 
-logger.debug('Performance: fetchUserData', {
-  duration: '245.67ms',
-  userId: '123'
-})
+logger.debug("Performance: fetchUserData", {
+  duration: "245.67ms",
+  userId: "123",
+});
 
 // Slow operations automatically logged as warnings
-logger.warn('Slow operation detected', {
-  operation: 'complexQuery',
-  duration: '2500ms'
-})
+logger.warn("Slow operation detected", {
+  operation: "complexQuery",
+  duration: "2500ms",
+});
 ```
 
 ## Performance Marks & Measures
@@ -300,19 +300,19 @@ logger.warn('Slow operation detected', {
 Use Web Performance API:
 
 ```typescript
-import { mark, measure } from '@/lib/monitoring/performance'
+import { mark, measure } from "@/lib/monitoring/performance";
 
 // Mark start
-mark('fetchStart')
+mark("fetchStart");
 
-await fetchData()
+await fetchData();
 
 // Mark end
-mark('fetchEnd')
+mark("fetchEnd");
 
 // Measure duration
-const duration = measure('dataFetch', 'fetchStart', 'fetchEnd')
-console.log(`Fetch took ${duration}ms`)
+const duration = measure("dataFetch", "fetchStart", "fetchEnd");
+console.log(`Fetch took ${duration}ms`);
 ```
 
 ## Decorator Pattern
@@ -320,10 +320,10 @@ console.log(`Fetch took ${duration}ms`)
 Use decorators for class methods (TypeScript 5+):
 
 ```typescript
-import { tracked } from '@/lib/monitoring/performance'
+import { tracked } from "@/lib/monitoring/performance";
 
 class AstrologyService {
-  @tracked('AstrologyService.calculateChart')
+  @tracked("AstrologyService.calculateChart")
   async calculateChart(birthData: BirthData) {
     // Implementation
     // Automatically tracked!
@@ -341,6 +341,7 @@ class AstrologyService {
 ### 1. Track Critical Paths
 
 Focus on user-facing operations:
+
 - Page loads
 - API requests
 - Database queries
@@ -361,20 +362,17 @@ measureAsync('getData', ...)
 ### 3. Add Context Metadata
 
 ```typescript
-measureAsync(
-  'fetchHoroscope',
-  fetchFn,
-  {
-    userId: user.id,
-    zodiacSign: 'Aries',
-    language: 'en',
-  }
-)
+measureAsync("fetchHoroscope", fetchFn, {
+  userId: user.id,
+  zodiacSign: "Aries",
+  language: "en",
+});
 ```
 
 ### 4. Set Realistic Budgets
 
 Base budgets on:
+
 - User expectations
 - Industry standards
 - Historical data
@@ -383,6 +381,7 @@ Base budgets on:
 ### 5. Monitor Trends
 
 Track metrics over time:
+
 - Set up alerts for degradation
 - Compare across releases
 - Identify seasonal patterns

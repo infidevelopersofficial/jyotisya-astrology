@@ -52,6 +52,7 @@ curl -X POST http://localhost:3000/api/v1/astrology/birth-chart \
 ## 📁 What Was Created
 
 ### Infrastructure
+
 ```
 services/astro-core-python/
 ├── railway.toml              # Railway deployment config
@@ -68,6 +69,7 @@ apps/web/
 ```
 
 ### Services
+
 ```
 apps/web/lib/astrology/
 ├── python-client.ts          # Railway Python service client
@@ -77,6 +79,7 @@ apps/web/lib/astrology/
 ```
 
 ### API Routes
+
 ```
 apps/web/app/api/v1/astrology/
 ├── birth-chart/route.ts      # Enhanced endpoint
@@ -110,18 +113,21 @@ apps/web/app/api/v1/astrology/
 ## 🧪 Testing Checklist
 
 ### Local Testing
+
 - [ ] Python service responds to `/health`
 - [ ] Birth chart returns `"source": "python"`
 - [ ] Status endpoint shows service health
 - [ ] Invalid requests return 400 errors
 
 ### Service Failover
+
 - [ ] Stop Railway service
 - [ ] Birth chart falls back to FreeAstrologyAPI
 - [ ] Response shows `"source": "freeastrology"`
 - [ ] Circuit breaker opens after 5 failures
 
 ### Production Readiness
+
 - [ ] Railway service deployed
 - [ ] Vercel env vars updated
 - [ ] All endpoints tested
@@ -158,6 +164,7 @@ curl http://localhost:3000/api/v1/astrology/status | jq
 ## 🔧 Common Issues & Fixes
 
 ### Python Service Not Responding
+
 ```bash
 # Check Railway logs
 railway logs
@@ -170,6 +177,7 @@ curl https://your-railway-url.railway.app/health
 ```
 
 ### Circuit Breaker Open
+
 ```bash
 # Wait 60 seconds for auto-reset
 # Or restart Next.js dev server
@@ -177,6 +185,7 @@ curl https://your-railway-url.railway.app/health
 ```
 
 ### Rate Limit Exceeded
+
 ```bash
 # Check status endpoint
 curl http://localhost:3000/api/v1/astrology/status
@@ -190,12 +199,14 @@ curl http://localhost:3000/api/v1/astrology/status
 ## 📝 Next: Choose Your Feature
 
 ### Option A: Chart Generation (Visual Features)
+
 - SVG charts with 4 styles
 - Divisional charts (D1-D60)
 - PDF export
 - **Time**: 3-4 days
 
 ### Option B: AI Interpretations (Engagement)
+
 - OpenAI birth chart analysis
 - Streaming responses
 - Smart caching

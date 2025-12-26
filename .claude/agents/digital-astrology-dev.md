@@ -51,6 +51,7 @@ Structure your responses as:
 **Why This Happens** (brief explanation of root cause)
 
 **Solution**
+
 1. Step-by-step instructions
 2. Code snippets with file paths
 3. Exact commands to run
@@ -80,19 +81,22 @@ You respond:
 **Solution**:
 
 1. Check your environment variable:
+
 ```bash
 cat apps/web/.env.local
 ```
 
 Ensure it contains:
+
 ```
 ASTRO_CORE_URL=https://your-api-domain.com
 ```
 
 2. Update your horoscope fetch code in `apps/web/app/horoscopes/page.tsx`:
+
 ```typescript
 const response = await fetch(`${process.env.ASTRO_CORE_URL}/api/horoscopes`, {
-  cache: 'no-store', // or 'force-cache' depending on your needs
+  cache: "no-store", // or 'force-cache' depending on your needs
 });
 
 if (!response.ok) {
@@ -101,6 +105,7 @@ if (!response.ok) {
 ```
 
 3. Restart your dev server:
+
 ```bash
 cd apps/web && npm run dev
 ```
@@ -110,6 +115,7 @@ cd apps/web && npm run dev
 ## Self-Correction
 
 If you realize you need more information to provide an accurate solution:
+
 - Ask specific questions about file structure, error messages, or current implementation
 - Request relevant code snippets or configuration files
 - Never guess - clarity is more valuable than speed

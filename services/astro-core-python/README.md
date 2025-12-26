@@ -10,6 +10,7 @@ Switch between backends via environment variable `ASTROLOGY_BACKEND=internal|fre
 ## Features
 
 ### Internal Calculation Engine (NEW!)
+
 - `POST /planets`: Calculate birth chart with planetary positions using Skyfield (JPL DE421 ephemeris)
 - Sidereal (Vedic) coordinates with Lahiri ayanamsha
 - Ascendant & house calculations (Whole Sign + Placidus)
@@ -18,6 +19,7 @@ Switch between backends via environment variable `ASTROLOGY_BACKEND=internal|fre
 - Same API contract as FreeAstrologyAPI
 
 ### FreeAstrologyAPI Proxy (Legacy)
+
 - `GET /horoscope/daily`: Fetches planetary snapshot data for a single sign
 - `GET /horoscope/daily/batch`: Hydrates all twelve signs in parallel
 - `GET /panchang/today`: Returns Panchang details
@@ -128,15 +130,15 @@ pytest
 
 ## Why Use Internal Engine?
 
-| Feature | Internal Engine | FreeAstrologyAPI |
-|---------|----------------|------------------|
-| **Cost** | Free | $0 (50 req/day) or paid plans |
-| **Requests** | Unlimited | 50/day (free tier) |
-| **Accuracy** | JPL DE421 (NASA data) | Commercial ephemeris |
-| **Privacy** | Local calculations | External API calls |
-| **Latency** | 5-15ms | 200-500ms |
-| **Customization** | Full control | Limited |
-| **Dependencies** | Skyfield (~50MB) | None |
+| Feature           | Internal Engine       | FreeAstrologyAPI              |
+| ----------------- | --------------------- | ----------------------------- |
+| **Cost**          | Free                  | $0 (50 req/day) or paid plans |
+| **Requests**      | Unlimited             | 50/day (free tier)            |
+| **Accuracy**      | JPL DE421 (NASA data) | Commercial ephemeris          |
+| **Privacy**       | Local calculations    | External API calls            |
+| **Latency**       | 5-15ms                | 200-500ms                     |
+| **Customization** | Full control          | Limited                       |
+| **Dependencies**  | Skyfield (~50MB)      | None                          |
 
 ## Documentation
 
