@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Optional, Dict
 
 from fastapi import Depends, FastAPI, HTTPException, Query
 
@@ -20,7 +20,7 @@ def get_client(settings: Annotated[Settings, Depends(get_settings)]) -> FreeAstr
 
 
 @app.get("/healthz")
-async def health() -> dict[str, str]:
+async def health() -> Dict[str, str]:
   return {"status": "ok", "source": "freeastrologyapi-proxy"}
 
 
@@ -31,9 +31,9 @@ async def health() -> dict[str, str]:
 )
 async def daily_horoscope(
   sun_sign: Annotated[str, Query(alias="sunSign")],
-  locale: Annotated[str | None, Query()] = None,
-  date: Annotated[str | None, Query()] = None,
-  timezone: Annotated[str | None, Query()] = None,
+  locale: Annotated[Optional[str], Query()] = None,
+  date: Annotated[Optional[str], Query()] = None,
+  timezone: Annotated[Optional[str], Query()] = None,
   client: FreeAstrologyApiClient = Depends(get_client),
   settings: Settings = Depends(get_settings),
 ) -> DailyHoroscopeResult:
@@ -50,12 +50,12 @@ async def daily_horoscope(
   responses={200: {"description": "Dictionary keyed by Western sun sign"}, 502: {"model": ErrorResponse}},
 )
 async def daily_batch(
-  locale: Annotated[str | None, Query()] = None,
-  date: Annotated[str | None, Query()] = None,
-  timezone: Annotated[str | None, Query()] = None,
+  locale: Annotated[Optional[str], Query()] = None,
+  date: Annotated[Optional[str], Query()] = None,
+  timezone: Annotated[Optional[str], Query()] = None,
   client: FreeAstrologyApiClient = Depends(get_client),
   settings: Settings = Depends(get_settings),
-) -> dict[str, dict[str, str | None]]:
+) -> Dict[str, Dict[str, Optional[str]]]:
   target_locale = locale or settings.default_locale
   signs = [
     "aries",
@@ -72,7 +72,7 @@ async def daily_batch(
     "pisces",
   ]
 
-  results: dict[str, dict[str, str | None]] = {}
+  results: Dict[str, Dict[str, Optional[str]]] = {}
   for sign in signs:
     try:
       payload = await client.get_daily_horoscope_data(sign=sign, locale=target_locale, date=date, timezone_name=timezone)
@@ -96,9 +96,9 @@ async def daily_batch(
   responses={502: {"model": ErrorResponse}},
 )
 async def today_panchang(
-  locale: Annotated[str | None, Query()] = None,
-  date: Annotated[str | None, Query()] = None,
-  timezone: Annotated[str | None, Query()] = None,
+  locale: Annotated[Optional[str], Query()] = None,
+  date: Annotated[Optional[str], Query()] = None,
+  timezone: Annotated[Optional[str], Query()] = None,
   client: FreeAstrologyApiClient = Depends(get_client),
   settings: Settings = Depends(get_settings),
 ) -> PanchangResult:

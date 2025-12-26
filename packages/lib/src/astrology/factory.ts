@@ -23,14 +23,16 @@ function createProvider(): AstrologyProvider {
     const apiKey = process.env.JYOTISH_API_KEY;
 
     if (!baseUrl || !apiKey) {
-      console.warn("[astrology] Missing Jyotish API credentials, falling back to open-source provider.");
+      console.warn(
+        "[astrology] Missing Jyotish API credentials, falling back to open-source provider.",
+      );
       return new OpenSourceAstrologyProvider();
     }
 
     return new JyotishApiProvider({
       baseUrl,
       apiKey,
-      timeoutMs: Number(process.env.JYOTISH_API_TIMEOUT_MS ?? 8000)
+      timeoutMs: Number(process.env.JYOTISH_API_TIMEOUT_MS ?? 8000),
     });
   }
 

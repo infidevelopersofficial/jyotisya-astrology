@@ -22,25 +22,25 @@ const SIGN_MAP: Array<{
   { sunSign: "sagittarius", western: "Sagittarius", vedic: "Dhanu" },
   { sunSign: "capricorn", western: "Capricorn", vedic: "Makara" },
   { sunSign: "aquarius", western: "Aquarius", vedic: "Kumbha" },
-  { sunSign: "pisces", western: "Pisces", vedic: "Meena" }
+  { sunSign: "pisces", western: "Pisces", vedic: "Meena" },
 ];
 
 type SystemType = "vedic" | "western";
 
-export default function DailyHoroscopeGrid() {
+export default function DailyHoroscopeGrid(): React.ReactElement {
   const [system, setSystem] = useState<SystemType>("western");
 
   const locale: LocaleCode = system === "vedic" ? "hi" : "en";
 
   const { data, isLoading } = useQuery({
     queryKey: ["horoscope", "daily", system],
-    queryFn: () => getDailyHoroscope({ system, locale })
+    queryFn: () => getDailyHoroscope({ system, locale }),
   });
 
   const signs = SIGN_MAP.map((sign) => ({
     ...sign,
     label: system === "vedic" ? sign.vedic : sign.western,
-    dataKey: sign.western
+    dataKey: sign.western,
   }));
 
   return (

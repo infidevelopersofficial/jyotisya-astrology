@@ -51,7 +51,7 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
       narrative,
       promptTokens: response.usage?.prompt_tokens,
       completionTokens: response.usage?.completion_tokens,
-      raw: response
+      raw: response,
     };
   }
 
@@ -64,7 +64,7 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
         method: "POST",
         headers: {
           Authorization: `Bearer ${this.apiKey}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           model: this.model,
@@ -73,15 +73,15 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
             {
               role: "system",
               content:
-                "You are a senior Vedic astrologer creating concise daily guidance. Blend practical advice with spiritual nuance. Never fabricate planetary data; rely only on facts provided."
+                "You are a senior Vedic astrologer creating concise daily guidance. Blend practical advice with spiritual nuance. Never fabricate planetary data; rely only on facts provided.",
             },
             {
               role: "user",
-              content: prompt
-            }
-          ]
+              content: prompt,
+            },
+          ],
         }),
-        signal: controller.signal
+        signal: controller.signal,
       });
 
       if (!response.ok) {

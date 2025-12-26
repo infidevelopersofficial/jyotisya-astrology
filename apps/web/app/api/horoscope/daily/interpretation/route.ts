@@ -4,7 +4,7 @@ import {
   getAstrologyProvider,
   getInterpretationProvider,
   LocaleCode,
-  SunSign
+  SunSign,
 } from "@digital-astrology/lib";
 
 const SUN_SIGNS = [
@@ -19,7 +19,7 @@ const SUN_SIGNS = [
   "sagittarius",
   "capricorn",
   "aquarius",
-  "pisces"
+  "pisces",
 ] as const satisfies readonly SunSign[];
 
 const SUPPORTED_LOCALES = ["en", "hi", "ta"] as const satisfies readonly LocaleCode[];
@@ -33,10 +33,11 @@ const querySchema = z.object({
   timezone: z.string().default("Asia/Kolkata"),
   locale: z.enum(SUPPORTED_LOCALES).default("en"),
   tone: z.enum(TONES).optional(),
-  focus: z.enum(FOCUS_AREAS).optional()
+  focus: z.enum(FOCUS_AREAS).optional(),
 });
 
-export async function GET(request: NextRequest) {
+// eslint-disable-next-line complexity, max-lines-per-function
+export async function GET(request: NextRequest): Promise<NextResponse> {
   const searchParams = Object.fromEntries(new URL(request.url).searchParams.entries());
   const parsed = querySchema.safeParse(searchParams);
 
@@ -45,9 +46,9 @@ export async function GET(request: NextRequest) {
       {
         error: "invalid_request",
         message: "Invalid horoscope interpretation parameters",
-        details: parsed.error.flatten().fieldErrors
+        details: parsed.error.flatten().fieldErrors,
       },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -56,37 +57,37 @@ export async function GET(request: NextRequest) {
   try {
     const [astrologyProvider, interpretationProvider] = await Promise.all([
       getAstrologyProvider(),
-      getInterpretationProvider()
+      getInterpretationProvider(),
     ]);
 
     const deterministic = await astrologyProvider.getDailyHoroscope({
       sunSign,
       date,
       timezone,
-      locale
+      locale,
     });
 
     const interpretation = await interpretationProvider.generateDailyNarrative({
       horoscope: deterministic,
       tone,
       focus,
-      locale
+      locale,
     });
 
     return NextResponse.json({
       source: deterministic.source,
       metadata: deterministic.metadata,
       horoscope: deterministic.summary,
-      interpretation
+      interpretation,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     console.error("[api/horoscope/daily/interpretation] failure", error);
     return NextResponse.json(
       {
         error: "interpretation_failure",
-        message: "Unable to generate horoscope interpretation at this time."
+        message: "Unable to generate horoscope interpretation at this time.",
       },
-      { status: 502 }
+      { status: 502 },
     );
   }
 }

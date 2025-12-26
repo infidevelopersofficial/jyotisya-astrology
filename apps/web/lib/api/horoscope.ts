@@ -3,14 +3,17 @@ import {
   type DailyHoroscopeResult,
   type InterpretationOutput,
   type LocaleCode,
-  type SunSign
+  type SunSign,
 } from "@digital-astrology/lib";
 import { apiClient } from "@lib/utils/api-client";
 
-export async function getDailyHoroscope(params: { system: "vedic" | "western"; locale: LocaleCode }) {
+export async function getDailyHoroscope(params: {
+  system: "vedic" | "western";
+  locale: LocaleCode;
+}) {
   const search = new URLSearchParams({
     system: params.system,
-    locale: params.locale
+    locale: params.locale,
   });
   const response = await apiClient(`/api/horoscope/daily?${search.toString()}`);
   const json = await response.json();
@@ -32,7 +35,7 @@ export async function getDailyInterpretation(params: {
 }) {
   const search = new URLSearchParams({
     sunSign: params.sunSign,
-    locale: params.locale
+    locale: params.locale,
   });
 
   if (params.tone) search.set("tone", params.tone);

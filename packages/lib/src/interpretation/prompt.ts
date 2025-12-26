@@ -24,7 +24,7 @@ type PanchangRecord = {
 export function buildDailyHoroscopePrompt(input: InterpretationInput): string {
   const { horoscope, tone = "uplifting", focus = "career", locale } = input;
   const { summary, metadata } = horoscope;
-  const snapshot = (summary.snapshot ?? {}) as Record<string, unknown>;
+  const snapshot = (summary.snapshot ?? {});
   const raw = metadata.raw ?? {};
 
   const planetLines = extractPlanetLines(snapshot, raw);
@@ -64,17 +64,14 @@ export function buildDailyHoroscopePrompt(input: InterpretationInput): string {
   return lines.join("\n");
 }
 
-function extractPlanetLines(
-  snapshot: Record<string, unknown>,
-  raw: unknown,
-): string[] {
+function extractPlanetLines(snapshot: Record<string, unknown>, raw: unknown): string[] {
   const candidates: unknown[] = [];
 
   if (Array.isArray(snapshot.planets)) {
     candidates.push(...snapshot.planets);
   }
-  if (Array.isArray((snapshot as Record<string, unknown>).planetPositions)) {
-    candidates.push(...((snapshot as Record<string, unknown>).planetPositions as unknown[]));
+  if (Array.isArray((snapshot).planetPositions)) {
+    candidates.push(...((snapshot).planetPositions as unknown[]));
   }
 
   const rawObj = raw as Record<string, unknown>;
@@ -112,10 +109,7 @@ function extractPlanetLines(
   return unique(formatted);
 }
 
-function extractPanchangLines(
-  snapshot: Record<string, unknown>,
-  raw: unknown,
-): string[] {
+function extractPanchangLines(snapshot: Record<string, unknown>, raw: unknown): string[] {
   const sources: unknown[] = [];
   sources.push(snapshot);
   if (raw && typeof raw === "object") {

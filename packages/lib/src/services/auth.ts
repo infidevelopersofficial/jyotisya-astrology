@@ -10,11 +10,11 @@ export interface AuthClient {
 }
 
 export class MockAuthClient implements AuthClient {
-  async login(email: string) {
+  async login(_email: string, _password: string) {
     return {
       userId: "mock-user",
       token: "mock-token",
-      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString()
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
     };
   }
 

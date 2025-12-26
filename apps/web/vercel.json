@@ -1,7 +1,8 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "turbo build --filter=@digital-astrology/web",
+  "buildCommand": "cd ../.. && turbo build --filter=@digital-astrology/web",
   "installCommand": "yarn install --immutable",
   "framework": null,
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./"
 }

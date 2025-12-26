@@ -14,7 +14,7 @@ export class KundliService {
       ...details,
       ascendant: "Taurus",
       moonSign: "Libra",
-      houses: []
+      houses: [],
     };
   }
 }

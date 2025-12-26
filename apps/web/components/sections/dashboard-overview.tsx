@@ -4,19 +4,19 @@ const KUNDLI = {
   name: "Rupesh Kumar",
   rashi: "Vrishabha",
   nakshatra: "Rohini",
-  lastUpdated: "12 May 2024"
+  lastUpdated: "12 May 2024",
 };
 
 const ORDERS = [
   { id: "ORD-1021", item: "Emerald Gemstone", status: "Shipped" },
-  { id: "ORD-1018", item: "Ganesha Yantra", status: "Delivered" }
+  { id: "ORD-1018", item: "Ganesha Yantra", status: "Delivered" },
 ];
 
 const CONSULTATIONS = [
-  { id: "CONS-301", astrologer: "Acharya Aarti", date: "14 May 2024", mode: "Video" }
+  { id: "CONS-301", astrologer: "Acharya Aarti", date: "14 May 2024", mode: "Video" },
 ];
 
-export default function DashboardOverview() {
+export default function DashboardOverview(): React.ReactElement {
   return (
     <section className="grid gap-6 lg:grid-cols-2">
       <Card title="Saved Kundli" subtitle={`${KUNDLI.rashi} • ${KUNDLI.nakshatra}`}>
@@ -35,7 +35,9 @@ export default function DashboardOverview() {
         {CONSULTATIONS.map((consultation) => (
           <div key={consultation.id} className="mt-3 flex justify-between text-sm text-slate-200">
             <span>{consultation.astrologer}</span>
-            <span>{consultation.date} • {consultation.mode}</span>
+            <span>
+              {consultation.date} • {consultation.mode}
+            </span>
           </div>
         ))}
       </Card>

@@ -178,6 +178,7 @@ We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) 
 7. Open a Pull Request
 
 All PRs must:
+
 - ✅ Pass all CI checks
 - ✅ Have test coverage
 - ✅ Follow code standards
@@ -196,6 +197,7 @@ All PRs must:
 ## 🗺️ Roadmap
 
 ### ✅ Completed (Phase 1)
+
 - [x] Supabase authentication (Google OAuth + OTP)
 - [x] User management system
 - [x] CI/CD pipeline with GitHub Actions
@@ -206,6 +208,7 @@ All PRs must:
 - [x] Panchang calculations
 
 ### 🚧 In Progress (Phase 2)
+
 - [ ] Comprehensive test coverage (target: 70%+)
 - [ ] Error tracking and logging (Sentry)
 - [ ] Performance monitoring
@@ -214,6 +217,7 @@ All PRs must:
 - [ ] API documentation (OpenAPI/Swagger)
 
 ### 📋 Planned (Phase 3)
+
 - [ ] Complete commerce service
 - [ ] Complete consultations service
 - [ ] Complete notifications service
@@ -243,4 +247,3 @@ MIT License - see [LICENSE](LICENSE) for details
 ---
 
 **Built with ❤️ for the Indian astrology community**
-

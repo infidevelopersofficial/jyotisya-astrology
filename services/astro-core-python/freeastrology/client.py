@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import json
 from datetime import datetime, timezone
-from typing import Any
+from typing import Any, Optional, Dict
 
 import httpx
 from zoneinfo import ZoneInfo
@@ -16,7 +16,7 @@ class FreeAstrologyApiError(Exception):
 
 
 class FreeAstrologyApiClient:
-  def __init__(self, timeout: float | None = None) -> None:
+  def __init__(self, timeout: Optional[float] = None) -> None:
     settings = get_settings()
     self._base_url = settings.free_api_base_url.rstrip("/")
     self._timeout = timeout or settings.http_timeout_seconds
@@ -27,8 +27,8 @@ class FreeAstrologyApiClient:
     self,
     sign: str,
     locale: str,
-    date: str | None = None,
-    timezone_name: str | None = None,
+    date: Optional[str] = None,
+    timezone_name: Optional[str] = None,
   ) -> Mapping[str, Any]:
     payload = self._build_payload(date=date, timezone_name=timezone_name)
     payload["language"] = locale
@@ -37,14 +37,14 @@ class FreeAstrologyApiClient:
   async def get_today_panchang(
     self,
     locale: str,
-    date: str | None = None,
-    timezone_name: str | None = None,
+    date: Optional[str] = None,
+    timezone_name: Optional[str] = None,
   ) -> Mapping[str, Any]:
     payload = self._build_payload(date=date, timezone_name=timezone_name)
     payload["language"] = locale
     return await self._post("/complete-panchang", payload)
 
-  def _build_payload(self, date: str | None, timezone_name: str | None) -> dict[str, Any]:
+  def _build_payload(self, date: Optional[str], timezone_name: Optional[str]) -> Dict[str, Any]:
     tz = timezone_name or self._settings.default_timezone
     try:
       zone = ZoneInfo(tz)

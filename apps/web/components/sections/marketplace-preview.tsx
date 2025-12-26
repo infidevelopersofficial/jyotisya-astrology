@@ -7,10 +7,10 @@ import { Card, Button } from "@digital-astrology/ui";
 import Link from "next/link";
 import { getFeaturedProducts } from "@lib/api/products";
 
-export default function MarketplacePreview() {
+export default function MarketplacePreview(): React.ReactElement {
   const { data, isLoading } = useQuery({
     queryKey: ["products", "featured"],
-    queryFn: () => getFeaturedProducts(3)
+    queryFn: () => getFeaturedProducts(3),
   });
 
   const products = useMemo(() => data ?? [], [data]);

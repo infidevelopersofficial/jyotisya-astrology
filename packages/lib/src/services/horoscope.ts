@@ -4,7 +4,7 @@ export const horoscopeEntrySchema = z.object({
   summary: z.string(),
   mood: z.string(),
   luckyNumber: z.string(),
-  luckyColor: z.string()
+  luckyColor: z.string(),
 });
 
 export type HoroscopeEntry = z.infer<typeof horoscopeEntrySchema>;
@@ -45,7 +45,7 @@ export class MockHoroscopeClient implements HoroscopeClient {
       "Sagittarius",
       "Capricorn",
       "Aquarius",
-      "Pisces"
+      "Pisces",
     ];
 
     return Object.fromEntries(
@@ -55,9 +55,9 @@ export class MockHoroscopeClient implements HoroscopeClient {
           summary: `Sample ${cadence} guidance for ${sign} (${system})`,
           mood: "Harmonious",
           luckyNumber: "7",
-          luckyColor: "Saffron"
-        }
-      ])
+          luckyColor: "Saffron",
+        },
+      ]),
     );
   }
 }

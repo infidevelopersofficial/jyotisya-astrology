@@ -1,0 +1,815 @@
+
+> digital-astrology@0.1.0 lint
+> turbo lint
+
+• Packages in scope: @digital-astrology/admin, @digital-astrology/config, @digital-astrology/lib, @digital-astrology/schemas, @digital-astrology/ui, @digital-astrology/web, @jyotisya/fonts
+• Running lint in 7 packages
+• Remote caching disabled
+@digital-astrology/web:lint: cache miss, executing f0fd9cc8ab80e961
+@digital-astrology/admin:lint: cache hit, replaying logs 6fc27469052a8ed9
+@digital-astrology/admin:lint: 
+@digital-astrology/admin:lint:  ⚠ The Next.js plugin was not detected in your ESLint configuration. See https://nextjs.org/docs/basic-features/eslint#migrating-existing-config
+@digital-astrology/admin:lint: 
+@digital-astrology/admin:lint: ./app/(dashboard)/page.tsx
+@digital-astrology/admin:lint: 3:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/admin:lint: 
+@digital-astrology/admin:lint: ./app/layout.tsx
+@digital-astrology/admin:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/admin:lint: 
+@digital-astrology/admin:lint: info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/(marketing)/page.tsx
+@digital-astrology/web:lint: 11:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrologers/route.ts
+@digital-astrology/web:lint: 16:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrology/birth-chart/route.ts
+@digital-astrology/web:lint: 41:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrology/chart-svg/route.ts
+@digital-astrology/web:lint: 45:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrology/compatibility/route.ts
+@digital-astrology/web:lint: 67:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrology/panchang/route.ts
+@digital-astrology/web:lint: 18:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 20:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 22:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 35:31  Error: Unsafe argument of type `any` assigned to a parameter of type `string | number | Date`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 41:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 42:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 43:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/astrology/rate-limit/route.ts
+@digital-astrology/web:lint: 18:8  Error: Async function 'GET' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 18:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/consultations/create-order/route.ts
+@digital-astrology/web:lint: 18:8  Warning: Async function 'POST' has too many lines (144). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 18:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 18:8  Error: Async function 'POST' has a complexity of 19. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 49:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 50:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/consultations/verify-payment/route.ts
+@digital-astrology/web:lint: 18:8  Warning: Async function 'POST' has too many lines (169). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 18:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 18:8  Error: Async function 'POST' has a complexity of 21. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 49:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 50:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 133:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 175:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 175:34  Error: Unsafe member access .method on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 176:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 176:33  Error: Unsafe member access .email on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 177:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 177:35  Error: Unsafe member access .contact on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 186:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 187:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 193:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/geocode/route.ts
+@digital-astrology/web:lint: 47:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 64:7  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 77:7  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 91:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 109:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 127:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/health/route.ts
+@digital-astrology/web:lint: 10:8  Error: Async function 'GET' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 10:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/horoscope/daily/interpretation/route.ts
+@digital-astrology/web:lint: 39:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/horoscope/daily/route.ts
+@digital-astrology/web:lint: 32:8  Warning: Async function 'GET' has too many lines (123). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 32:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 32:8  Error: Async function 'GET' has a complexity of 24. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 182:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/horoscope/me/route.ts
+@digital-astrology/web:lint: 20:8  Warning: Async function 'GET' has too many lines (84). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 20:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/metrics/route.ts
+@digital-astrology/web:lint: 17:8  Error: Async function 'GET' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 17:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/onboarding/route.ts
+@digital-astrology/web:lint: 30:37  Error: 'unknown' overrides all other types in this union type.  @typescript-eslint/no-redundant-type-constituents
+@digital-astrology/web:lint: 31:34  Error: 'unknown' overrides all other types in this union type.  @typescript-eslint/no-redundant-type-constituents
+@digital-astrology/web:lint: 70:27  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 105:30  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 105:82  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 106:31  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 154:8  Warning: Async function 'POST' has too many lines (156). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 154:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 154:8  Error: Async function 'POST' has a complexity of 24. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 169:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 170:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 231:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 232:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 238:9  Error: Unsafe argument of type `any` assigned to a parameter of type `number`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 239:9  Error: Unsafe argument of type `any` assigned to a parameter of type `number`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 240:9  Error: Unsafe argument of type `any` assigned to a parameter of type `number`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 270:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 271:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 279:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 281:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 282:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 283:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 284:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 285:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 285:22  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 285:36  Error: Unsafe member access .toString on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 291:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 344:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/panchang/today/route.ts
+@digital-astrology/web:lint: 13:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/ready/route.ts
+@digital-astrology/web:lint: 18:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/user/kundli/route.ts
+@digital-astrology/web:lint: 26:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 40:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 71:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 106:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 168:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 216:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 245:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 299:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/user/settings/route.ts
+@digital-astrology/web:lint: 12:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 12:8  Error: Async function 'PATCH' has a complexity of 17. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 26:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 27:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 37:42  Error: Unsafe argument of type `any` assigned to a parameter of type `string`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 44:59  Error: Unsafe argument of type `any` assigned to a parameter of type `string`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 71:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 72:23  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 73:25  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 74:34  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/v1/astrology/birth-chart/route.ts
+@digital-astrology/web:lint: 29:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/api/webhooks/razorpay/route.ts
+@digital-astrology/web:lint: 27:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 55:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 56:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 56:27  Error: Unsafe member access .event on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 57:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 57:35  Error: Unsafe member access .payload on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 58:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 58:34  Error: Unsafe member access .payload on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 60:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 78:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 102:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 102:53  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+@digital-astrology/web:lint: 103:40  Error: Unsafe member access .order_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 108:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 108:33  Error: Unsafe member access .order_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 109:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 109:35  Error: Unsafe member access .id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 115:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 133:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 144:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 144:51  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+@digital-astrology/web:lint: 145:40  Error: Unsafe member access .order_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 150:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 150:33  Error: Unsafe member access .order_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 151:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 151:35  Error: Unsafe member access .id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 152:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 152:37  Error: Unsafe member access .error_reason on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 158:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 176:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 187:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 187:43  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+@digital-astrology/web:lint: 188:38  Error: Unsafe member access .payment_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 194:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 194:33  Error: Unsafe member access .id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/astrology-test/page.tsx
+@digital-astrology/web:lint: 16:16  Warning: Function 'AstrologyTestPage' has too many lines (483). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 16:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 16:16  Error: Function 'AstrologyTestPage' has a complexity of 24. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 42:35  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 55:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 56:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 56:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 56:54  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 59:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 60:17  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AstrologyAPIResponse | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 68:33  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 84:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 85:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 85:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 85:54  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 88:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 89:17  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AstrologyAPIResponse | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 97:33  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 115:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 116:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 116:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 116:54  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 119:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 120:17  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AstrologyAPIResponse | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 128:38  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 144:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 145:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 145:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 145:54  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 148:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 149:17  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AstrologyAPIResponse | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 157:35  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 164:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 165:17  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<AstrologyAPIResponse | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 189:21  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 320:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 345:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 374:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 428:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 448:1  Error: File has too many lines (494). Maximum allowed is 400.  max-lines
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/auth/callback/route.ts
+@digital-astrology/web:lint: 39:8  Warning: Async function 'GET' has too many lines (100). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 39:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 39:8  Error: Async function 'GET' has a complexity of 24. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 82:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 91:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 95:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 108:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 118:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 128:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/auth/error/page.tsx
+@digital-astrology/web:lint: 31:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 34:33  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 81:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/auth/signin/page.tsx
+@digital-astrology/web:lint: 8:1  Warning: Function 'SignInContent' has too many lines (330). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 8:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 22:58  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 53:52  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 84:54  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 119:39  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 208:32  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 236:32  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 266:28  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 307:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 326:23  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 370:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/auth/signout/route.ts
+@digital-astrology/web:lint: 4:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/consultations/[id]/page.tsx
+@digital-astrology/web:lint: 19:16  Warning: Async function 'ConsultationDetailsPage' has too many lines (196). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 19:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/consultations/page.tsx
+@digital-astrology/web:lint: 9:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/dashboard/birth-chart/page.tsx
+@digital-astrology/web:lint: 10:16  Warning: Async function 'BirthChartPage' has too many lines (152). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/dashboard/birth-chart-v3/page.tsx
+@digital-astrology/web:lint: 10:16  Warning: Async function 'BirthChartPageV3' has too many lines (171). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/dashboard/page.tsx
+@digital-astrology/web:lint: 7:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 16:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 80:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/dashboard/saved-charts/[id]/page.tsx
+@digital-astrology/web:lint: 17:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/dashboard/saved-charts/page.tsx
+@digital-astrology/web:lint: 11:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/error.tsx
+@digital-astrology/web:lint: 7:16  Warning: Function 'Error' has too many lines (113). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 7:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/layout.tsx
+@digital-astrology/web:lint: 29:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/my-kundlis/page.tsx
+@digital-astrology/web:lint: 7:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/not-found.tsx
+@digital-astrology/web:lint: 3:16  Warning: Function 'NotFound' has too many lines (86). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 3:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/onboarding/page.tsx
+@digital-astrology/web:lint: 23:16  Warning: Function 'OnboardingPage' has too many lines (263). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 23:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 23:16  Error: Function 'OnboardingPage' has a complexity of 19. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 43:35  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 53:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 54:27  Error: Unsafe member access .user on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 56:18  Error: Unsafe member access .onboardingCompleted on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 85:5  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 88:51  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 98:6  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 108:51  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 136:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 139:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 139:30  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 189:26  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/profile/page.tsx
+@digital-astrology/web:lint: 23:16  Warning: Function 'ProfilePage' has too many lines (191). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 23:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 42:7  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 46:33  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 50:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 53:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 53:30  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 56:18  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<UserProfile | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 56:23  Error: Unsafe member access .user on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 109:50  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/sentry-test/page.tsx
+@digital-astrology/web:lint: 7:16  Warning: Function 'SentryTestPage' has too many lines (115). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 7:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 10:30  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 23:34  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 47:31  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/settings/page.tsx
+@digital-astrology/web:lint: 6:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./app/shop/page.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./pages/api/commerce/products.ts
+@digital-astrology/web:lint: 50:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 59:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 63:22  Error: Unsafe member access .products on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 64:47  Error: Unsafe member access .products on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/DailyHoroscopePanel.tsx
+@digital-astrology/web:lint: 17:14  Warning: `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.  react/no-unescaped-entities
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/BirthChartDisplay.tsx
+@digital-astrology/web:lint: 30:16  Warning: Function 'BirthChartDisplay' has too many lines (223). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 30:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 30:16  Error: Function 'BirthChartDisplay' has a complexity of 16. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/BirthChartForm.tsx
+@digital-astrology/web:lint: 18:16  Warning: Function 'BirthChartForm' has too many lines (136). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 18:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/BirthChartGeneratorV2.tsx
+@digital-astrology/web:lint: 15:16  Warning: Function 'BirthChartGeneratorV2' has too many lines (217). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 15:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 15:16  Error: Function 'BirthChartGeneratorV2' has a complexity of 29. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 206:22  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 228:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 229:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 230:22  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 231:23  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/DivisionalChartsPanel.tsx
+@digital-astrology/web:lint: 12:16  Warning: Function 'DivisionalChartsPanel' has too many lines (109). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 12:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/HousesGuide.tsx
+@digital-astrology/web:lint: 5:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart/PlanetaryPositions.tsx
+@digital-astrology/web:lint: 15:16  Warning: Function 'PlanetaryPositions' has too many lines (110). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 15:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 35:22  Warning: Arrow function has too many lines (88). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart-generator-v2.tsx
+@digital-astrology/web:lint: 116:16  Warning: Function 'BirthChartGeneratorV2' has too many lines (911). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 116:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 116:16  Error: Function 'BirthChartGeneratorV2' has a complexity of 52. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 164:21  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 188:39  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 210:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 211:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 211:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 214:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 215:50  Error: Unsafe argument of type `any` assigned to a parameter of type `Record<string, unknown> | BirthChartResponse`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 233:46  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 251:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 289:38  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 318:38  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 333:41  Warning: Unexpected string concatenation.  prefer-template
+@digital-astrology/web:lint: 347:40  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 362:36  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 388:11  Error: Expected property shorthand.  object-shorthand
+@digital-astrology/web:lint: 393:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 394:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 394:35  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 397:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 398:23  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<string | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 398:30  Error: Unsafe member access .kundli on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 471:1  Error: File has too many lines (1011). Maximum allowed is 400.  max-lines
+@digital-astrology/web:lint: 645:27  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 800:98  Warning: Unexpected string concatenation.  prefer-template
+@digital-astrology/web:lint: 876:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 901:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 921:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 941:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 1032:23  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 1067:23  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart-generator-v3.tsx
+@digital-astrology/web:lint: 95:16  Warning: Function 'BirthChartGeneratorV3' has too many lines (787). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 95:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 95:16  Error: Function 'BirthChartGeneratorV3' has a complexity of 52. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 143:21  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 167:39  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 189:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 190:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 190:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 193:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 194:50  Error: Unsafe argument of type `any` assigned to a parameter of type `Record<string, unknown> | BirthChartResponse`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 212:46  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 230:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 268:38  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 291:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 297:38  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 312:41  Warning: Unexpected string concatenation.  prefer-template
+@digital-astrology/web:lint: 320:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 326:40  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 337:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 341:36  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 343:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 367:11  Error: Expected property shorthand.  object-shorthand
+@digital-astrology/web:lint: 372:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 373:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 373:35  Error: Unsafe member access .message on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 376:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 377:23  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<string | null>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 377:30  Error: Unsafe member access .kundli on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 386:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 392:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 475:1  Error: File has too many lines (869). Maximum allowed is 400.  max-lines
+@digital-astrology/web:lint: 504:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 690:98  Warning: Unexpected string concatenation.  prefer-template
+@digital-astrology/web:lint: 725:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 749:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 768:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 787:29  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 868:23  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 901:23  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/birth-chart-generator.tsx
+@digital-astrology/web:lint: 50:16  Warning: Function 'BirthChartGenerator' has too many lines (421). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 50:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 50:16  Error: Function 'BirthChartGenerator' has a complexity of 19. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 100:21  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 126:39  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 148:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 149:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 149:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 152:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 153:50  Error: Unsafe argument of type `any` assigned to a parameter of type `Record<string, unknown> | BirthChartResponse`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 166:46  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 184:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 203:88  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 360:23  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 448:1  Error: File has too many lines (462). Maximum allowed is 400.  max-lines
+@digital-astrology/web:lint: 473:21  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/datetime-picker.tsx
+@digital-astrology/web:lint: 11:16  Warning: Function 'DateTimePicker' has too many lines (158). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 11:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 68:69  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 80:69  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/astrology/location-picker.tsx
+@digital-astrology/web:lint: 63:16  Warning: Function 'LocationPicker' has too many lines (244). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 63:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 74:5  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 86:48  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 110:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 111:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 111:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 114:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 117:18  Error: Unsafe member access .from_cache on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 118:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 120:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 123:22  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<Location[]>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 123:29  Error: Unsafe member access .data on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 136:7  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 142:53  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 169:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/consultation/astrologer-list.tsx
+@digital-astrology/web:lint: 27:16  Warning: Function 'AstrologerList' has too many lines (195). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 27:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 40:7  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 51:57  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 67:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 68:22  Error: Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<Astrologer[]>`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 68:27  Error: Unsafe member access .astrologers on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 73:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 94:57  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 113:25  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/consultation/booking-modal.tsx
+@digital-astrology/web:lint: 19:16  Warning: Function 'BookingModal' has too many lines (198). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 19:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 27:30  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 31:43  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 58:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 59:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 59:35  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 62:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 73:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 73:31  Error: Unsafe member access .amount on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 74:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 74:33  Error: Unsafe member access .currency on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 75:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 75:33  Error: Unsafe member access .orderId on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 79:35  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+@digital-astrology/web:lint: 86:17  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 86:45  Error: Unsafe member access .razorpay_order_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 87:17  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 87:47  Error: Unsafe member access .razorpay_payment_id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 88:17  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 88:46  Error: Unsafe member access .razorpay_signature on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 92:19  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 94:24  Error: Unsafe member access .success on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 96:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 96:38  Error: Unsafe member access .id on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 128:25  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 134:25  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 237:23  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/consultation/cta.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/consultation/directory.tsx
+@digital-astrology/web:lint: 36:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/error-boundary.tsx
+@digital-astrology/web:lint: 43:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 64:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 71:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 144:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/horoscope/daily-grid.tsx
+@digital-astrology/web:lint: 30:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/horoscope/horoscope-card.tsx
+@digital-astrology/web:lint: 17:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 39:47  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 76:19  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/kundli/kundli-card.tsx
+@digital-astrology/web:lint: 28:16  Warning: Function 'KundliCard' has too many lines (148). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 28:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 32:21  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 37:33  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 38:10  Warning: Unexpected confirm.  no-alert
+@digital-astrology/web:lint: 58:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 64:32  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 83:7  Warning: Unexpected alert.  no-alert
+@digital-astrology/web:lint: 144:19  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 166:19  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/kundli/kundlis-grid.tsx
+@digital-astrology/web:lint: 25:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 28:37  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/layout/footer.tsx
+@digital-astrology/web:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/layout/locale-switcher.tsx
+@digital-astrology/web:lint: 13:16  Warning: Function 'LocaleSwitcher' has too many lines (84). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 13:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 22:5  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 35:51  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/layout/main-nav.tsx
+@digital-astrology/web:lint: 20:16  Warning: Function 'MainNav' has too many lines (115). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 20:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 27:46  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 41:22  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/layout/user-dropdown.tsx
+@digital-astrology/web:lint: 13:16  Warning: Function 'UserDropdown' has too many lines (102). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 13:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 20:5  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 30:34  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 37:26  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 39:7  Error: Unsafe return of a value of type `any`.  @typescript-eslint/no-unsafe-return
+@digital-astrology/web:lint: 39:14  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 39:14  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 39:14  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 39:14  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 39:14  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 39:38  Error: Unsafe member access .split on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 39:49  Error: Unsafe member access .map on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 39:74  Error: Unsafe member access .join on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 39:83  Error: Unsafe member access .toUpperCase on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 39:97  Error: Unsafe member access .slice on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 114:23  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/providers/auth-listener-provider.tsx
+@digital-astrology/web:lint: 28:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 40:7  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 51:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 55:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 61:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 68:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 75:7  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/providers/intl-provider.tsx
+@digital-astrology/web:lint: 95:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 120:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/providers/query-provider.tsx
+@digital-astrology/web:lint: 6:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/saved-charts/RecentlyViewedList.tsx
+@digital-astrology/web:lint: 14:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/saved-charts/SavedChartCard.tsx
+@digital-astrology/web:lint: 19:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 25:60  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 37:30  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 61:19  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/saved-charts/SavedChartsList.tsx
+@digital-astrology/web:lint: 10:16  Warning: Function 'SavedChartsList' has too many lines (136). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/dashboard-overview.tsx
+@digital-astrology/web:lint: 19:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/features.tsx
+@digital-astrology/web:lint: 26:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/hero.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/marketplace-grid.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/marketplace-preview.tsx
+@digital-astrology/web:lint: 10:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/mobile-app.tsx
+@digital-astrology/web:lint: 4:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/panchang-highlights.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/testimonials.tsx
+@digital-astrology/web:lint: 28:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/sections/trust-bar.tsx
+@digital-astrology/web:lint: 8:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./components/settings/settings-form.tsx
+@digital-astrology/web:lint: 37:16  Warning: Function 'SettingsForm' has too many lines (221). Maximum allowed is 80.  max-lines-per-function
+@digital-astrology/web:lint: 37:16  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 37:16  Error: Function 'SettingsForm' has a complexity of 21. Maximum allowed is 15.  complexity
+@digital-astrology/web:lint: 49:51  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 62:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 65:25  Error: Unsafe argument of type `any` assigned to a parameter of type `string | undefined`.  @typescript-eslint/no-unsafe-argument
+@digital-astrology/web:lint: 65:30  Error: Unsafe member access .error on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 96:24  Error: Promise-returning function provided to attribute where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/analytics/events.ts
+@digital-astrology/web:lint: 35:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 39:7  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 75:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 86:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 96:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 105:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 114:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 123:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 132:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/auth.ts
+@digital-astrology/web:lint: 36:5  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 55:7  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/cache.ts
+@digital-astrology/web:lint: 77:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 89:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 97:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 105:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 112:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 119:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 129:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 186:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 186:21  Error: Unsafe call of a(n) `any` typed value.  @typescript-eslint/no-unsafe-call
+@digital-astrology/web:lint: 186:36  Error: Unsafe member access .cache on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 187:39  Error: Unsafe member access .timestamp on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 234:7  Error: Unsafe return of a value of type `any`.  @typescript-eslint/no-unsafe-return
+@digital-astrology/web:lint: 237:11  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 248:5  Error: Unsafe return of a value of type `any`.  @typescript-eslint/no-unsafe-return
+@digital-astrology/web:lint: 283:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 330:9  Error: Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator.  @typescript-eslint/no-floating-promises
+@digital-astrology/web:lint: 337:11  Error: Promise returned in function argument where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 344:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/horoscope.ts
+@digital-astrology/web:lint: 10:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 16:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 27:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/panchang.test.ts
+@digital-astrology/web:lint: 28:7  Error: Async method 'json' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 43:7  Error: Async method 'json' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 53:7  Error: Async method 'json' has no 'await' expression.  @typescript-eslint/require-await
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/panchang.ts
+@digital-astrology/web:lint: 41:18  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 55:18  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/products.ts
+@digital-astrology/web:lint: 17:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 19:9  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 23:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/retry.ts
+@digital-astrology/web:lint: 57:27  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 57:65  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 58:32  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 189:15  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 204:31  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 204:69  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 205:36  Error: Unsafe member access .response on an `any` value.  @typescript-eslint/no-unsafe-member-access
+@digital-astrology/web:lint: 280:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 305:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 310:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/api/route-handler.ts
+@digital-astrology/web:lint: 122:5  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/astrology/cached-client.ts
+@digital-astrology/web:lint: 129:66  Error: Invalid type "unknown" of template literal expression.  @typescript-eslint/restrict-template-expressions
+@digital-astrology/web:lint: 162:66  Error: Invalid type "unknown" of template literal expression.  @typescript-eslint/restrict-template-expressions
+@digital-astrology/web:lint: 249:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 258:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 266:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 275:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 283:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 292:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 300:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 308:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 316:20  Error: This assertion is unnecessary since it does not change the type of the expression.  @typescript-eslint/no-unnecessary-type-assertion
+@digital-astrology/web:lint: 324:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/astrology/client.ts
+@digital-astrology/web:lint: 57:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 66:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 161:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/astrology/python-client.ts
+@digital-astrology/web:lint: 38:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 43:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 74:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 131:15  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 185:13  Error: Unsafe assignment of an `any` value.  @typescript-eslint/no-unsafe-assignment
+@digital-astrology/web:lint: 188:7  Error: Unsafe return of a value of type `any`.  @typescript-eslint/no-unsafe-return
+@digital-astrology/web:lint: 233:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/astrology/service-orchestrator.ts
+@digital-astrology/web:lint: 199:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/db/prisma.ts
+@digital-astrology/web:lint: 25:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 44:1  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 121:28  Error: Promise returned in function argument where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 129:24  Error: Promise returned in function argument where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 138:25  Error: Promise returned in function argument where a void return was expected.  @typescript-eslint/no-misused-promises
+@digital-astrology/web:lint: 182:8  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 
+@digital-astrology/web:lint: ./lib/monitoring/logger.ts
+@digital-astrology/web:lint: 49:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 63:11  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 67:9  Error: Unexpected console statement.  no-console
+@digital-astrology/web:lint: 81:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 88:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 95:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 102:3  Warning: Missing return type on function.  @typescript-eslint/explicit-function-return-type
+@digital-astrology/web:lint: 102:42  Error: 'unknown' overrides all other types in this
+
+ Tasks:    1 successful, 2 total
+Cached:    1 cached, 2 total
+  Time:    2.969s 
+Failed:    @digital-astrology/web#lint
+

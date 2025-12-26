@@ -8,12 +8,12 @@ const MOCK_ORDERS: Order[] = [
   {
     id: "ORD-1021",
     status: "shipped",
-    items: [{ sku: "GEM-NEELAM-01", quantity: 1 }]
-  }
+    items: [{ sku: "GEM-NEELAM-01", quantity: 1 }],
+  },
 ];
 
 export class OrderService {
-  listByUser(userId: string) {
+  listByUser(_userId: string) {
     return MOCK_ORDERS;
   }
 }
