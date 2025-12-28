@@ -7,7 +7,8 @@
  * Documentation: https://razorpay.com/docs/api/
  */
 
-import crypto from "crypto";
+import * as crypto from "crypto";
+import type { RazorpayPayment, RazorpayRefund } from "./razorpay-types";
 
 // Razorpay configuration
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
@@ -155,9 +156,9 @@ export function verifyWebhookSignature(body: string, signature: string): boolean
  * Fetch payment details from Razorpay
  *
  * @param paymentId Razorpay payment ID
- * @returns Payment details
+ * @returns Payment details with full type safety
  */
-export async function fetchPaymentDetails(paymentId: string): Promise<any> {
+export async function fetchPaymentDetails(paymentId: string): Promise<RazorpayPayment> {
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
     throw new Error("Razorpay credentials not configured");
   }
@@ -172,13 +173,13 @@ export async function fetchPaymentDetails(paymentId: string): Promise<any> {
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = (await response.json()) as { error?: { description?: string } };
     throw new Error(
       `Failed to fetch payment details: ${error.error?.description || response.statusText}`,
     );
   }
 
-  return response.json();
+  return response.json() as Promise<RazorpayPayment>;
 }
 
 /**
@@ -186,16 +187,16 @@ export async function fetchPaymentDetails(paymentId: string): Promise<any> {
  *
  * @param paymentId Razorpay payment ID
  * @param amount Amount to refund in rupees (optional, full refund if not specified)
- * @returns Refund object
+ * @returns Refund object with full type safety
  */
-export async function initiateRefund(paymentId: string, amount?: number): Promise<any> {
+export async function initiateRefund(paymentId: string, amount?: number): Promise<RazorpayRefund> {
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
     throw new Error("Razorpay credentials not configured");
   }
 
   const auth = Buffer.from(`${RAZORPAY_KEY_ID}:${RAZORPAY_KEY_SECRET}`).toString("base64");
 
-  const refundData: any = {};
+  const refundData: { amount?: number; speed?: "normal" | "optimum" } = {};
   if (amount !== undefined) {
     refundData.amount = Math.round(amount * 100); // Convert to paise
   }
@@ -210,11 +211,11 @@ export async function initiateRefund(paymentId: string, amount?: number): Promis
   });
 
   if (!response.ok) {
-    const error = await response.json();
+    const error = (await response.json()) as { error?: { description?: string } };
     throw new Error(`Refund failed: ${error.error?.description || response.statusText}`);
   }
 
-  return response.json();
+  return response.json() as Promise<RazorpayRefund>;
 }
 
 /**

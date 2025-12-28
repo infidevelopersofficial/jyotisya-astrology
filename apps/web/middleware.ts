@@ -2,6 +2,9 @@ import type { NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 import { addSecurityHeaders } from "./lib/security/headers";
 
+// Middleware automatically runs on Edge Runtime in Next.js 14
+// No need to explicitly declare runtime here
+
 // Routes that don't require onboarding (public or auth)
 const PUBLIC_ROUTES = ["/", "/auth", "/onboarding", "/shop"];
 
