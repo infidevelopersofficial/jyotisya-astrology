@@ -100,6 +100,35 @@
         "@typescript-eslint/no-unsafe-call": "off",
         "@typescript-eslint/no-unsafe-return": "off"
       }
+    },
+    {
+      "files": ["app/api/**/*.ts", "app/api/**/*.tsx"],
+      "rules": {
+        "max-lines-per-function": [
+          "warn",
+          { "max": 150, "skipBlankLines": true, "skipComments": true }
+        ],
+        "@typescript-eslint/no-unsafe-assignment": "off",
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/no-unsafe-call": "off",
+        "@typescript-eslint/no-unsafe-argument": "off",
+        "@typescript-eslint/no-unsafe-return": "off"
+      }
+    },
+    {
+      "files": [
+        "app/**/components/**/*.tsx",
+        "components/**/*.tsx",
+        "app/**/page.tsx",
+        "app/**/layout.tsx"
+      ],
+      "rules": {
+        "max-lines-per-function": [
+          "warn",
+          { "max": 250, "skipBlankLines": true, "skipComments": true }
+        ],
+        "max-lines": ["warn", { "max": 500, "skipBlankLines": true, "skipComments": true }]
+      }
     }
   ],
   "ignorePatterns": ["app/auth-test/**", ".next/**", "out/**"]

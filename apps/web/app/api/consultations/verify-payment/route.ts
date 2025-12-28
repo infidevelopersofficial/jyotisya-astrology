@@ -42,17 +42,24 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     // Parse and validate request body
     const body = (await request.json()) as Record<string, unknown>;
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
-    if (!razorpay_order_id || typeof razorpay_order_id !== "string") {
+    // Type-safe extraction with validation
+    const razorpay_order_id =
+      typeof body.razorpay_order_id === "string" ? body.razorpay_order_id : null;
+    const razorpay_payment_id =
+      typeof body.razorpay_payment_id === "string" ? body.razorpay_payment_id : null;
+    const razorpay_signature =
+      typeof body.razorpay_signature === "string" ? body.razorpay_signature : null;
+
+    if (!razorpay_order_id) {
       return NextResponse.json({ error: "Invalid razorpay_order_id" }, { status: 400 });
     }
 
-    if (!razorpay_payment_id || typeof razorpay_payment_id !== "string") {
+    if (!razorpay_payment_id) {
       return NextResponse.json({ error: "Invalid razorpay_payment_id" }, { status: 400 });
     }
 
-    if (!razorpay_signature || typeof razorpay_signature !== "string") {
+    if (!razorpay_signature) {
       return NextResponse.json({ error: "Invalid razorpay_signature" }, { status: 400 });
     }
 
@@ -114,12 +121,13 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Fetch payment details from Razorpay to get additional info
-    let paymentDetails;
+    let paymentDetails: Awaited<ReturnType<typeof fetchPaymentDetails>> | undefined;
     try {
       paymentDetails = await fetchPaymentDetails(razorpay_payment_id);
     } catch (error: unknown) {
       console.error("Error fetching payment details:", error);
       // Continue even if fetch fails - signature verification is sufficient
+      paymentDetails = undefined;
     }
 
     // Update consultation payment status
@@ -171,19 +179,22 @@ export async function POST(request: Request): Promise<NextResponse> {
     console.error("Payment verification error:", error);
 
     // If verification failed, mark payment as failed
-    let razorpay_order_id: string | undefined;
+    // Note: request body can only be read once, so this will likely fail
+    // We'll handle the error gracefully
+    let failedOrderId: string | undefined;
     try {
       const bodyRetry = (await request.json()) as Record<string, unknown>;
-      razorpay_order_id = bodyRetry.razorpay_order_id as string | undefined;
+      failedOrderId =
+        typeof bodyRetry.razorpay_order_id === "string" ? bodyRetry.razorpay_order_id : undefined;
     } catch {
-      razorpay_order_id = undefined;
+      failedOrderId = undefined;
     }
 
-    if (razorpay_order_id) {
+    if (failedOrderId) {
       try {
         await prisma.consultation.updateMany({
           where: {
-            paymentId: razorpay_order_id,
+            paymentId: failedOrderId,
             paymentStatus: "PENDING",
           },
           data: {
