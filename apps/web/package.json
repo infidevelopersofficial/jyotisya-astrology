@@ -23,7 +23,7 @@
     "@digital-astrology/schemas": "workspace:*",
     "@digital-astrology/ui": "workspace:*",
     "@jyotisya/fonts": "workspace:*",
-    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/adapter-pg": "^7.2.0",
     "@prisma/client": "7.1.0",
     "@sentry/nextjs": "^8.0.0",
     "@supabase/ssr": "^0.8.0",
