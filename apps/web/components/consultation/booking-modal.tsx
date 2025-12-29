@@ -1,7 +1,39 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@digital-astrology/ui";
+import { AlertTriangle } from "lucide-react";
+import * as Sentry from "@sentry/nextjs";
+
+// API Response types
+interface CreateOrderResponse {
+  success: boolean;
+  message: string;
+  consultation: {
+    id: string;
+    scheduledAt: string;
+    duration: number;
+    amount: number;
+    astrologer: {
+      id: string;
+      name: string;
+      imageUrl: string;
+      specialization: string[];
+      languages: string[];
+    };
+  };
+  razorpayOrder: {
+    orderId: string;
+    amount: number;
+    currency: string;
+  };
+}
+
+interface VerifyPaymentResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+}
 
 interface BookingModalProps {
   astrologer: {
@@ -22,6 +54,21 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
   const [duration, setDuration] = useState(30);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [disclaimerAccepted, setDisclaimerAccepted] = useState(false);
+
+  // Log modal open event to Sentry for tracking
+  useEffect(() => {
+    Sentry.addBreadcrumb({
+      category: "consultation",
+      message: "Booking modal opened",
+      level: "info",
+      data: {
+        astrologerId: astrologer.id,
+        astrologerName: astrologer.name,
+        hourlyRate: astrologer.hourlyRate,
+      },
+    });
+  }, [astrologer.id, astrologer.name, astrologer.hourlyRate]);
 
   // Calculate amount based on duration
   const calculateAmount = () => {
@@ -55,11 +102,11 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
       });
 
       if (!createResponse.ok) {
-        const errorData = await createResponse.json();
+        const errorData = (await createResponse.json()) as { error?: string };
         throw new Error(errorData.error || "Failed to create order");
       }
 
-      const { consultation, razorpayOrder } = await createResponse.json();
+      const { consultation, razorpayOrder } = (await createResponse.json()) as CreateOrderResponse;
 
       // Step 2: Open Razorpay checkout
       const razorpayKeyId = process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
@@ -76,33 +123,48 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
         name: "Jyotishya",
         description: `Consultation with ${astrologer.name}`,
         image: "/logo.png",
-        handler: async (response: any) => {
-          try {
-            // Step 3: Verify payment
-            const verifyResponse = await fetch("/api/consultations/verify-payment", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                razorpay_order_id: response.razorpay_order_id,
-                razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-              }),
-            });
+        handler: (response: {
+          razorpay_payment_id: string;
+          razorpay_order_id: string;
+          razorpay_signature: string;
+        }) => {
+          // Use void async IIFE to handle async operations in handler
+          void (async () => {
+            try {
+              // Step 3: Verify payment
+              const verifyResponse = await fetch("/api/consultations/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                }),
+              });
 
-            const result = await verifyResponse.json();
+              const result = (await verifyResponse.json()) as VerifyPaymentResponse;
 
-            if (result.success) {
-              // Payment successful!
-              onSuccess(consultation.id);
-            } else {
+              if (result.success) {
+                // Payment successful!
+                onSuccess(consultation.id);
+              } else {
+                setError("Payment verification failed. Please contact support.");
+                Sentry.captureMessage("Payment verification failed", {
+                  level: "error",
+                  tags: { operation: "verify_payment" },
+                  extra: { consultationId: consultation.id, error: result.error },
+                });
+              }
+            } catch (error: unknown) {
               setError("Payment verification failed. Please contact support.");
+              Sentry.captureException(error, {
+                tags: { operation: "verify_payment" },
+                extra: { consultationId: consultation.id },
+              });
+            } finally {
+              setLoading(false);
             }
-          } catch (error: unknown) {
-            console.error("Verification error:", error);
-            setError("Payment verification failed. Please contact support.");
-          } finally {
-            setLoading(false);
-          }
+          })();
         },
         modal: {
           ondismiss: () => {
@@ -118,8 +180,11 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
       const razorpay = new window.Razorpay(options);
       razorpay.open();
     } catch (error: unknown) {
-      console.error("Booking error:", error);
       setError(error instanceof Error ? error.message : "Failed to create booking");
+      Sentry.captureException(error, {
+        tags: { operation: "create_consultation_order" },
+        extra: { astrologerId: astrologer.id, duration, scheduledDate, scheduledTime },
+      });
       setLoading(false);
     }
   };
@@ -213,6 +278,48 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
             <p className="text-xs text-slate-400 mt-1">Rate: ₹{astrologer.hourlyRate}/hour</p>
           </div>
 
+          {/* Disclaimer - Entertainment Only */}
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-500 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-yellow-200 mb-2">Important Disclaimer</h4>
+                <p className="text-xs text-yellow-100/80 leading-relaxed mb-3">
+                  Astrology consultations are provided for{" "}
+                  <strong>entertainment and self-reflection purposes only</strong>. They are NOT a
+                  substitute for professional medical, legal, financial, or psychological advice.
+                  Always consult qualified professionals for important life decisions.
+                </p>
+                <label className="flex items-start gap-2 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    checked={disclaimerAccepted}
+                    onChange={(e) => {
+                      const accepted = e.target.checked;
+                      setDisclaimerAccepted(accepted);
+
+                      // Log disclaimer acceptance/rejection to Sentry
+                      Sentry.addBreadcrumb({
+                        category: "consultation",
+                        message: accepted ? "Disclaimer accepted" : "Disclaimer rejected",
+                        level: "info",
+                        data: {
+                          astrologerId: astrologer.id,
+                          disclaimerAccepted: accepted,
+                        },
+                      });
+                    }}
+                    className="mt-1 w-4 h-4 rounded border-yellow-500/50 bg-white/5 text-yellow-500 focus:ring-2 focus:ring-yellow-500 focus:ring-offset-0"
+                  />
+                  <span className="text-xs text-yellow-100 group-hover:text-yellow-50 transition-colors">
+                    I understand and agree that this consultation is for entertainment purposes only
+                    and does not replace professional advice.
+                  </span>
+                </label>
+              </div>
+            </div>
+          </div>
+
           {/* Error message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-sm text-red-400">
@@ -225,10 +332,22 @@ export default function BookingModal({ astrologer, onClose, onSuccess }: Booking
             <Button variant="secondary" onClick={onClose} disabled={loading} className="flex-1">
               Cancel
             </Button>
-            <Button onClick={handleBookConsultation} disabled={loading} className="flex-1">
+            <Button
+              onClick={handleBookConsultation}
+              disabled={loading || !disclaimerAccepted}
+              className="flex-1"
+              title={!disclaimerAccepted ? "Please accept the disclaimer to proceed" : ""}
+            >
               {loading ? "Processing..." : "Proceed to Pay"}
             </Button>
           </div>
+
+          {/* Helper text if disclaimer not accepted */}
+          {!disclaimerAccepted && (
+            <p className="text-xs text-center text-slate-400 mt-2">
+              Please accept the disclaimer above to proceed with payment
+            </p>
+          )}
         </div>
       </div>
     </div>

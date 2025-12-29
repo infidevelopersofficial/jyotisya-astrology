@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import MainNav from "@components/layout/main-nav";
 import Footer from "@components/layout/footer";
+import { CookieBanner } from "@components/legal/cookie-banner";
 import { IntlProvider } from "@components/providers/intl-provider";
 import { QueryProvider } from "@components/providers/query-provider";
 import AuthListenerProvider from "@components/providers/auth-listener-provider";
@@ -45,6 +46,7 @@ export default function RootLayout({
                 <MainNav />
                 {children}
                 <Footer />
+                <CookieBanner />
               </AuthListenerProvider>
             </QueryProvider>
           </IntlProvider>

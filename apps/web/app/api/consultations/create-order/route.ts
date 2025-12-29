@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/db/prisma";
 import { createRazorpayOrder } from "@/lib/payments/razorpay";
+import { retryRazorpayOrderCreation, paymentCircuitBreaker } from "@/lib/payments/retry";
+import * as Sentry from "@sentry/nextjs";
 
 // Force dynamic rendering for this API route
 export const dynamic = "force-dynamic";
@@ -146,19 +148,81 @@ export async function POST(request: Request): Promise<NextResponse> {
     // Calculate amount based on hourly rate and duration
     const amountInRupees = calculateAmount(astrologer.hourlyRate, duration);
 
-    // Create Razorpay order
-    const razorpayOrder = await createRazorpayOrder({
-      amount: amountInRupees,
-      currency: "INR",
-      receipt: `consultation_${Date.now()}`,
-      notes: {
-        userId: dbUser.id,
-        astrologerId: astrologer.id,
-        astrologerName: astrologer.name,
-        scheduledAt: scheduledDate.toISOString(),
-        duration: duration.toString(),
-      },
-    });
+    // Check circuit breaker before attempting payment
+    if (paymentCircuitBreaker.isCircuitOpen()) {
+      const message = "Payment gateway temporarily unavailable. Please try again in a few minutes.";
+
+      Sentry.captureMessage(message, {
+        level: "warning",
+        tags: {
+          operation: "create_order_blocked",
+          circuit_breaker: "open",
+        },
+        extra: {
+          userId: dbUser.id,
+          astrologerId,
+          circuitBreakerStats: paymentCircuitBreaker.getStats(),
+        },
+      });
+
+      return NextResponse.json(
+        {
+          error: message,
+          retryAfter: 60, // Suggest retry after 60 seconds
+        },
+        { status: 503 }, // Service Unavailable
+      );
+    }
+
+    // Create Razorpay order with automatic retry on failure
+    let razorpayOrder;
+    try {
+      razorpayOrder = await retryRazorpayOrderCreation(() =>
+        createRazorpayOrder({
+          amount: amountInRupees,
+          currency: "INR",
+          receipt: `consultation_${Date.now()}`,
+          notes: {
+            userId: dbUser.id,
+            astrologerId: astrologer.id,
+            astrologerName: astrologer.name,
+            scheduledAt: scheduledDate.toISOString(),
+            duration: duration.toString(),
+          },
+        }),
+      );
+
+      // Record successful payment order creation
+      paymentCircuitBreaker.recordSuccess();
+
+      Sentry.addBreadcrumb({
+        category: "payment",
+        message: "Razorpay order created successfully",
+        level: "info",
+        data: {
+          orderId: razorpayOrder.id,
+          amount: amountInRupees,
+          userId: dbUser.id,
+        },
+      });
+    } catch (retryError) {
+      // Record payment failure for circuit breaker
+      paymentCircuitBreaker.recordFailure();
+
+      Sentry.captureException(retryError, {
+        tags: {
+          operation: "create_razorpay_order_failed",
+        },
+        extra: {
+          userId: dbUser.id,
+          astrologerId,
+          amount: amountInRupees,
+          circuitBreakerStats: paymentCircuitBreaker.getStats(),
+        },
+      });
+
+      throw retryError; // Re-throw to be caught by outer try-catch
+    }
 
     // Create consultation record in database with PENDING payment status
     const consultation = await prisma.consultation.create({
