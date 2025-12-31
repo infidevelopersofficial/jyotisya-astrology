@@ -38,12 +38,6 @@ const nextConfig = {
       ];
     }
 
-    // Edge Runtime compatibility - prevent __dirname usage
-    config.node = {
-      ...config.node,
-      __dirname: false,
-    };
-
     return config;
   },
 };
