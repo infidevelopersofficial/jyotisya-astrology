@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Personalized Vedic & Western astrology services for India.",
   keywords: ["vedic astrology", "kundli", "panchang", "horoscope", "astrologer consultation"],
   alternates: {
-    canonical: "https://www.jyotishya.in",
+    canonical: "https://www.jyotirvidya.app",
   },
 };
 

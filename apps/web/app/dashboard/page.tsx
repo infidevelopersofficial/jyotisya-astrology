@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import DailyHoroscopeGrid from "@components/horoscope/daily-grid";
 import PanchangHighlights from "@components/sections/panchang-highlights";
+import { PageContainer, PageHeader, PageSection } from "@/components/layout/page-container";
 
 export default async function DashboardPage() {
   // Server-side authentication check
@@ -19,28 +20,22 @@ export default async function DashboardPage() {
   const displayName = user.user_metadata?.name || user.email?.split("@")[0] || "there";
 
   return (
-    <div className="mx-auto min-h-screen max-w-7xl px-6 py-12 lg:px-16">
+    <PageContainer size="xl">
       {/* Welcome Section */}
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold text-white">Welcome back, {displayName}!</h1>
-        <p className="mt-2 text-slate-300">{user.email}</p>
-      </div>
+      <PageHeader title={`Welcome back, ${displayName}!`} description={user.email || undefined} />
 
       {/* Daily Horoscope */}
-      <div className="mb-12">
-        <h2 className="mb-6 text-2xl font-semibold text-white">Your Daily Horoscope</h2>
+      <PageSection title="Your Daily Horoscope">
         <DailyHoroscopeGrid />
-      </div>
+      </PageSection>
 
       {/* Panchang */}
-      <div className="mb-12">
-        <h2 className="mb-6 text-2xl font-semibold text-white">Today&apos;s Panchang</h2>
+      <PageSection title="Today's Panchang">
         <PanchangHighlights />
-      </div>
+      </PageSection>
 
       {/* Quick Actions */}
-      <div>
-        <h2 className="mb-6 text-2xl font-semibold text-white">Explore More</h2>
+      <PageSection title="Explore More">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <ActionCard
             title="Your Birth Chart"
@@ -75,8 +70,8 @@ export default async function DashboardPage() {
             gradient="from-green-500 to-teal-500"
           />
         </div>
-      </div>
-    </div>
+      </PageSection>
+    </PageContainer>
   );
 }
 
