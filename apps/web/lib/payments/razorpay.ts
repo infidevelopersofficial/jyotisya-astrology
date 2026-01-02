@@ -8,15 +8,14 @@
  */
 
 import * as crypto from "crypto";
-import type { RazorpayPayment, RazorpayRefund } from "./razorpay-types";
+import type { RazorpayPayment, RazorpayRefund, RazorpayOrder } from "./razorpay-types";
 
 // Razorpay configuration
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
-if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.warn("⚠️  Razorpay credentials not configured. Payment features will not work.");
-}
+// Note: Razorpay credentials are optional during build-time
+// They will be checked at runtime when attempting to create orders
 
 /**
  * Payment order options
@@ -26,23 +25,6 @@ export interface CreateOrderOptions {
   currency?: string; // Default: INR
   receipt?: string; // Optional receipt ID for your reference
   notes?: Record<string, string>;
-}
-
-/**
- * Razorpay order response
- */
-export interface RazorpayOrder {
-  id: string;
-  entity: string;
-  amount: number; // Amount in paise
-  amount_paid: number;
-  amount_due: number;
-  currency: string;
-  receipt: string | null;
-  status: "created" | "attempted" | "paid";
-  attempts: number;
-  notes: Record<string, string>;
-  created_at: number;
 }
 
 /**
@@ -179,7 +161,8 @@ export async function fetchPaymentDetails(paymentId: string): Promise<RazorpayPa
     );
   }
 
-  return response.json() as Promise<RazorpayPayment>;
+  const payment: RazorpayPayment = await response.json();
+  return payment;
 }
 
 /**
@@ -215,7 +198,8 @@ export async function initiateRefund(paymentId: string, amount?: number): Promis
     throw new Error(`Refund failed: ${error.error?.description || response.statusText}`);
   }
 
-  return response.json() as Promise<RazorpayRefund>;
+  const refund: RazorpayRefund = await response.json();
+  return refund;
 }
 
 /**

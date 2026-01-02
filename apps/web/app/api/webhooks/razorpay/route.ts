@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { verifyWebhookSignature } from "@/lib/payments/razorpay";
+import * as Sentry from "@sentry/nextjs";
 
 // Force dynamic rendering to avoid DATABASE_URL requirement at build time
 export const dynamic = "force-dynamic";
@@ -34,7 +35,16 @@ export async function POST(request: Request): Promise<NextResponse> {
     const signature = request.headers.get("x-razorpay-signature");
 
     if (!signature) {
-      console.error("Webhook error: Missing signature");
+      Sentry.captureMessage("Razorpay webhook missing signature", {
+        level: "error",
+        tags: {
+          operation: "webhook_validation",
+          error_type: "missing_signature",
+        },
+        extra: {
+          headers: Object.fromEntries(request.headers.entries()),
+        },
+      });
       return NextResponse.json({ error: "Missing signature" }, { status: 400 });
     }
 
@@ -42,7 +52,18 @@ export async function POST(request: Request): Promise<NextResponse> {
     const isValid = verifyWebhookSignature(rawBody, signature);
 
     if (!isValid) {
-      console.error("Webhook error: Invalid signature");
+      Sentry.captureMessage("Razorpay webhook invalid signature - possible security threat", {
+        level: "error",
+        tags: {
+          operation: "webhook_validation",
+          error_type: "invalid_signature",
+          security: "signature_mismatch",
+        },
+        extra: {
+          signatureLength: signature.length,
+          bodyLength: rawBody.length,
+        },
+      });
       return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
     }
 
@@ -52,7 +73,19 @@ export async function POST(request: Request): Promise<NextResponse> {
     const paymentEntity = payload.payload?.payment?.entity;
     const refundEntity = payload.payload?.refund?.entity;
 
-    console.error(`Received Razorpay webhook: ${event}`);
+    // Log webhook receipt with payment metadata
+    Sentry.addBreadcrumb({
+      category: "webhook",
+      message: `Razorpay webhook received: ${event}`,
+      level: "info",
+      data: {
+        event,
+        orderId: paymentEntity?.order_id || refundEntity?.payment_id || "unknown",
+        paymentId: paymentEntity?.id || "unknown",
+        amount: paymentEntity?.amount ? paymentEntity.amount / 100 : undefined,
+        status: paymentEntity?.status || refundEntity?.status || "unknown",
+      },
+    });
 
     // Handle different webhook events
     switch (event) {
@@ -70,12 +103,28 @@ export async function POST(request: Request): Promise<NextResponse> {
         break;
 
       default:
-        console.error(`Unhandled webhook event: ${event}`);
+        Sentry.captureMessage(`Unhandled Razorpay webhook event: ${event}`, {
+          level: "warning",
+          tags: {
+            operation: "webhook_processing",
+            event_type: event,
+          },
+          extra: {
+            payload,
+          },
+        });
     }
 
     return NextResponse.json({ success: true, message: "Webhook processed" }, { status: 200 });
   } catch (error: unknown) {
-    console.error("Webhook processing error:", error);
+    Sentry.captureException(error, {
+      tags: {
+        operation: "webhook_processing_failed",
+      },
+      extra: {
+        errorMessage: error instanceof Error ? error.message : "Unknown error",
+      },
+    });
 
     return NextResponse.json(
       {
@@ -90,15 +139,30 @@ export async function POST(request: Request): Promise<NextResponse> {
 /**
  * Handle payment.captured event
  * Updates consultation payment status to PAID
+ *
+ * @param paymentEntity - Razorpay payment entity (dynamic payload structure)
+ * Note: Using 'any' type because Razorpay webhook payloads have dynamic structure
+ * that varies by event type and is not fully type-safe from their SDK
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
-    console.error("Invalid payment entity:", paymentEntity);
+    Sentry.captureMessage("Invalid payment entity in payment.captured webhook", {
+      level: "error",
+      tags: {
+        operation: "payment_captured",
+        error_type: "invalid_entity",
+      },
+      extra: {
+        paymentEntity,
+      },
+    });
     return;
   }
 
   const orderId = paymentEntity.order_id;
   const paymentId = paymentEntity.id;
+  const amount = paymentEntity.amount ? paymentEntity.amount / 100 : 0;
 
   try {
     // Find consultation by Razorpay order ID
@@ -109,7 +173,18 @@ async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
     });
 
     if (!consultation) {
-      console.error(`Consultation not found for order ID: ${orderId}`);
+      Sentry.captureMessage("Consultation not found for payment.captured webhook", {
+        level: "error",
+        tags: {
+          operation: "payment_captured",
+          error_type: "consultation_not_found",
+        },
+        extra: {
+          orderId,
+          paymentId,
+          amount,
+        },
+      });
       return;
     }
 
@@ -122,9 +197,29 @@ async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
       },
     });
 
-    console.error(`Payment captured for consultation ${consultation.id}, payment ID: ${paymentId}`);
+    Sentry.addBreadcrumb({
+      category: "payment",
+      message: "Payment captured successfully",
+      level: "info",
+      data: {
+        consultationId: consultation.id,
+        paymentId,
+        orderId,
+        amount,
+        userId: consultation.userId,
+      },
+    });
   } catch (error: unknown) {
-    console.error("Error handling payment.captured:", error);
+    Sentry.captureException(error, {
+      tags: {
+        operation: "payment_captured_failed",
+      },
+      extra: {
+        orderId,
+        paymentId,
+        amount,
+      },
+    });
     throw error;
   }
 }
@@ -132,16 +227,31 @@ async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
 /**
  * Handle payment.failed event
  * Updates consultation payment status to FAILED
+ *
+ * @param paymentEntity - Razorpay payment entity (dynamic payload structure)
+ * Note: Using 'any' type because Razorpay webhook payloads have dynamic structure
+ * that varies by event type and is not fully type-safe from their SDK
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handlePaymentFailed(paymentEntity: any): Promise<void> {
   if (!paymentEntity || !paymentEntity.order_id) {
-    console.error("Invalid payment entity:", paymentEntity);
+    Sentry.captureMessage("Invalid payment entity in payment.failed webhook", {
+      level: "error",
+      tags: {
+        operation: "payment_failed",
+        error_type: "invalid_entity",
+      },
+      extra: {
+        paymentEntity,
+      },
+    });
     return;
   }
 
   const orderId = paymentEntity.order_id;
   const paymentId = paymentEntity.id;
   const errorReason = paymentEntity.error_reason || "Unknown error";
+  const amount = paymentEntity.amount ? paymentEntity.amount / 100 : 0;
 
   try {
     // Find consultation by Razorpay order ID
@@ -152,7 +262,19 @@ async function handlePaymentFailed(paymentEntity: any): Promise<void> {
     });
 
     if (!consultation) {
-      console.error(`Consultation not found for order ID: ${orderId}`);
+      Sentry.captureMessage("Consultation not found for payment.failed webhook", {
+        level: "error",
+        tags: {
+          operation: "payment_failed",
+          error_type: "consultation_not_found",
+        },
+        extra: {
+          orderId,
+          paymentId,
+          amount,
+          errorReason,
+        },
+      });
       return;
     }
 
@@ -165,11 +287,32 @@ async function handlePaymentFailed(paymentEntity: any): Promise<void> {
       },
     });
 
-    console.error(
-      `Payment failed for consultation ${consultation.id}, payment ID: ${paymentId}, reason: ${errorReason}`,
-    );
+    Sentry.captureException(new Error(`Payment failed: ${errorReason}`), {
+      tags: {
+        operation: "payment_failed",
+        payment_status: "failed",
+      },
+      extra: {
+        consultationId: consultation.id,
+        paymentId,
+        orderId,
+        amount,
+        errorReason,
+        userId: consultation.userId,
+      },
+    });
   } catch (error: unknown) {
-    console.error("Error handling payment.failed:", error);
+    Sentry.captureException(error, {
+      tags: {
+        operation: "payment_failed_handler_error",
+      },
+      extra: {
+        orderId,
+        paymentId,
+        amount,
+        errorReason,
+      },
+    });
     throw error;
   }
 }
@@ -177,15 +320,31 @@ async function handlePaymentFailed(paymentEntity: any): Promise<void> {
 /**
  * Handle refund.created and refund.processed events
  * Updates consultation payment status to REFUNDED
+ *
+ * @param refundEntity - Razorpay refund entity (dynamic payload structure)
+ * Note: Using 'any' type because Razorpay webhook payloads have dynamic structure
+ * that varies by event type and is not fully type-safe from their SDK
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handleRefund(refundEntity: any): Promise<void> {
   if (!refundEntity || !refundEntity.payment_id) {
-    console.error("Invalid refund entity:", refundEntity);
+    Sentry.captureMessage("Invalid refund entity in refund webhook", {
+      level: "error",
+      tags: {
+        operation: "refund_processing",
+        error_type: "invalid_entity",
+      },
+      extra: {
+        refundEntity,
+      },
+    });
     return;
   }
 
   // const paymentId = refundEntity.payment_id // TODO: Use when razorpayPaymentId field is added
   const refundId = refundEntity.id;
+  const refundAmount = refundEntity.amount ? refundEntity.amount / 100 : 0;
+  const refundStatus = refundEntity.status;
 
   try {
     // Find consultation by payment ID (note: this is the Razorpay payment ID, not order ID)
@@ -202,18 +361,52 @@ async function handleRefund(refundEntity: any): Promise<void> {
     // This is a limitation that should be addressed by adding a razorpayPaymentId field
 
     if (consultations.length === 0) {
-      console.error(`No paid consultations found for refund ${refundId}`);
+      Sentry.captureMessage("No paid consultations found for refund webhook", {
+        level: "error",
+        tags: {
+          operation: "refund_processing",
+          error_type: "no_consultations_found",
+        },
+        extra: {
+          refundId,
+          refundAmount,
+          refundStatus,
+        },
+      });
       return;
     }
 
     // For now, log a warning about the limitation
-    console.warn(
-      `Refund processing limitation: Cannot match refund ${refundId} to specific consultation without razorpayPaymentId field`,
+    Sentry.captureMessage(
+      "Refund processing limitation: Cannot match refund to specific consultation",
+      {
+        level: "warning",
+        tags: {
+          operation: "refund_processing",
+          limitation: "missing_razorpay_payment_id_field",
+        },
+        extra: {
+          refundId,
+          refundAmount,
+          refundStatus,
+          paidConsultationsCount: consultations.length,
+          message: "TODO: Add razorpayPaymentId field to Consultation model",
+        },
+      },
     );
 
     // TODO: Add razorpayPaymentId field to Consultation model and update this logic
   } catch (error: unknown) {
-    console.error("Error handling refund:", error);
+    Sentry.captureException(error, {
+      tags: {
+        operation: "refund_processing_failed",
+      },
+      extra: {
+        refundId,
+        refundAmount,
+        refundStatus,
+      },
+    });
     throw error;
   }
 }

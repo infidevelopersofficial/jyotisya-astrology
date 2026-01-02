@@ -1,10 +1,9 @@
 import Link from "next/link";
 
 const QUICK_LINKS = [
-  { href: "/privacy", label: "Privacy" },
-  { href: "/terms", label: "Terms" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/contact", label: "Contact" },
+  { href: "/privacy", label: "Privacy Policy" },
+  { href: "/terms", label: "Terms of Service" },
+  { href: "/refund-policy", label: "Refund Policy" },
 ];
 
 export default function Footer(): React.ReactElement {
@@ -37,26 +36,16 @@ export default function Footer(): React.ReactElement {
             ))}
           </ul>
         </div>
-        <div>
+        <div className="w-max">
           <h3 className="text-sm font-semibold uppercase tracking-widest text-orange-200">
             Stay Updated
           </h3>
           <p className="mt-4 text-sm text-slate-300">
             Get auspicious alerts, festival insights, and exclusive offers on WhatsApp.
           </p>
-          <form className="mt-5 flex gap-2">
-            <input
-              type="tel"
-              placeholder="Enter WhatsApp number"
-              className="w-full rounded-full border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-slate-400 focus:border-orange-400 focus:outline-none"
-            />
-            <button
-              type="submit"
-              className="rounded-full bg-gradient-to-r from-orange-500 to-pink-500 px-4 py-3 text-sm font-semibold text-white"
-            >
-              Subscribe
-            </button>
-          </form>
+          <div className="mt-5 rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-center">
+            <p className="text-xs text-slate-400">Coming Soon</p>
+          </div>
         </div>
       </div>
       <div className="border-t border-white/10 py-4 text-center text-xs text-slate-500">

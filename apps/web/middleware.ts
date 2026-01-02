@@ -1,4 +1,5 @@
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 import { addSecurityHeaders } from "./lib/security/headers";
 
@@ -17,6 +18,16 @@ function isPublicRoute(pathname: string): boolean {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Redirect test/debug pages to home in production
+  const isTestPage =
+    pathname.startsWith("/astrology-test") ||
+    pathname.startsWith("/auth-test") ||
+    pathname.startsWith("/sentry-test");
+
+  if (isTestPage && process.env.NODE_ENV === "production") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   // Update Supabase session
   let response = await updateSession(request);
