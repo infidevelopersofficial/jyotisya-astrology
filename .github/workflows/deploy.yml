@@ -117,32 +117,53 @@ jobs:
   # ============================================================================
   deploy-web:
     name: Deploy Web App
-    needs: [setup, build]
+    needs: [setup]
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     environment:
       name: ${{ needs.setup.outputs.environment }}
-      url: ${{ steps.deploy.outputs.url }}
+      url: ${{ steps.deploy.outputs.preview-url }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          name: deployment-build
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: vercel pull --yes --environment=${{ needs.setup.outputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/web
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build Project Artifacts
+        run: vercel build ${{ needs.setup.outputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: ./apps/web
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Deploy to Vercel
         id: deploy
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          working-directory: ./apps/web
-          vercel-args: ${{ needs.setup.outputs.environment == 'production' && '--prod' || '' }}
+        run: |
+          if [[ "${{ needs.setup.outputs.environment }}" == "production" ]]; then
+            vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+          else
+            vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+          fi
+          echo "preview-url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
+        working-directory: ./apps/web
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Comment deployment URL on PR
         if: github.event_name == 'pull_request'
@@ -153,7 +174,7 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🚀 Deployed to **${{ needs.setup.outputs.environment }}**: ${{ steps.deploy.outputs.url }}'
+              body: '🚀 Deployed to **${{ needs.setup.outputs.environment }}**: ${{ steps.deploy.outputs.preview-url }}'
             })
 
   # ============================================================================
@@ -190,7 +211,7 @@ jobs:
   # ============================================================================
   migrate:
     name: Run Database Migrations
-    needs: [setup, build]
+    needs: [setup]
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
