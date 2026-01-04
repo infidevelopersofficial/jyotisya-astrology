@@ -162,7 +162,7 @@ jobs:
   deploy-admin:
     name: Deploy Admin App
     needs: [setup, build]
-    if: needs.setup.outputs.deploy == 'true'
+    if: false # Temporarily disabled
     runs-on: ubuntu-latest
     timeout-minutes: 10
     environment: ${{ needs.setup.outputs.environment }}-admin
@@ -223,7 +223,7 @@ jobs:
   # ============================================================================
   deployment-complete:
     name: Deployment Complete
-    needs: [setup, deploy-web, deploy-admin, migrate]
+    needs: [setup, deploy-web, migrate]
     if: always() && needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
 
@@ -231,7 +231,6 @@ jobs:
       - name: Check deployment status
         run: |
           if [[ "${{ needs.deploy-web.result }}" != "success" || \
-                "${{ needs.deploy-admin.result }}" != "success" || \
                 "${{ needs.migrate.result }}" != "success" ]]; then
             echo "❌ Deployment failed"
             exit 1
