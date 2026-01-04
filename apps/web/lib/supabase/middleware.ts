@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
-import { createClient } from "./server";
 
 export async function updateSession(request: NextRequest) {
   // Validate environment variables before attempting to create Supabase client
@@ -59,88 +58,8 @@ export async function updateSession(request: NextRequest) {
 }
 
 /**
- * Authentication error response
- */
-function unauthorizedResponse(message = "Unauthorized") {
-  return NextResponse.json({ error: "unauthorized", message }, { status: 401 });
-}
-
-/**
- * Server error response
- */
-function serverErrorResponse(message = "Authentication failed") {
-  return NextResponse.json({ error: "server_error", message }, { status: 500 });
-}
-
-/**
- * Require authentication for API routes
- * Returns user data if authenticated, or error response if not
+ * Note: requireAuth and optionalAuth have been moved to lib/api/auth.ts
+ * for use in API routes (Node.js runtime only).
  *
- * Usage:
- * ```typescript
- * export async function GET(request: NextRequest): Promise<NextResponse> {
- *   const user = await requireAuth(request)
- *   if (user instanceof NextResponse) return user // Auth failed, return error
- *
- *   // User is authenticated, proceed with request
- *   // Access user.id, user.email, etc.
- * }
- * ```
+ * This middleware file should only contain Edge Runtime-compatible code.
  */
-export async function requireAuth(_request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser();
-
-    if (error) {
-      console.error(
-        "[requireAuth] Supabase auth error:",
-        error instanceof Error ? error.message : String(error),
-      );
-      return unauthorizedResponse("Invalid or expired session");
-    }
-
-    if (!user) {
-      return unauthorizedResponse("No active session");
-    }
-
-    return user;
-  } catch (error: unknown) {
-    console.error("[requireAuth] Unexpected error:", error);
-    return serverErrorResponse();
-  }
-}
-
-/**
- * Optional authentication for API routes
- * Returns user data if authenticated, or null if not (without error response)
- *
- * Usage:
- * ```typescript
- * export async function GET(request: NextRequest): Promise<NextResponse> {
- *   const user = await optionalAuth(request)
- *
- *   if (user) {
- *     // User is authenticated, show personalized content
- *   } else {
- *     // User is not authenticated, show public content
- *   }
- * }
- * ```
- */
-export async function optionalAuth(_request: NextRequest) {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    return user;
-  } catch (error: unknown) {
-    console.error("[optionalAuth] Error:", error);
-    return null;
-  }
-}
