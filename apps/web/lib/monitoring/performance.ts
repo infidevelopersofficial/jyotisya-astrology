@@ -1,5 +1,4 @@
 import { logger } from "./logger";
-import * as Sentry from "@sentry/nextjs";
 
 /**
  * Performance Monitoring Utilities
@@ -9,7 +8,35 @@ import * as Sentry from "@sentry/nextjs";
  * - API request timing
  * - Component render timing
  * - Custom performance marks
+ *
+ * Note: Sentry is conditionally imported to avoid Edge Runtime compatibility issues
  */
+
+/**
+ * Runtime-safe Sentry utilities
+ * These functions detect the runtime environment and only use Sentry in Node.js runtime
+ */
+const SafeSentry = {
+  metrics: {
+    distribution: (
+      name: string,
+      value: number,
+      options?: { unit?: string; tags?: Record<string, string> },
+    ) => {
+      // Skip Sentry in Edge Runtime (where __dirname is not available)
+      if (typeof process !== "undefined" && process.release?.name === "node") {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
+          const Sentry = require("@sentry/nextjs");
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+          Sentry.metrics.distribution(name, value, options);
+        } catch {
+          // Silently fail if Sentry not available - this is expected in Edge Runtime
+        }
+      }
+    },
+  },
+};
 
 interface PerformanceMetric {
   name: string;
@@ -45,8 +72,8 @@ class PerformanceMonitor {
         ...metric.metadata,
       });
 
-      // Report to Sentry
-      Sentry.metrics.distribution(`performance.${metric.name}`, metric.duration, {
+      // Report to Sentry (runtime-safe)
+      SafeSentry.metrics.distribution(`performance.${metric.name}`, metric.duration, {
         unit: "millisecond",
         tags: metric.metadata as Record<string, string>,
       });
@@ -348,8 +375,8 @@ export function reportWebVitals(metric: {
     id: metric.id,
   });
 
-  // Send to Sentry
-  Sentry.metrics.distribution(`webvital.${metric.name}`, metric.value, {
+  // Send to Sentry (runtime-safe)
+  SafeSentry.metrics.distribution(`webvital.${metric.name}`, metric.value, {
     unit: "millisecond",
     tags: {
       rating: metric.rating || "unknown",

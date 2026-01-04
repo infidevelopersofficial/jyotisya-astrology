@@ -11,9 +11,71 @@
  * - Attempt 4: After 4 seconds (total 3 retries)
  *
  * @module lib/payments/retry
+ *
+ * Note: Sentry is conditionally imported to avoid Edge Runtime compatibility issues
  */
 
-import * as Sentry from "@sentry/nextjs";
+/**
+ * Runtime-safe Sentry utilities
+ * These functions detect the runtime environment and only use Sentry in Node.js runtime
+ */
+const SafeSentry = {
+  addBreadcrumb: (breadcrumb: {
+    category: string;
+    message: string;
+    level?: "info" | "warning" | "error";
+    data?: Record<string, unknown>;
+  }) => {
+    // Skip Sentry in Edge Runtime (where __dirname is not available)
+    if (typeof process !== "undefined" && process.release?.name === "node") {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
+        const Sentry = require("@sentry/nextjs");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        Sentry.addBreadcrumb(breadcrumb);
+      } catch {
+        // Silently fail if Sentry not available - this is expected in Edge Runtime
+      }
+    }
+  },
+  captureException: (
+    error: unknown,
+    options?: {
+      tags?: Record<string, string>;
+      extra?: Record<string, unknown>;
+    },
+  ) => {
+    if (typeof process !== "undefined" && process.release?.name === "node") {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
+        const Sentry = require("@sentry/nextjs");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        Sentry.captureException(error, options);
+      } catch {
+        // Silently fail if Sentry not available - this is expected in Edge Runtime
+      }
+    }
+  },
+  captureMessage: (
+    message: string,
+    options?: {
+      level?: "info" | "warning" | "error";
+      tags?: Record<string, string>;
+      extra?: Record<string, unknown>;
+    },
+  ) => {
+    if (typeof process !== "undefined" && process.release?.name === "node") {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-unsafe-assignment
+        const Sentry = require("@sentry/nextjs");
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        Sentry.captureMessage(message, options);
+      } catch {
+        // Silently fail if Sentry not available - this is expected in Edge Runtime
+      }
+    }
+  },
+};
 
 /**
  * Retry configuration options
@@ -131,7 +193,7 @@ export async function retryWithBackoff<T>(
 
       // Success! Log if this was a retry
       if (attempt > 1) {
-        Sentry.addBreadcrumb({
+        SafeSentry.addBreadcrumb({
           category: "payment.retry",
           message: `Payment operation succeeded on attempt ${attempt}`,
           level: "info",
@@ -149,10 +211,10 @@ export async function retryWithBackoff<T>(
       // If this is the last attempt, don't retry
       if (attempt > maxAttempts) {
         // Log final failure to Sentry
-        Sentry.captureException(error, {
+        SafeSentry.captureException(error, {
           tags: {
             operation: "payment_retry_exhausted",
-            attempts: attempt,
+            attempts: String(attempt),
           },
           extra: {
             maxAttempts,
@@ -165,7 +227,7 @@ export async function retryWithBackoff<T>(
 
       // Check if error is retryable
       if (!isRetryable(error)) {
-        Sentry.addBreadcrumb({
+        SafeSentry.addBreadcrumb({
           category: "payment.retry",
           message: "Payment error is not retryable, failing immediately",
           level: "warning",
@@ -182,7 +244,7 @@ export async function retryWithBackoff<T>(
       const nextDelay = attempt === 1 ? currentDelay : currentDelay * backoffMultiplier;
 
       // Log retry attempt
-      Sentry.addBreadcrumb({
+      SafeSentry.addBreadcrumb({
         category: "payment.retry",
         message: `Payment attempt ${attempt} failed, retrying in ${nextDelay}ms`,
         level: "warning",
@@ -306,7 +368,7 @@ export class PaymentCircuitBreaker {
     this.failures = 0; // Reset failure count on success
 
     if (this.isOpen) {
-      Sentry.addBreadcrumb({
+      SafeSentry.addBreadcrumb({
         category: "payment.circuit_breaker",
         message: "Circuit breaker closed after successful payment",
         level: "info",
@@ -326,7 +388,7 @@ export class PaymentCircuitBreaker {
     if (this.failures >= this.failureThreshold && !this.isOpen) {
       this.isOpen = true;
 
-      Sentry.captureMessage("Payment circuit breaker opened", {
+      SafeSentry.captureMessage("Payment circuit breaker opened", {
         level: "error",
         tags: {
           operation: "circuit_breaker_opened",
