@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { updateSession } from "./lib/supabase/middleware";
 import { addSecurityHeaders } from "./lib/security/headers";
 
 // Middleware automatically runs on Edge Runtime in Next.js 14
