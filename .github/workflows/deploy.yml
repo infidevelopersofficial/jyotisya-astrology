@@ -138,7 +138,7 @@ jobs:
         run: npm install --global vercel@latest
 
       - name: Pull Vercel Environment Information
-        run: vercel pull --yes --environment=${{ needs.setup.outputs.environment }} --token=${{ secrets.VERCEL_TOKEN }} --org-id=${{ secrets.VERCEL_ORG_ID }}
+        run: vercel pull --yes --environment=${{ needs.setup.outputs.environment }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
