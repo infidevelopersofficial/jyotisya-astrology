@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Update Supabase session
-  let response = await updateSession(request);
+  let response = NextResponse.next({ request });
 
   // Skip onboarding check for API routes and public routes
   if (pathname.startsWith("/api") || isPublicRoute(pathname)) {
