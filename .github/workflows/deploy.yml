@@ -145,7 +145,7 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Build Project Artifacts
-        run: vercel build ${{ needs.setup.outputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }} --org-id=${{ secrets.VERCEL_ORG_ID }}
+        run: vercel build ${{ needs.setup.outputs.environment == 'production' && '--prod' || '' }} --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: ./apps/web
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -155,9 +155,9 @@ jobs:
         id: deploy
         run: |
           if [[ "${{ needs.setup.outputs.environment }}" == "production" ]]; then
-            vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} --org-id=${{ secrets.VERCEL_ORG_ID }} > deployment-url.txt
+            vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
           else
-            vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --org-id=${{ secrets.VERCEL_ORG_ID }} > deployment-url.txt
+            vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
           fi
           echo "preview-url=$(cat deployment-url.txt)" >> $GITHUB_OUTPUT
         working-directory: ./apps/web
