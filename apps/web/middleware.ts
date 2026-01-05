@@ -17,6 +17,8 @@ function isPublicRoute(pathname: string): boolean {
 }
 
 export async function middleware(request: NextRequest) {
+    try {
+      
   const { pathname } = request.nextUrl;
 
   // Redirect test/debug pages to home in production
@@ -46,6 +48,11 @@ export async function middleware(request: NextRequest) {
   response = addSecurityHeaders(response, request);
 
   return response;
+        } catch (error: unknown) {
+          // Silently fail if middleware errors - allows app to load even if Sentry or other services fail
+          console.error('[Middleware Error]:', error);
+          return NextResponse.next({ request });
+        }
 }
 
 export const config = {
