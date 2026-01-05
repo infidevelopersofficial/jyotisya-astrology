@@ -22,6 +22,11 @@ const nextConfig = {
     // Allow builds to complete with TypeScript errors in CI (use cautiously)
     // ignoreBuildErrors: process.env.CI === "true",
   },
+    // Disable Sentry in Edge Runtime (middleware) to avoid __dirname errors
+  sentry: {
+        disableServerWebpackPlugin: true,
+      },
+  
 
   // Suppress webpack warnings from Sentry's OpenTelemetry integration
   webpack: (config, { isServer }) => {
