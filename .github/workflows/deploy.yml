@@ -121,9 +121,6 @@ jobs:
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment:
-      name: ${{ needs.setup.outputs.environment }}
-      url: ${{ steps.deploy.outputs.preview-url }}
 
     steps:
       - name: Checkout code
