@@ -2,6 +2,9 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "node:path";
 
+/**
+ * Note: __dirname is safe here since Vitest runs in Node.js, not Edge Runtime
+ */
 export default defineConfig({
   plugins: [react()],
   esbuild: {
