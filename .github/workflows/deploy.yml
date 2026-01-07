@@ -56,7 +56,7 @@ jobs:
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment: ${{ needs.setup.outputs.environment }}
+    
 
     steps:
       - name: Checkout code
@@ -183,7 +183,7 @@ jobs:
     if: false # Temporarily disabled
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    environment: ${{ needs.setup.outputs.environment }}-admin
+    -admin
 
     steps:
       - name: Checkout code
@@ -212,7 +212,7 @@ jobs:
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    environment: ${{ needs.setup.outputs.environment }}
+    
 
     steps:
       - name: Checkout code
