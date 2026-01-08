@@ -7,6 +7,8 @@ import * as Sentry from "@sentry/nextjs";
 
 // Force dynamic rendering for this API route
 export const dynamic = "force-dynamic";
+// Explicitly run in Node.js runtime (required for Sentry and Node.js APIs)
+export const runtime = "nodejs";
 
 interface RequestBody {
   astrologerId: string;

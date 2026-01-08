@@ -5,6 +5,8 @@ import * as Sentry from "@sentry/nextjs";
 
 // Force dynamic rendering to avoid DATABASE_URL requirement at build time
 export const dynamic = "force-dynamic";
+// Explicitly run in Node.js runtime (required for Sentry and Node.js APIs)
+export const runtime = "nodejs";
 
 /**
  * POST /api/webhooks/razorpay
