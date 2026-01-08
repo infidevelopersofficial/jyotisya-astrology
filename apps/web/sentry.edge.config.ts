@@ -17,9 +17,14 @@
  * - Test thoroughly to ensure no Node.js globals are accessed
  */
 
+// CRITICAL: DO NOT import anything from @sentry/nextjs or lib/monitoring/sentry
 // Intentionally empty - no Sentry initialization for Edge Runtime
 // This prevents __dirname and other Node.js global errors
 
-console.info(
-  "[Sentry Edge] Sentry is disabled for Edge Runtime (middleware) to prevent Node.js compatibility issues",
-);
+// Disable any logging to prevent potential webpack bundling issues
+// console.info(
+//   "[Sentry Edge] Sentry is disabled for Edge Runtime (middleware) to prevent Node.js compatibility issues",
+// );
+
+// Export an empty object to satisfy Next.js Sentry auto-detection
+export {};
