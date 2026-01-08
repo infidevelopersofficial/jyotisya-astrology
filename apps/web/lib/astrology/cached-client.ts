@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { cached } from "@/lib/api/cache";
 import { logger } from "@/lib/monitoring/logger";
+import { astrologyOrchestrator } from "./service-orchestrator";
 import { astrologyAPI, createAstrologyRequest } from "./client";
 import type {
   AstrologyRequest,
@@ -13,13 +14,17 @@ import type {
   WesternNatalResponse,
   DivisionalChartType,
   CachedResponse,
+  ServiceBackend,
 } from "./types";
 
 /**
  * Cached Astrology API Client
  *
- * Wraps all API calls with aggressive 24-hour caching to respect
- * the 50 requests/day limit.
+ * Uses the service orchestrator to automatically route requests between:
+ * - Python FastAPI service (Railway) - PRIMARY, unlimited requests
+ * - FreeAstrologyAPI - FALLBACK, 50 req/day limit
+ *
+ * Wraps all API calls with aggressive 24-hour caching for optimal performance.
  *
  * Cache Strategy:
  * - Birth charts: 24 hours (birth data doesn't change)
@@ -79,7 +84,7 @@ function generateCompatibilityKey(person1: AstrologyRequest, person2: AstrologyR
 /**
  * Wrap response with cache metadata
  */
-function wrapCachedResponse<T>(data: T, ttl: number): CachedResponse<T> {
+function wrapCachedResponse<T>(data: T, ttl: number, source?: ServiceBackend): CachedResponse<T> {
   const now = new Date();
   const expiresAt = new Date(now.getTime() + ttl);
 
@@ -88,6 +93,7 @@ function wrapCachedResponse<T>(data: T, ttl: number): CachedResponse<T> {
     cached_at: now.toISOString(),
     expires_at: expiresAt.toISOString(),
     from_cache: false, // Will be true if served from cache
+    source: source || "freeastrology",
   };
 }
 
@@ -98,9 +104,9 @@ function wrapCachedResponse<T>(data: T, ttl: number): CachedResponse<T> {
 const getBirthChartCached = cached(
   async (...args: unknown[]) => {
     const request = args[0] as AstrologyRequest;
-    logger.info("Fetching birth chart from API", { request });
-    const data = await astrologyAPI.getBirthChart(request);
-    return wrapCachedResponse(data, CACHE_24H);
+    logger.info("Fetching birth chart from orchestrator", { request });
+    const { data, source } = await astrologyOrchestrator.getBirthChart(request);
+    return wrapCachedResponse(data, CACHE_24H, source);
   },
   {
     ttl: CACHE_24H,
@@ -131,9 +137,9 @@ const getDivisionalChartCached = cached(
 const getChartSVGCached = cached(
   async (...args: unknown[]) => {
     const request = args[0] as AstrologyRequest;
-    logger.info("Fetching chart SVG from API", { request });
-    const data = await astrologyAPI.getChartSVG(request);
-    return wrapCachedResponse(data, CACHE_24H);
+    logger.info("Fetching chart SVG from orchestrator", { request });
+    const { data, source } = await astrologyOrchestrator.getChartSVG(request);
+    return wrapCachedResponse(data, CACHE_24H, source);
   },
   {
     ttl: CACHE_24H,

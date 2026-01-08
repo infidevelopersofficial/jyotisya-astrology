@@ -7,7 +7,8 @@ import path from "path";
  * This is the root-level configuration that provides shared settings
  * for all workspace packages. Individual apps can extend this config
  * with their own vitest.config.ts files.
- *
+
+*
  * Note: __dirname is safe here since Vitest runs in Node.js, not Edge Runtime
  */
 export default defineConfig({

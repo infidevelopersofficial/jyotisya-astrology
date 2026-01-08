@@ -265,6 +265,11 @@ export interface RateLimitInfo {
 }
 
 /**
+ * Service backend type
+ */
+export type ServiceBackend = "python" | "freeastrology" | "unavailable";
+
+/**
  * Cached response metadata
  */
 export interface CachedResponse<T> {
@@ -272,4 +277,5 @@ export interface CachedResponse<T> {
   cached_at: string;
   expires_at: string;
   from_cache: boolean;
+  source?: ServiceBackend; // Which backend served the request
 }
