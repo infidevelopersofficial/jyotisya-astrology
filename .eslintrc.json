@@ -61,6 +61,9 @@
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/restrict-template-expressions": "warn",
 
+    // React/JSX Rules
+    "react/no-unescaped-entities": "off", // Disabled for content-heavy pages (legal, marketing)
+
     // Production Safety
     "no-console": "warn",
     "no-debugger": "error",
