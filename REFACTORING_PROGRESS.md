@@ -2,7 +2,7 @@
 
 **Migration Goal**: Consolidate NestJS/FastAPI services into Next.js App Router API routes for Vercel deployment
 
-**Updated**: 2025-12-19
+**Updated**: 2026-01-08
 
 ---
 
@@ -63,15 +63,41 @@
 
 ---
 
-## 🚧 Phase 2: Core Astrology APIs (IN PROGRESS)
+## ✅ Phase 2: Core Astrology APIs (COMPLETED)
 
-### Next Tasks:
+### Completed Tasks:
 
-1. Create Python service client (`apps/web/lib/astrology/python-client.ts`)
-2. Create service orchestrator (`apps/web/lib/astrology/service-orchestrator.ts`)
-3. Enhance birth-chart API route
-4. Update cached-client with multi-layer caching
-5. Mark NestJS service as deprecated
+1. ✅ Created Python service client (`apps/web/lib/astrology/python-client.ts`)
+   - Circuit breaker pattern for resilience
+   - Automatic retry logic with exponential backoff
+   - Health checking and service monitoring
+   - 10s timeout with configurable settings
+
+2. ✅ Created service orchestrator (`apps/web/lib/astrology/service-orchestrator.ts`)
+   - Intelligent routing between Python (primary) and FreeAstrologyAPI (fallback)
+   - Automatic failover when Python service is unavailable
+   - Health tracking for both services
+   - Service status reporting
+
+3. ✅ Enhanced cached-client with service orchestrator integration
+   - Updated to use orchestrator instead of direct API client
+   - Birth chart and chart SVG now route through orchestrator
+   - Source tracking (python/freeastrology) in cached responses
+   - Maintains 24-hour caching for optimal performance
+
+4. ✅ API routes now use multi-layer architecture:
+   - Layer 1: API Route (`/api/astrology/birth-chart`)
+   - Layer 2: Cached Client (24h caching)
+   - Layer 3: Service Orchestrator (intelligent routing)
+   - Layer 4: Python Client or FreeAstrologyAPI Client
+
+**Architecture Diagram:**
+
+```
+API Route → Cached Client → Orchestrator → Python Service (primary)
+                                        ↓
+                                        → FreeAstrologyAPI (fallback)
+```
 
 ---
 
@@ -172,7 +198,7 @@ curl https://your-app.railway.app/health
 - ✅ API infrastructure established
 - ✅ Turborepo pipeline updated
 
-### Overall Progress: 26% (5/19 tasks completed)
+### Overall Progress: 47% (9/19 tasks completed)
 
 ---
 

@@ -1,6 +1,7 @@
 {
   "root": true,
   "extends": [
+    "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "prettier"
@@ -59,6 +60,9 @@
     "@typescript-eslint/no-redundant-type-constituents": "warn",
     "@typescript-eslint/no-unnecessary-type-assertion": "warn",
     "@typescript-eslint/restrict-template-expressions": "warn",
+
+    // React/JSX Rules
+    "react/no-unescaped-entities": "off", // Disabled for content-heavy pages (legal, marketing)
 
     // Production Safety
     "no-console": "warn",
