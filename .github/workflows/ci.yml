@@ -48,15 +48,14 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: 17
-      
-        run: yarn lint
-        continue-on-error: true
-
-      - name: Type check
+      - name: Generate Prisma Client
+              run: npx prisma generate --schema=./prisma/schema.prisma
+                    - name: Run ESLint
+                            run: yarn lint
+                                    continue-on-error: true
         run: |
-          npx tsc --noEmit && npx tsc --noEmit
-          cd ../admin && npx tsc --noEmit
+
+                   npx tsc --noEmit && npx tsc --noEmit
 
   # ============================================================================
   # BUILD
