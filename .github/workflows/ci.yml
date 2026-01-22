@@ -147,7 +147,7 @@ jobs:
             ${{ runner.os }}-nextjs-
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: NODE_ENV="" yarn install --immutable
 
       - name: Generate Prisma Client
         run: |
