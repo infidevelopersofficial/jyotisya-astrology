@@ -141,6 +141,10 @@ export function verifyWebhookSignature(body: string, signature: string): boolean
  * @returns Payment details with full type safety
  */
 export async function fetchPaymentDetails(paymentId: string): Promise<RazorpayPayment> {
+   // Validate payment ID to prevent SSRF attacks
+  if (!paymentId || typeof paymentId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(paymentId)) {
+    throw new Error('Invalid payment ID format');
+  }
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
     throw new Error("Razorpay credentials not configured");
   }
@@ -173,6 +177,10 @@ export async function fetchPaymentDetails(paymentId: string): Promise<RazorpayPa
  * @returns Refund object with full type safety
  */
 export async function initiateRefund(paymentId: string, amount?: number): Promise<RazorpayRefund> {
+   // Validate payment ID to prevent SSRF attacks
+  if (!paymentId || typeof paymentId !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(paymentId)) {
+    throw new Error('Invalid payment ID format');
+  }
   if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
     throw new Error("Razorpay credentials not configured");
   }
