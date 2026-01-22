@@ -29,6 +29,7 @@ export default defineConfig({
       "**/.next/**",
       "**/cypress/**",
       "**/.{idea,git,cache,output,temp}/**",
+              "**/_archived/**",
     ],
     coverage: {
       provider: "v8",
