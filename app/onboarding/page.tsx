@@ -84,7 +84,9 @@ export default function OnboardingPage(): React.ReactElement {
   }, []);
 
   const handleDateTimeChange = (dateTime: string) => {
-    const [date, time] = dateTime.split("T");
+    const [date, timeWithSeconds] = dateTime.split("T");
+    // Extract only HH:MM from the time portion (removes seconds and timezone)
+    const time = timeWithSeconds?.substring(0, 5); // "04:40:00.000Z" -> "04:40"
     setFormData((prev) => ({ ...prev, birthDate: date ?? "", birthTime: time ?? "" }));
   };
 
