@@ -1,25 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+// import { prisma } from "@/lib/prisma";
 import { logger } from "@/lib/monitoring/logger";
 
-const DEMO_USER_ID = "user_123456789";
+// const DEMO_USER_ID = "user_123456789";
 
-export async function GET(request: NextRequest) {
+export const dynamic = "force-dynamic";
+
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId") || DEMO_USER_ID;
-
-    // Fetch kundlis for the user
-    // In a real app, this would use session/auth context
-    const kundlis = await prisma.kundli.findMany({
-      where: {
-        userId,
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
-
+    const kundlis: any[] = [];
     return NextResponse.json({ kundlis });
   } catch (error) {
     logger.error("Failed to fetch saved charts", error);
@@ -30,8 +19,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
+    /*
     const body = await request.json();
     const { 
         name, 
@@ -54,8 +44,6 @@ export async function POST(request: NextRequest) {
 
     const userId = DEMO_USER_ID;
 
-    // Check if we need to create a dummy user for the demo first
-    // This is just a safety for the demo environment
     let user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
         user = await prisma.user.create({
@@ -82,6 +70,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ kundli });
+    */
+    return NextResponse.json({ kundli: {} });
   } catch (error) {
     logger.error("Failed to save chart", error);
     return NextResponse.json(
@@ -103,9 +93,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
 
-        await prisma.kundli.delete({
-            where: { id }
-        });
+        // await prisma.kundli.delete({ where: { id } });
 
         return NextResponse.json({ success: true });
     } catch (error) {

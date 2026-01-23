@@ -152,7 +152,7 @@ export class OpenAIInterpretationProvider implements InterpretationProvider, Bir
         challenges: z.array(z.string()),
         remedies: z.array(z.string()),
       }),
-      prompt: prompt,
+      prompt,
     });
   }
 }

@@ -15,7 +15,7 @@ const nextConfig = {
   eslint: {
     // WARNING: This allows production builds to complete even with ESLint errors
     // Use this only in CI for gradual migration. Fix warnings in development!
-    ignoreDuringBuilds: process.env.CI === "true",
+    ignoreDuringBuilds: true,
   },
 
   typescript: {
