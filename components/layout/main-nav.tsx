@@ -26,21 +26,28 @@ export default function MainNav(): React.ReactElement {
 
   const renderLinks = (onClick?: () => void) => (
     <nav className="flex flex-col gap-3 text-sm text-slate-200 md:flex-row md:items-center">
-      {LINKS.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          onClick={onClick}
-          className={clsx(
-            "rounded-full px-4 py-2 transition",
-            pathname === link.href
-              ? "bg-white/10 text-white"
-              : "text-slate-300 hover:bg-white/5 hover:text-white",
-          )}
-        >
-          {nav.links[link.key]}
-        </Link>
-      ))}
+      {LINKS.map((link) => {
+        const isActive = pathname === link.href || (link.href !== "/" && pathname?.startsWith(link.href));
+        return (
+          <Link
+            key={link.href}
+            href={link.href}
+            onClick={onClick}
+            aria-current={isActive ? "page" : undefined}
+            className={clsx(
+              "relative px-4 py-2 text-sm font-medium transition-colors",
+              isActive
+                ? "text-orange-400"
+                : "text-slate-400 hover:text-white"
+            )}
+          >
+            {nav.links[link.key]}
+            {isActive && (
+              <span className="absolute bottom-0 left-1/2 h-0.5 w-1/2 -translate-x-1/2 bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.6)]" />
+            )}
+          </Link>
+        );
+      })}
     </nav>
   );
 

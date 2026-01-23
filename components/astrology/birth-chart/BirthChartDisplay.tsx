@@ -14,6 +14,12 @@ import {
 import { getFormattedBirthDateTime } from "@/services/astrology/birthChartService";
 import PlanetaryPositions from "./PlanetaryPositions";
 import HousesGuide from "./HousesGuide";
+import NorthIndianChart from "@/components/charts/NorthIndianChart";
+import SouthIndianChart from "@/components/charts/SouthIndianChart";
+import { useState, useEffect } from "react";
+
+import InterpretationModal from "./InterpretationModal";
+import { useChartInterpretation } from "@/hooks/astrology/useChartInterpretation";
 
 interface BirthChartDisplayProps {
   birthData: BirthData;
@@ -54,6 +60,28 @@ export default function BirthChartDisplay({
   onSaveChart,
 }: BirthChartDisplayProps) {
   const formatted = getFormattedBirthDateTime(birthData.dateTime);
+  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
+  const [showInterpretation, setShowInterpretation] = useState(false);
+
+  // Load preference on mount
+  useEffect(() => {
+    const savedStyle = localStorage.getItem("chartStyle");
+    if (savedStyle === "north" || savedStyle === "south") {
+      setChartStyle(savedStyle);
+    }
+  }, []);
+
+  // Update preference handler
+  const handleSetChartStyle = (style: "north" | "south") => {
+    setChartStyle(style);
+    localStorage.setItem("chartStyle", style);
+  };
+  
+  const { interpreting, interpretation, generateInterpretation } = useChartInterpretation({
+    chartData,
+    onError: (err) => console.error(err) // Could use toast here
+  });
+
 
   return (
     <div className="space-y-6">
@@ -128,112 +156,180 @@ export default function BirthChartDisplay({
       {/* Houses Guide */}
       {showHelp && <HousesGuide />}
 
+
+
       {/* Chart Visualization */}
-      {svgData && (
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
               <span className="text-2xl">📈</span>
               Visual Chart
             </h3>
-
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-2">
+            
+            {/* Chart Style Toggle */}
+            <div className="flex rounded-lg border border-white/10 bg-black/20 p-1">
               <button
-                onClick={onSaveChart}
-                disabled={savingChart || !!savedChartId}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-                title="Save to your account"
+                onClick={() => handleSetChartStyle("north")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                  chartStyle === "north"
+                    ? "bg-indigo-500 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
               >
-                {savingChart ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                    <span>Saving...</span>
-                  </>
-                ) : savedChartId ? (
-                  <>
-                    <span>✅</span>
-                    <span>Saved</span>
-                  </>
-                ) : (
-                  <>
-                    <span>💾</span>
-                    <span>Save</span>
-                  </>
-                )}
+                North
               </button>
-
               <button
-                onClick={onDownloadPNG}
-                disabled={downloadingPNG}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-                title="Download as image"
+                onClick={() => handleSetChartStyle("south")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                  chartStyle === "south"
+                    ? "bg-indigo-500 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
               >
-                {downloadingPNG ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                    <span>PNG</span>
-                  </>
-                ) : (
-                  <>
-                    <span>📥</span>
-                    <span>PNG</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={onDownloadPDF}
-                disabled={downloadingPDF}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-                title="Download as PDF"
-              >
-                {downloadingPDF ? (
-                  <>
-                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                    <span>PDF</span>
-                  </>
-                ) : (
-                  <>
-                    <span>📄</span>
-                    <span>PDF</span>
-                  </>
-                )}
-              </button>
-
-              <button
-                onClick={onCopyLink}
-                className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl"
-                title="Copy shareable link"
-              >
-                {copiedLink ? (
-                  <>
-                    <span>✅</span>
-                    <span>Copied</span>
-                  </>
-                ) : (
-                  <>
-                    <span>🔗</span>
-                    <span>Share</span>
-                  </>
-                )}
+                South
               </button>
             </div>
+            
+            <button
+               onClick={() => setShowInterpretation(true)}
+               className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition-all"
+            >
+              <span>✨</span>
+              <span>AI Analysis</span>
+            </button>
           </div>
 
-          {showHelp && (
-            <p className="mb-5 text-sm text-slate-400">
-              Traditional South Indian style chart showing planetary positions
-            </p>
-          )}
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={onSaveChart}
+              disabled={savingChart || !!savedChartId}
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              title="Save to your account"
+            >
+              {savingChart ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                  <span>Saving...</span>
+                </>
+              ) : savedChartId ? (
+                <>
+                  <span>✅</span>
+                  <span>Saved</span>
+                </>
+              ) : (
+                <>
+                  <span>💾</span>
+                  <span>Save</span>
+                </>
+              )}
+            </button>
 
-          <div
-            id="rasi-chart"
-            className="flex justify-center rounded-xl bg-white p-8 shadow-inner"
-            dangerouslySetInnerHTML={{ __html: svgData.data.svg_code }}
-          />
+            <button
+              onClick={onDownloadPNG}
+              disabled={downloadingPNG}
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              title="Download as image"
+            >
+              {downloadingPNG ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                  <span>PNG</span>
+                </>
+              ) : (
+                <>
+                  <span>📥</span>
+                  <span>PNG</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={onDownloadPDF}
+              disabled={downloadingPDF}
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              title="Download as PDF"
+            >
+              {downloadingPDF ? (
+                <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                  <span>PDF</span>
+                </>
+              ) : (
+                <>
+                  <span>📄</span>
+                  <span>PDF</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={onCopyLink}
+              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl"
+              title="Copy shareable link"
+            >
+              {copiedLink ? (
+                <>
+                  <span>✅</span>
+                  <span>Copied</span>
+                </>
+              ) : (
+                <>
+                  <span>🔗</span>
+                  <span>Share</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
-      )}
+
+        {showHelp && (
+          <p className="mb-5 text-sm text-slate-400">
+            {chartStyle === "north" 
+              ? "North Indian (Diamond) style chart. Houses are fixed, Signs move." 
+              : "South Indian (Square) style chart. Signs are fixed, Houses move via Ascendant."}
+             Click to focus.
+          </p>
+        )}
+
+        <div
+          id="rasi-chart"
+          className="flex justify-center rounded-xl bg-slate-900 p-8 shadow-inner"
+        >
+          {chartData.data.planets && chartData.data.ascendant !== undefined ? (
+            chartStyle === "north" ? (
+              <NorthIndianChart 
+                planets={chartData.data.planets.map(p => ({
+                  name: p.name,
+                  house: p.house || 1,
+                  sign: p.sign || "",
+                  degree: p.fullDegree,
+                  isRetro: Boolean(p.isRetro)
+                }))}
+                ascendantSign={Math.floor(chartData.data.ascendant / 30) + 1}
+                onPlanetClick={(p) => onTogglePlanet(p.name)}
+              />
+            ) : (
+              <SouthIndianChart
+                planets={chartData.data.planets.map(p => ({
+                  name: p.name,
+                  house: p.house || 1,
+                  sign: p.sign || "",
+                  degree: p.fullDegree,
+                  isRetro: Boolean(p.isRetro)
+                }))}
+                ascendantSign={Math.floor(chartData.data.ascendant / 30) + 1}
+                onPlanetClick={(p) => onTogglePlanet(p.name)}
+              />
+            )
+          ) : svgData ? (
+             <div dangerouslySetInnerHTML={{ __html: svgData.data.svg_code }} />
+          ) : (
+             <p className="text-slate-500">Chart data unavailable</p>
+          )}
+        </div>
+      </div>
 
       {/* Next Steps Card */}
       <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 p-6">
@@ -266,6 +362,13 @@ export default function BirthChartDisplay({
           <span className="transition-transform group-hover:translate-x-1">→</span>
         </button>
       </div>
+      <InterpretationModal
+        isOpen={showInterpretation}
+        onClose={() => setShowInterpretation(false)}
+        loading={interpreting}
+        interpretation={interpretation}
+        onGenerate={() => generateInterpretation()}
+      />
     </div>
   );
 }

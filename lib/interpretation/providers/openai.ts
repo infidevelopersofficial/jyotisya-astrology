@@ -1,5 +1,10 @@
 import { buildDailyHoroscopePrompt } from "../prompt";
 import { InterpretationInput, InterpretationOutput, InterpretationProvider } from "../types";
+import { BirthChartInterpretationInput, BirthChartInterpretationOutput, BirthChartInterpretationProvider } from "../birth-chart-types";
+import { buildBirthChartPrompt } from "../birth-chart-prompt";
+import { createOpenAI } from "@ai-sdk/openai";
+import { streamObject } from "ai";
+import { z } from "zod";
 
 interface OpenAIConfig {
   apiKey: string;
@@ -24,7 +29,7 @@ interface OpenAIChatCompletion {
   }>;
 }
 
-export class OpenAIInterpretationProvider implements InterpretationProvider {
+export class OpenAIInterpretationProvider implements InterpretationProvider, BirthChartInterpretationProvider {
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly model: string;
@@ -55,7 +60,7 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
     };
   }
 
-  private async createChatCompletion(prompt: string): Promise<OpenAIChatCompletion> {
+  private async createChatCompletion(prompt: string, jsonMode = false): Promise<OpenAIChatCompletion> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
 
@@ -69,6 +74,7 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
         body: JSON.stringify({
           model: this.model,
           temperature: 0.7,
+          response_format: jsonMode ? { type: "json_object" } : undefined,
           messages: [
             {
               role: "system",
@@ -97,5 +103,56 @@ export class OpenAIInterpretationProvider implements InterpretationProvider {
 
   private buildPrompt(input: InterpretationInput): string {
     return buildDailyHoroscopePrompt(input);
+  }
+
+  async generateBirthChartInterpretation(input: BirthChartInterpretationInput): Promise<BirthChartInterpretationOutput> {
+    const prompt = buildBirthChartPrompt(input);
+    const response = await this.createChatCompletion(prompt, true); // true for JSON mode
+    
+    // Parse JSON response
+    const content = response.choices?.[0]?.message?.content || "{}";
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (e) {
+      console.error("Failed to parse JSON interpretation", e);
+      parsed = {
+        narrative: content,
+        strengths: [],
+        challenges: [],
+        remedies: []
+      };
+    }
+
+    return {
+      provider: "openai",
+      generatedAt: new Date(response.created * 1000).toISOString(),
+      locale: input.locale,
+      narrative: parsed.narrative || "Analysis generated.",
+      strengths: parsed.strengths || [],
+      challenges: parsed.challenges || [],
+      remedies: parsed.remedies || [],
+      raw: response
+    };
+  }
+
+  async streamBirthChartInterpretation(input: BirthChartInterpretationInput): Promise<any> {
+    const openai = createOpenAI({
+      apiKey: this.apiKey,
+      baseURL: this.baseUrl !== "https://api.openai.com/v1" ? this.baseUrl : undefined,
+    });
+
+    const prompt = buildBirthChartPrompt(input);
+
+    return streamObject({
+      model: openai(this.model),
+      schema: z.object({
+        narrative: z.string(),
+        strengths: z.array(z.string()),
+        challenges: z.array(z.string()),
+        remedies: z.array(z.string()),
+      }),
+      prompt: prompt,
+    });
   }
 }

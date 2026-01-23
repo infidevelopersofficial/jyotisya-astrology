@@ -233,6 +233,7 @@ export default function BirthChartGeneratorV2({
       {activeTab === "divisional" && state.chartData && (
         <DivisionalChartsPanel
           svgData={state.svgData}
+          divisionalData={state.divisionalData}
           selectedDivisional={state.selectedDivisional}
           onSelectDivisional={selectDivisional}
         />

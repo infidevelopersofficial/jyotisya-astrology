@@ -16,11 +16,14 @@ import { logger } from "@/lib/monitoring/logger";
  * }
  */
 
+import { DivisionalChartType } from "@/lib/astrology/types";
+
 interface BirthChartRequestBody {
   dateTime: string;
   latitude: number;
   longitude: number;
   timezone: number;
+  chartType?: string;
 }
 
 function isBirthChartRequestBody(body: unknown): body is BirthChartRequestBody {
@@ -52,7 +55,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       );
     }
 
-    const { dateTime, latitude, longitude, timezone } = body;
+    const { dateTime, latitude, longitude, timezone, chartType } = body;
 
     // Create astrology request
     const astrologyRequest = createAstrologyRequest({
@@ -62,8 +65,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       timezone,
     });
 
-    // Get birth chart (will be cached for 24 hours)
-    const result = await cachedAstrologyAPI.getBirthChart(astrologyRequest);
+    let result;
+    if (chartType && chartType !== 'D1') {
+       result = await cachedAstrologyAPI.getDivisionalChart(astrologyRequest, chartType as DivisionalChartType);
+    } else {
+       // Get birth chart (will be cached for 24 hours)
+       result = await cachedAstrologyAPI.getBirthChart(astrologyRequest);
+    }
 
     return NextResponse.json(result, { status: 200 });
   } catch (error: unknown) {
