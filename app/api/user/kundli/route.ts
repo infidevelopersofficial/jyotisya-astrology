@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     // In a real app, this would use session/auth context
     const kundlis = await prisma.kundli.findMany({
       where: {
-        userId: userId,
+        userId,
       },
       orderBy: {
         updatedAt: "desc",
