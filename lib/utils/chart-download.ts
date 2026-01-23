@@ -31,7 +31,7 @@ export async function downloadChartAsPNG(
     // Capture the element as canvas
     const canvas = await html2canvas(element, {
       backgroundColor: "#ffffff",
-      scale: 2, // Higher quality
+      scale: 3, // Higher quality
       logging: false,
       useCORS: true,
     });
@@ -76,7 +76,7 @@ export async function downloadChartAsPDF(
     // Capture the element as canvas
     const canvas = await html2canvas(element, {
       backgroundColor: "#ffffff",
-      scale: 2,
+      scale: 3, // Higher quality
       logging: false,
       useCORS: true,
     });

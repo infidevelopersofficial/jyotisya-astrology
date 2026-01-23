@@ -184,13 +184,14 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
               <div className="space-y-2 text-xs text-orange-200 flex-grow">
                 <div className="flex flex-wrap gap-3">
                   <span>⭐ {astrologer.rating.toFixed(1)}</span>
-                  <span>
-                    Status:
-                    <span
-                      className={astrologer.available ? "text-green-400 ml-1" : "text-red-400 ml-1"}
-                    >
-                      {astrologer.available ? "Available" : "Busy"}
-                    </span>
+                  <span className="flex items-center">
+                    {astrologer.available ? (
+                       <span className="inline-flex items-center gap-1 rounded bg-green-500/10 px-2 py-0.5 text-xs text-green-400 border border-green-500/20">
+                         ⏱️ 8 min wait
+                       </span>
+                    ) : (
+                       <span className="text-red-400 ml-1">Busy</span>
+                    )}
                   </span>
                   {astrologer.totalReviews > 0 && <span>{astrologer.totalReviews} reviews</span>}
                 </div>

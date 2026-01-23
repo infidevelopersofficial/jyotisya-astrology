@@ -1,22 +1,46 @@
 "use client";
 
-import type { ChartSVGResponse } from "@/types/astrology/birthChart.types";
+import type { ChartSVGResponse, BirthChartResponse } from "@/types/astrology/birthChart.types";
 import { DIVISIONAL_CHARTS } from "@/services/astrology/birthChartService";
+import NorthIndianChart from "@/components/charts/NorthIndianChart";
+import SouthIndianChart from "@/components/charts/SouthIndianChart";
+import { useState, useEffect } from "react";
 
 interface DivisionalChartsPanelProps {
   svgData: { [key: string]: ChartSVGResponse };
+  divisionalData?: { [key: string]: BirthChartResponse };
   selectedDivisional: string;
   onSelectDivisional: (code: string) => void;
 }
 
 export default function DivisionalChartsPanel({
   svgData,
+  divisionalData,
   selectedDivisional,
   onSelectDivisional,
 }: DivisionalChartsPanelProps) {
   const selectedChart = DIVISIONAL_CHARTS.find((c) => c.code === selectedDivisional);
   const beginnerCharts = DIVISIONAL_CHARTS.filter((c) => c.beginner);
   const advancedCharts = DIVISIONAL_CHARTS.filter((c) => !c.beginner);
+  
+  const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
+
+  // Load preference on mount
+  useEffect(() => {
+    const savedStyle = localStorage.getItem("chartStyle");
+    if (savedStyle === "north" || savedStyle === "south") {
+      setChartStyle(savedStyle);
+    }
+  }, []);
+
+  // Update preference handler
+  const handleSetChartStyle = (style: "north" | "south") => {
+    setChartStyle(style);
+    localStorage.setItem("chartStyle", style);
+  };
+  
+  const activeData = divisionalData?.[selectedDivisional]?.data;
+  const hasInteractiveChart = activeData && activeData.planets && activeData.ascendant !== undefined;
 
   return (
     <div className="space-y-6">
@@ -102,11 +126,64 @@ export default function DivisionalChartsPanel({
 
       {/* Selected Chart Display */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <h3 className="mb-5 text-xl font-semibold text-white">
-          {selectedChart?.name || selectedDivisional}
-        </h3>
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
+           <h3 className="text-xl font-semibold text-white">
+             {selectedChart?.name || selectedDivisional}
+           </h3>
 
-        {svgData[selectedDivisional] ? (
+           {hasInteractiveChart && (
+            <div className="flex rounded-lg border border-white/10 bg-black/20 p-1">
+              <button
+                onClick={() => handleSetChartStyle("north")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                  chartStyle === "north"
+                    ? "bg-indigo-500 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                North
+              </button>
+              <button
+                onClick={() => handleSetChartStyle("south")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                  chartStyle === "south"
+                    ? "bg-indigo-500 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                South
+              </button>
+            </div>
+           )}
+        </div>
+
+        {hasInteractiveChart ? (
+             <div className="flex justify-center rounded-xl bg-slate-900 p-8 shadow-inner">
+                 {chartStyle === "north" ? (
+                   <NorthIndianChart 
+                     planets={activeData!.planets!.map(p => ({
+                        name: p.name,
+                        house: p.house || 1,
+                        sign: p.sign || "",
+                        degree: p.fullDegree,
+                        isRetro: Boolean(p.isRetro)
+                     }))}
+                     ascendantSign={Math.floor(activeData!.ascendant! / 30) + 1}
+                   />
+                 ) : (
+                   <SouthIndianChart
+                     planets={activeData!.planets!.map(p => ({
+                        name: p.name,
+                        house: p.house || 1,
+                        sign: p.sign || "",
+                        degree: p.fullDegree,
+                        isRetro: Boolean(p.isRetro)
+                     }))}
+                     ascendantSign={Math.floor(activeData!.ascendant! / 30) + 1}
+                   />
+                 )}
+             </div>
+        ) : svgData[selectedDivisional] ? (
           <div
             className="flex justify-center rounded-xl bg-white p-8 shadow-inner"
             dangerouslySetInnerHTML={{

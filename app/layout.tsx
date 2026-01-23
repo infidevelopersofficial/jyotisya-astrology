@@ -16,9 +16,22 @@ export const metadata: Metadata = {
   title: "Jyotishya | Your Cosmic Companion",
   description: "Personalized Vedic & Western astrology services for India.",
   keywords: ["vedic astrology", "kundli", "panchang", "horoscope", "astrologer consultation"],
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Jyotishya",
+  },
   alternates: {
     canonical: "https://www.jyotirvidya.app",
   },
+};
+
+export const viewport = {
+  themeColor: "#0F172A",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({

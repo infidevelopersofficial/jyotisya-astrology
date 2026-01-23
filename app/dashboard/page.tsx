@@ -3,7 +3,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import DailyHoroscopeGrid from "@components/horoscope/daily-grid";
 import PanchangHighlights from "@components/sections/panchang-highlights";
-import { PageContainer, PageHeader, PageSection } from "@/components/layout/page-container";
+import { PageContainer, PageSection } from "@/components/layout/page-container";
+import SmartWelcome from "@/components/dashboard/SmartWelcome";
 
 export default async function DashboardPage() {
   // Server-side authentication check
@@ -21,8 +22,8 @@ export default async function DashboardPage() {
 
   return (
     <PageContainer size="xl">
-      {/* Welcome Section */}
-      <PageHeader title={`Welcome back, ${displayName}!`} description={user.email || undefined} />
+      {/* Smart Welcome Section */}
+      <SmartWelcome displayName={displayName} />
 
       {/* Daily Horoscope */}
       <PageSection title="Your Daily Horoscope">
@@ -47,9 +48,9 @@ export default async function DashboardPage() {
           <ActionCard
             title="Saved Charts"
             description="View and manage your saved birth charts"
-            href="/dashboard/saved-charts"
+            href="/dashboard/charts"
             gradient="from-blue-500 to-cyan-500"
-            icon="📊"
+            icon="📂"
           />
           <ActionCard
             title="View All Horoscopes"

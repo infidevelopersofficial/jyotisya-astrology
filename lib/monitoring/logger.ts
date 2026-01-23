@@ -183,8 +183,8 @@ class Logger {
   /**
    * Log performance metric
    */
-  performance(metric: string, value: number, unit = "ms", context?: LogContext) {
-    this.debug(`Performance: ${metric} = ${value}${unit}`, {
+performanceMetric(metric: string, value: number, unit = "ms", context?: LogContext) { 
+  this.debug(`Performance: ${metric} = ${value}${unit}`, {
       type: "performance",
       metric,
       value,

@@ -15,7 +15,8 @@ interface EnvConfig {
 
   // Astrology Provider (Required)
   JYOTISH_API_URL: string;
-  JYOTISH_API_KEY: string;
+  JYOTISH_API_KEY?: string;
+  FREE_ASTROLOGY_API_KEY?: string;
 
   // Python Astrology Service (Required for production)
   ASTRO_PYTHON_SERVICE_URL?: string;
@@ -40,7 +41,6 @@ const REQUIRED_ENV_VARS = [
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "DATABASE_URL",
   "JYOTISH_API_URL",
-  "JYOTISH_API_KEY",
 ] as const;
 
 /**
@@ -141,7 +141,8 @@ export function validateEnv(): EnvConfig {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     DATABASE_URL: process.env.DATABASE_URL!,
     JYOTISH_API_URL: process.env.JYOTISH_API_URL!,
-    JYOTISH_API_KEY: process.env.JYOTISH_API_KEY!,
+    JYOTISH_API_KEY: process.env.JYOTISH_API_KEY,
+    FREE_ASTROLOGY_API_KEY: process.env.FREE_ASTROLOGY_API_KEY,
     ASTRO_PYTHON_SERVICE_URL: process.env.ASTRO_PYTHON_SERVICE_URL,
     ASTRO_PYTHON_SERVICE_TIMEOUT_MS: process.env.ASTRO_PYTHON_SERVICE_TIMEOUT_MS,
     API_INTERNAL_SECRET: process.env.API_INTERNAL_SECRET,

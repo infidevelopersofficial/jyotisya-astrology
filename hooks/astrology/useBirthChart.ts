@@ -33,6 +33,7 @@ export function useBirthChart() {
   });
 
   const [chartData, setChartData] = useState<BirthChartResponse | null>(null);
+  const [divisionalData, setDivisionalData] = useState<{ [key: string]: BirthChartResponse }>({});
   const [svgData, setSvgData] = useState<{ [key: string]: ChartSVGResponse }>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +72,7 @@ export function useBirthChart() {
       const rawData = await response.json();
       const transformedData = transformChartData(rawData);
       setChartData(transformedData);
+      setDivisionalData(prev => ({ ...prev, "D1": transformedData }));
       setActiveTab("chart");
       await fetchSVG("D1");
 
@@ -86,6 +88,35 @@ export function useBirthChart() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  /**
+   * Fetch Divisional Chart Data (JSON)
+   */
+  const fetchDivisionalData = async (chartType: string): Promise<void> => {
+    if (divisionalData[chartType]) return;
+
+    try {
+        const response = await fetch("/api/astrology/birth-chart", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              dateTime: birthData.dateTime,
+              latitude: birthData.latitude,
+              longitude: birthData.longitude,
+              timezone: birthData.timezone,
+              chartType: chartType
+            }),
+          });
+    
+          if (!response.ok) throw new Error("Failed to load divisional chart data");
+    
+          const rawData = await response.json();
+          const transformedData = transformChartData(rawData);
+          setDivisionalData(prev => ({ ...prev, [chartType]: transformedData }));
+    } catch (err) {
+        console.error(`Failed to load ${chartType} data:`, err);
     }
   };
 
@@ -118,16 +149,20 @@ export function useBirthChart() {
   };
 
   /**
-   * Select a divisional chart and load its SVG
+   * Select a divisional chart and load its data
    */
   const selectDivisional = (code: string): void => {
     setSelectedDivisional(code);
+    if (code !== "D1") {
+       fetchDivisionalData(code).catch(err => console.error("Failed to fetch D-Chart data:", err));
+    }
     fetchSVG(code).catch((err) => console.error("Failed to fetch SVG:", err));
   };
 
-  const state: BirthChartState = {
+  const state: BirthChartState & { divisionalData: { [key: string]: BirthChartResponse } } = {
     birthData,
     chartData,
+    divisionalData,
     svgData,
     loading,
     error,

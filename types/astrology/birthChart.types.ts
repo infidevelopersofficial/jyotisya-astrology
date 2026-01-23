@@ -76,6 +76,7 @@ export interface HouseMeaning {
 export interface BirthChartState {
   birthData: BirthData;
   chartData: BirthChartResponse | null;
+  divisionalData?: { [key: string]: BirthChartResponse };
   svgData: { [key: string]: ChartSVGResponse };
   loading: boolean;
   error: string | null;
