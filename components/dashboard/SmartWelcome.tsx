@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, Sparkles, User, Calendar, Percent, Moon, ArrowUpCircle } from "lucide-react";
 import { useSavedCharts } from "@/hooks/user/useSavedCharts";
-import { getSunSignFromDate } from "@/services/astrology/birthChartService";
+import { getSunSignFromDate, getSignName } from "@/services/astrology/birthChartService";
+import { BirthChartResponse } from "@/types/astrology/birthChart.types";
 
 interface SmartWelcomeProps {
     displayName: string;
@@ -24,17 +25,42 @@ export default function SmartWelcome({ displayName }: SmartWelcomeProps) {
     useEffect(() => {
         if (!loading && charts.length > 0) {
             // Assume the first chart created is the user's "primary" chart for now
-            // In a fuller app, we'd have a 'isPrimary' flag
             const primary = charts[0];
-            if (primary) {
-                const sign = getSunSignFromDate(new Date(primary.birthDate));
-                setStats(prev => ({
-                    ...prev,
-                    sunSign: `${sign} ☀️`,
-                    chartsCount: charts.length,
-                    completion: 75,
-                }));
+            if (!primary) return;
+
+            const data = primary.chartData as unknown as BirthChartResponse;
+
+            let sunSignName = "Unknown";
+            let moonSignName = "Unknown";
+            let ascendantName = "Unknown";
+
+            // Extract from Chart Data if available
+            if (data?.data?.planets) {
+                const planets = data.data.planets;
+                const sun = planets.find(p => p.name === "Sun");
+                const moon = planets.find(p => p.name === "Moon");
+                
+                sunSignName = sun?.sign || getSunSignFromDate(new Date(primary.birthDate));
+                moonSignName = moon?.sign || "Unknown";
+
+                const ascDegree = data.data.ascendant;
+                if (typeof ascDegree === 'number') {
+                     const signNum = Math.floor(ascDegree / 30) + 1;
+                     ascendantName = getSignName(signNum);
+                }
+            } else {
+                // Fallback if no chart data processed yet
+                sunSignName = getSunSignFromDate(new Date(primary.birthDate));
             }
+
+            setStats(prev => ({
+                ...prev,
+                sunSign: `${sunSignName}`,
+                moonSign: `${moonSignName}`,
+                ascendant: `${ascendantName}`,
+                chartsCount: charts.length,
+                completion: data?.data ? 80 : 60, // Higher completion if chart data exists
+            }));
         }
     }, [charts, loading]);
 
