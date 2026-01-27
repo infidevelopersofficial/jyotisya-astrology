@@ -65,9 +65,38 @@ export default function BirthChartGeneratorV2({
         </button>
       </div>
 
-      {/* Clean Progress Stepper */}
+      {/* Compact Progress Indicator - Mobile First */}
       <div className="relative">
-        <div className="flex items-center justify-between">
+        {/* Mobile: Compact dots */}
+        <div className="flex items-center justify-center gap-3 md:hidden">
+          {["form", "chart", "divisional"].map((step, i) => {
+            const isActive = activeTab === step;
+            const isCompleted = step === "form" ? !!state.chartData : step === "chart" ? activeTab === "divisional" : false;
+            return (
+              <div key={step} className="flex items-center gap-3">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border-2 text-sm font-bold transition-all ${
+                    isActive
+                      ? "border-orange-500 bg-orange-500 text-white shadow-lg"
+                      : isCompleted
+                        ? "border-green-500 bg-green-500 text-white"
+                        : "border-slate-600 bg-slate-800 text-slate-400"
+                  }`}
+                >
+                  {isCompleted ? "✓" : i + 1}
+                </div>
+                {i < 2 && (
+                  <div className={`h-0.5 w-6 rounded-full ${
+                    isCompleted ? "bg-gradient-to-r from-green-500 to-orange-500" : "bg-slate-700"
+                  }`} />
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop: Full stepper */}
+        <div className="hidden md:flex items-center justify-between">
           {/* Step 1 */}
           <div className="flex flex-col items-center gap-2">
             <div
@@ -154,44 +183,44 @@ export default function BirthChartGeneratorV2({
         </div>
       </div>
 
-      {/* Simplified Tabs */}
-      <div className="flex gap-3">
+      {/* Simplified Tabs - Mobile Optimized */}
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
         <button
           onClick={() => setActiveTab("form")}
-          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 font-semibold transition-all min-h-[48px] active:scale-[0.98] ${
             activeTab === "form"
               ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
               : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white"
           }`}
         >
-          <span className="text-xl">📝</span>
-          <span>Details</span>
+          <span className="text-lg sm:text-xl">📝</span>
+          <span className="text-sm sm:text-base">Details</span>
         </button>
 
         <button
           onClick={() => setActiveTab("chart")}
           disabled={!state.chartData}
-          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 font-semibold transition-all min-h-[48px] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
             activeTab === "chart"
               ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
               : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5"
           }`}
         >
-          <span className="text-xl">🌟</span>
-          <span>Chart</span>
+          <span className="text-lg sm:text-xl">🌟</span>
+          <span className="text-sm sm:text-base">Chart</span>
         </button>
 
         <button
           onClick={() => setActiveTab("divisional")}
           disabled={!state.chartData}
-          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-6 py-4 font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 font-semibold transition-all min-h-[48px] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
             activeTab === "divisional"
               ? "bg-gradient-to-r from-orange-500 to-pink-500 text-white shadow-lg shadow-orange-500/25"
               : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5"
           }`}
         >
-          <span className="text-xl">📊</span>
-          <span>Explore</span>
+          <span className="text-lg sm:text-xl">📊</span>
+          <span className="text-sm sm:text-base">Explore</span>
         </button>
       </div>
 
