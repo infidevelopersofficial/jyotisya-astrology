@@ -84,14 +84,15 @@ export default function MainNav(): React.ReactElement {
         </div>
         <button
           type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white md:hidden"
+          className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/10 text-white md:hidden active:bg-white/20 transition-colors"
           onClick={() => setMobileMenuOpen((prev) => !prev)}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileMenuOpen}
         >
-          <span className="flex h-4 flex-col justify-between">
-            <span className="block h-0.5 w-5 bg-white" />
-            <span className="block h-0.5 w-5 bg-white" />
-            <span className="block h-0.5 w-5 bg-white" />
+          <span className="flex h-5 flex-col justify-between">
+            <span className={`block h-0.5 w-6 bg-white transition-transform duration-200 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block h-0.5 w-6 bg-white transition-opacity duration-200 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+            <span className={`block h-0.5 w-6 bg-white transition-transform duration-200 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
           </span>
         </button>
       </div>

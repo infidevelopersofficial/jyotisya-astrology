@@ -128,45 +128,48 @@ export default function DailyHoroscopeGrid(): React.ReactElement {
 
       <FirstVisitModal onSelect={handleSignSelect} />
 
-      {/* Carousel Selector */}
-      <div className="relative mb-8 group">
+      {/* Carousel Selector - Mobile Optimized */}
+      <div className="relative mb-8">
+         {/* Left Arrow - Always visible on mobile with touch-friendly size */}
          <button 
              onClick={() => scroll("left")}
              aria-label="Scroll left"
-             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-slate-900/80 border border-white/10 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-0 -ml-4 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-orange-500 md:flex"
+             className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 md:w-10 md:h-10 flex items-center justify-center bg-slate-900/90 border border-white/20 rounded-full text-white shadow-lg -ml-3 md:-ml-4 focus:outline-none focus:ring-2 focus:ring-orange-500 active:scale-95 transition-transform"
          >
-             <ChevronLeft className="w-5 h-5" />
+             <ChevronLeft className="w-6 h-6 md:w-5 md:h-5" />
          </button>
          
          <div 
             ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide px-1 snap-x scroll-padding-x-4"
+            className="flex gap-3 md:gap-4 overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory scroll-smooth"
+            style={{ scrollPaddingLeft: '1rem', scrollPaddingRight: '1rem' }}
          >
              {signs.map((sign) => (
                  <button
                     key={sign.sunSign}
                     onClick={() => handleSignSelect(sign.sunSign)}
                     aria-label={`Select ${sign.label}`}
-                    className={`flex flex-col items-center gap-2 min-w-[80px] p-3 rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 snap-center ${
+                    className={`flex flex-col items-center gap-2 min-w-[88px] md:min-w-[80px] p-4 md:p-3 rounded-2xl border transition-all snap-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500 active:scale-95 ${
                         selectedSign === sign.sunSign
-                            ? "border-orange-500 bg-orange-500/10 shadow-[0_0_15px_rgba(249,115,22,0.3)] scale-105"
+                            ? "border-orange-500 bg-orange-500/10 shadow-[0_0_20px_rgba(249,115,22,0.4)] scale-105"
                             : "border-white/5 bg-white/5 hover:bg-white/10 hover:border-white/10"
                     }`}
                  >
-                     <span className="text-2xl">{sign.icon}</span>
-                     <span className={`text-xs font-medium ${selectedSign === sign.sunSign ? "text-orange-200" : "text-slate-400"}`}>
+                     <span className="text-3xl md:text-2xl">{sign.icon}</span>
+                     <span className={`text-sm md:text-xs font-medium ${selectedSign === sign.sunSign ? "text-orange-200" : "text-slate-400"}`}>
                          {sign.label}
                      </span>
                  </button>
              ))}
          </div>
 
+         {/* Right Arrow */}
          <button 
              onClick={() => scroll("right")}
              aria-label="Scroll right"
-             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-8 h-8 flex items-center justify-center bg-slate-900/80 border border-white/10 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity -mr-4 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-orange-500 md:flex"
+             className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-12 h-12 md:w-10 md:h-10 flex items-center justify-center bg-slate-900/90 border border-white/20 rounded-full text-white shadow-lg -mr-3 md:-mr-4 focus:outline-none focus:ring-2 focus:ring-orange-500 active:scale-95 transition-transform"
          >
-             <ChevronRight className="w-5 h-5" />
+             <ChevronRight className="w-6 h-6 md:w-5 md:h-5" />
          </button>
       </div>
 
