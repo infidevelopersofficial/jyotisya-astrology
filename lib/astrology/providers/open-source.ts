@@ -139,9 +139,9 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
   private async fetchRemoteHoroscope(
     baseUrl: string,
     sign: string,
-    locale: string,
+    _locale: string,
     cacheKey: string,
-    system?: "vedic" | "western",
+    _system?: "vedic" | "western",
   ) {
     try {
       // Use POST method for the Astro Core API

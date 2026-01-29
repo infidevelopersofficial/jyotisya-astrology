@@ -86,7 +86,7 @@ export class RealHoroscopeClient implements HoroscopeClient {
     this.timeout = timeout;
   }
 
-  async getDaily(system: "vedic" | "western"): Promise<HoroscopeResponse> {
+  async getDaily(_system: "vedic" | "western"): Promise<HoroscopeResponse> {
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -124,16 +124,16 @@ export class RealHoroscopeClient implements HoroscopeClient {
     }
   }
 
-  async getWeekly(system: "vedic" | "western"): Promise<HoroscopeResponse> {
+  async getWeekly(_system: "vedic" | "western"): Promise<HoroscopeResponse> {
     // For now, weekly uses the same daily data
     // Future: implement weekly aggregation endpoint
-    return this.getDaily(system);
+    return this.getDaily(_system);
   }
 
-  async getMonthly(system: "vedic" | "western"): Promise<HoroscopeResponse> {
+  async getMonthly(_system: "vedic" | "western"): Promise<HoroscopeResponse> {
     // For now, monthly uses the same daily data
     // Future: implement monthly aggregation endpoint
-    return this.getDaily(system);
+    return this.getDaily(_system);
   }
 }
 
