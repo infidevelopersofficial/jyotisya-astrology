@@ -32,29 +32,29 @@ export default function PanchangHighlights(): React.ReactElement {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {/* Tithi Card */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/10 cursor-pointer">
-            <h3 className="text-xl font-bold text-white mb-1">Tithi</h3>
-            <p className="text-lg font-medium text-orange-200 mb-2">{data?.tithi ?? "--"}</p>
+        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-orange-500/30 hover:shadow-lg hover:shadow-orange-500/10 active:scale-[0.98] cursor-pointer">
+            <h3 className="text-lg md:text-xl font-bold text-white mb-1">Tithi</h3>
+            <p className="text-base md:text-lg font-medium text-orange-200 mb-2">{data?.tithi ?? "--"}</p>
             <p className="text-sm text-slate-300 group-hover:text-white transition-colors">
               {isLoading ? "Loading Panchang details…" : "Auspicious timings aligned with Lunar Month (चंद्र मास)."}
             </p>
         </div>
 
         {/* Nakshatra Card */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 cursor-pointer">
-            <h3 className="text-xl font-bold text-white mb-1">Nakshatra</h3>
-            <p className="text-lg font-medium text-blue-200 mb-2">{data?.nakshatra ?? "--"}</p>
+        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/30 hover:shadow-lg hover:shadow-blue-500/10 active:scale-[0.98] cursor-pointer">
+            <h3 className="text-lg md:text-xl font-bold text-white mb-1">Nakshatra</h3>
+            <p className="text-base md:text-lg font-medium text-blue-200 mb-2">{data?.nakshatra ?? "--"}</p>
             <p className="text-sm text-slate-300 group-hover:text-white transition-colors">
               {isLoading ? "" : "Ideal for Vastu, Travel (यात्रा), and Rituals (संस्कार)."}
             </p>
         </div>
 
         {/* Festival Card */}
-        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-6 transition-all duration-300 hover:-translate-y-1 hover:border-pink-500/30 hover:shadow-lg hover:shadow-pink-500/10 cursor-pointer">
-            <h3 className="text-xl font-bold text-white mb-1">Next Festival</h3>
-            <p className="text-lg font-medium text-pink-200 mb-2">Ekadashi • Jan 24</p>
+        <div className="group relative overflow-hidden rounded-2xl border border-white/5 bg-white/5 p-5 md:p-6 transition-all duration-300 hover:-translate-y-1 hover:border-pink-500/30 hover:shadow-lg hover:shadow-pink-500/10 active:scale-[0.98] cursor-pointer">
+            <h3 className="text-lg md:text-xl font-bold text-white mb-1">Next Festival</h3>
+            <p className="text-base md:text-lg font-medium text-pink-200 mb-2">Ekadashi • Jan 24</p>
             <p className="text-sm text-slate-300 group-hover:text-white transition-colors">
               {isLoading ? "" : "Prepare for Shattila Ekadashi fast & Vishnu puja."}
             </p>

@@ -44,7 +44,7 @@ export function PageContainer({
   className = "",
   children,
 }: PageContainerProps) {
-  const paddingClass = noPadding ? "" : "px-6 py-12 lg:px-16";
+  const paddingClass = noPadding ? "" : "px-4 sm:px-6 lg:px-8 py-6 md:py-8 lg:py-12";
 
   return (
     <div className={`mx-auto min-h-screen ${sizeClasses[size]} ${paddingClass} ${className}`}>
@@ -64,10 +64,10 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, description, action }: PageHeaderProps) {
   return (
-    <header className="mb-12">
+    <header className="mb-8 md:mb-12">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="mb-2 text-4xl font-bold text-white lg:text-5xl">{title}</h1>
+          <h1 className="mb-2 text-3xl md:text-4xl font-bold text-white lg:text-5xl">{title}</h1>
           {description && <p className="mt-2 text-slate-300">{description}</p>}
         </div>
         {action && <div className="ml-4">{action}</div>}
@@ -88,10 +88,10 @@ interface PageSectionProps {
 
 export function PageSection({ title, description, children, className = "" }: PageSectionProps) {
   return (
-    <section className={`mb-12 ${className}`}>
+    <section className={`mb-8 md:mb-12 lg:mb-16 ${className}`}>
       {title && (
-        <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-white">{title}</h2>
+        <div className="mb-4 md:mb-6">
+          <h2 className="text-2xl md:text-3xl font-semibold text-white">{title}</h2>
           {description && <p className="mt-2 text-slate-300">{description}</p>}
         </div>
       )}

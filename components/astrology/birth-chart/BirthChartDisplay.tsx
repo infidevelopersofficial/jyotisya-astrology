@@ -159,11 +159,11 @@ export default function BirthChartDisplay({
 
 
       {/* Chart Visualization */}
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
         <div className="mb-5 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
-              <span className="text-2xl">📈</span>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+            <h3 className="flex items-center gap-2 text-base sm:text-lg font-semibold text-white">
+              <span className="text-xl sm:text-2xl">📈</span>
               Visual Chart
             </h3>
             
@@ -171,7 +171,7 @@ export default function BirthChartDisplay({
             <div className="flex rounded-lg border border-white/10 bg-black/20 p-1">
               <button
                 onClick={() => handleSetChartStyle("north")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
                   chartStyle === "north"
                     ? "bg-indigo-500 text-white shadow"
                     : "text-slate-400 hover:text-white"
@@ -181,7 +181,7 @@ export default function BirthChartDisplay({
               </button>
               <button
                 onClick={() => handleSetChartStyle("south")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+                className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all min-h-[36px] ${
                   chartStyle === "south"
                     ? "bg-indigo-500 text-white shadow"
                     : "text-slate-400 hover:text-white"
@@ -193,25 +193,25 @@ export default function BirthChartDisplay({
             
             <button
                onClick={() => setShowInterpretation(true)}
-               className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 px-3 py-1.5 text-xs font-semibold text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition-all"
+               className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-600 px-3 py-2 text-xs font-semibold text-white shadow-md shadow-purple-500/20 hover:shadow-lg transition-all min-h-[40px]"
             >
               <span>✨</span>
               <span>AI Analysis</span>
             </button>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap items-center gap-2">
+          {/* Action Buttons - Mobile Grid */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             <button
               onClick={onSaveChart}
               disabled={savingChart || !!savedChartId}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-green-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
               title="Save to your account"
             >
               {savingChart ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                  <span>Saving...</span>
+                  <span className="hidden sm:inline">Saving...</span>
                 </>
               ) : savedChartId ? (
                 <>
@@ -229,7 +229,7 @@ export default function BirthChartDisplay({
             <button
               onClick={onDownloadPNG}
               disabled={downloadingPNG}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
               title="Download as image"
             >
               {downloadingPNG ? (
@@ -248,7 +248,7 @@ export default function BirthChartDisplay({
             <button
               onClick={onDownloadPDF}
               disabled={downloadingPDF}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
               title="Download as PDF"
             >
               {downloadingPDF ? (
@@ -266,7 +266,7 @@ export default function BirthChartDisplay({
 
             <button
               onClick={onCopyLink}
-              className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl"
+              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-orange-500/20 transition-all hover:shadow-xl min-h-[44px] active:scale-[0.98]"
               title="Copy shareable link"
             >
               {copiedLink ? (
@@ -295,7 +295,7 @@ export default function BirthChartDisplay({
 
         <div
           id="rasi-chart"
-          className="flex justify-center rounded-xl bg-slate-900 p-8 shadow-inner"
+          className="flex justify-center rounded-xl bg-slate-900 p-4 sm:p-6 md:p-8 shadow-inner overflow-x-auto"
         >
           {chartData.data.planets && chartData.data.ascendant !== undefined ? (
             chartStyle === "north" ? (

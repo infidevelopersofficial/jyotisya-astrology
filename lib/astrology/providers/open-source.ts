@@ -139,51 +139,76 @@ export class OpenSourceAstrologyProvider implements AstrologyProvider {
   private async fetchRemoteHoroscope(
     baseUrl: string,
     sign: string,
-    locale: string,
+    _locale: string,
     cacheKey: string,
-    system?: "vedic" | "western",
+    _system?: "vedic" | "western",
   ) {
     try {
-      const params = new URLSearchParams({
-        sunSign: sign,
-        locale,
+      // Use POST method for the Astro Core API
+      const response = await fetch(`${baseUrl}/horoscope/daily`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sign: sign.toLowerCase(),
+          timezone: "Asia/Kolkata",
+        }),
       });
-      if (system) {
-        params.set("system", system);
-      }
-      const response = await fetch(`${baseUrl}/horoscope/daily?${params.toString()}`);
+      
       if (!response.ok) {
         console.warn("[astrology] ASTRO_CORE_URL horoscope responded with status", response.status);
         return this.cacheAndReturn(cacheKey, { entry: null, raw: null, source: undefined });
       }
 
       const payload = await response.json();
-      const summary = payload?.horoscope;
-      if (!summary || typeof summary !== "object") {
-        console.warn("[astrology] ASTRO_CORE_URL horoscope payload missing summary for", sign);
+      
+      // New API response format has guidance object
+      const guidance = payload?.guidance;
+      if (!guidance || typeof guidance !== "object") {
+        console.warn("[astrology] ASTRO_CORE_URL horoscope payload missing guidance for", sign);
         return this.cacheAndReturn(cacheKey, {
           entry: null,
           raw: payload,
-          source: payload?.source,
+          source: payload?.backend,
         });
       }
 
+      // Map ratings to mood and lucky values
+      const ratings = payload?.ratings ?? {};
+      const mood = this.ratingToMood(ratings.overall ?? 3);
+      const luckyNumber = String(((ratings.overall + ratings.career + ratings.love + ratings.health) % 9) + 1 || 7);
+      
       const entry: HoroscopeEntry = {
-        summary: String(summary.summary ?? summary.guidance ?? ""),
-        mood: summary.mood ?? "Balanced",
-        luckyNumber: summary.luckyNumber ?? "--",
-        luckyColor: summary.luckyColor ?? "--",
+        summary: String(guidance.overall ?? ""),
+        mood,
+        luckyNumber,
+        luckyColor: this.getSignColor(sign),
       };
 
       return this.cacheAndReturn(cacheKey, {
         entry,
         raw: payload,
-        source: payload?.source,
+        source: payload?.backend ?? "astro_core",
       });
     } catch (error) {
       console.warn("[astrology] ASTRO_CORE_URL horoscope fetch failed", error);
       return this.cacheAndReturn(cacheKey, { entry: null, raw: null, source: undefined });
     }
+  }
+  
+  private ratingToMood(rating: number): string {
+    if (rating >= 4) return "Excellent";
+    if (rating >= 3) return "Harmonious";
+    if (rating >= 2) return "Challenging";
+    return "Introspective";
+  }
+  
+  private getSignColor(sign: string): string {
+    const colors: Record<string, string> = {
+      aries: "Red", taurus: "Green", gemini: "Yellow", cancer: "Silver",
+      leo: "Gold", virgo: "Navy", libra: "Pink", scorpio: "Maroon",
+      sagittarius: "Purple", capricorn: "Brown", aquarius: "Blue", pisces: "Teal",
+    };
+    return colors[sign.toLowerCase()] || "Gold";
   }
 
   private cacheAndReturn(

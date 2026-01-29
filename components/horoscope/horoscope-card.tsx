@@ -100,7 +100,7 @@ export default function HoroscopeCard({ sign, sunSign, locale, data, loading }: 
       ) : (
         <div className="space-y-5">
             <p className="text-sm leading-6 text-slate-200 font-light">
-                {data?.summary && data.summary !== "Sample daily guidance" ? data.summary : mockContent.summary}
+                {data?.summary && !data.summary.toLowerCase().includes("sample") ? data.summary : mockContent.summary}
             </p>
             
             <div className="grid grid-cols-2 gap-3 text-xs">

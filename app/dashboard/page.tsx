@@ -90,15 +90,15 @@ function ActionCard({
   icon?: string;
 }) {
   return (
-    <Link href={href} className="group">
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+    <Link href={href} className="group block">
+      <div className="rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6 transition-all hover:bg-white/10 hover:border-white/20 active:scale-[0.98] h-full">
         <div
-          className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-2xl`}
+          className={`mb-4 inline-flex h-14 w-14 md:h-12 md:w-12 items-center justify-center rounded-xl bg-gradient-to-br ${gradient} text-3xl md:text-2xl`}
         >
           {icon}
         </div>
-        <h3 className="mb-2 text-lg font-semibold text-white">{title}</h3>
-        <p className="text-sm text-slate-400">{description}</p>
+        <h3 className="mb-2 text-base md:text-lg font-semibold text-white">{title}</h3>
+        <p className="text-sm text-slate-400 leading-relaxed">{description}</p>
       </div>
     </Link>
   );

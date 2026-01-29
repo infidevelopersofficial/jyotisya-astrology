@@ -51,7 +51,7 @@ export default function BirthChartForm({
       )}
 
       {/* Main Form Card */}
-      <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-8 shadow-xl backdrop-blur-sm">
+      <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/5 to-white/[0.02] p-4 sm:p-6 md:p-8 shadow-xl backdrop-blur-sm">
         <div className="space-y-8">
           {/* Chart Name Field */}
           <div className="space-y-2.5">
