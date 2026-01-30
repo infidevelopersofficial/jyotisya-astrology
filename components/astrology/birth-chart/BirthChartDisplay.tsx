@@ -21,6 +21,7 @@ import { useState, useEffect } from "react";
 import InterpretationModal from "./InterpretationModal";
 import { useChartInterpretation } from "@/hooks/astrology/useChartInterpretation";
 import DashaPanel from "./DashaPanel";
+import YogasPanel from "./YogasPanel";
 
 interface BirthChartDisplayProps {
   birthData: BirthData;
@@ -159,6 +160,17 @@ export default function BirthChartDisplay({
 
       {/* Vimsottari Dasha Panel */}
       <DashaPanel
+        birthData={{
+          dateTime: birthData.dateTime,
+          latitude: birthData.latitude,
+          longitude: birthData.longitude,
+          timezone: birthData.timezone,
+        }}
+        showHelp={showHelp}
+      />
+
+      {/* Yogas (Planetary Combinations) Panel */}
+      <YogasPanel
         birthData={{
           dateTime: birthData.dateTime,
           latitude: birthData.latitude,

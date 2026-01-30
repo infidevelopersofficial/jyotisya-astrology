@@ -103,3 +103,81 @@ export interface DownloadOptions {
   birthDate?: string;
   birthPlace: string;
 }
+
+// ============================================================================
+// YOGAS (Planetary Combinations) Types
+// ============================================================================
+
+export interface Yoga {
+  name: string;
+  type: "raja" | "dhana" | "mahapurusha" | "prosperity" | "other";
+  planets: string[];
+  description: string;
+  effect: string;
+  strength: "very strong" | "strong" | "moderate" | "weak";
+}
+
+export interface YogaSummary {
+  total_yogas: number;
+  by_strength: {
+    "very strong": number;
+    strong: number;
+    moderate: number;
+    weak: number;
+  };
+  has_mahapurusha: boolean;
+  has_raja_yoga: boolean;
+  has_dhana_yoga: boolean;
+}
+
+export interface YogasResponse {
+  ascendant_rashi: number;
+  planets: Record<string, {
+    longitude: number;
+    rashi: number;
+    house: number;
+    is_exalted: boolean;
+    is_debilitated: boolean;
+  }>;
+  yogas: Yoga[];
+  categories: Record<string, Yoga[]>;
+  summary: YogaSummary;
+  backend: string;
+  birth_data?: {
+    birth_date: string;
+    ascendant_longitude: number;
+  };
+}
+
+// ============================================================================
+// DIVISIONAL CHARTS Types
+// ============================================================================
+
+export interface DivisionalPosition {
+  chart: string;
+  rashi: number;
+  sign: string;
+  lord: string;
+  degree?: number;
+  navamsa_number?: number;
+  dasamsa_number?: number;
+  hora?: string;
+}
+
+export interface DivisionalChartInfo {
+  name: string;
+  purpose: string;
+  positions: Record<string, DivisionalPosition>;
+  ascendant_sign: string;
+}
+
+export interface DivisionalChartsResponse {
+  charts: Record<string, DivisionalChartInfo>;
+  available_charts: string[];
+  primary_charts: string[];
+  backend: string;
+  birth_data?: {
+    birth_date: string;
+    ascendant_longitude: number;
+  };
+}
