@@ -20,6 +20,7 @@ import { useState, useEffect } from "react";
 
 import InterpretationModal from "./InterpretationModal";
 import { useChartInterpretation } from "@/hooks/astrology/useChartInterpretation";
+import DashaPanel from "./DashaPanel";
 
 interface BirthChartDisplayProps {
   birthData: BirthData;
@@ -156,7 +157,16 @@ export default function BirthChartDisplay({
       {/* Houses Guide */}
       {showHelp && <HousesGuide />}
 
-
+      {/* Vimsottari Dasha Panel */}
+      <DashaPanel
+        birthData={{
+          dateTime: birthData.dateTime,
+          latitude: birthData.latitude,
+          longitude: birthData.longitude,
+          timezone: birthData.timezone,
+        }}
+        showHelp={showHelp}
+      />
 
       {/* Chart Visualization */}
       <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6">
