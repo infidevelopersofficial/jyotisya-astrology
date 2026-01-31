@@ -6,6 +6,9 @@ import { useBirthChartActions } from "@/hooks/astrology/useBirthChartActions";
 import BirthChartForm from "./BirthChartForm";
 import BirthChartDisplay from "./BirthChartDisplay";
 import DivisionalChartsPanel from "./DivisionalChartsPanel";
+import KundliReport, { KundliReportData } from "@/components/reports/KundliReport";
+import { generatePdf } from "@/lib/reports/generatePdf";
+import { useMemo, useState } from "react";
 
 interface BirthChartGeneratorProps {
   userId: string;
@@ -37,7 +40,6 @@ export default function BirthChartGeneratorV2({
     savingChart,
     savedChartId,
     handleDownloadPNG,
-    handleDownloadPDF,
     handleCopyShareLink,
     handleSaveChart,
   } = useBirthChartActions({
@@ -46,6 +48,61 @@ export default function BirthChartGeneratorV2({
     selectedDivisional: state.selectedDivisional,
     setError,
   });
+
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+
+  // Prepare data for the PDF report
+  const reportData = useMemo<KundliReportData | null>(() => {
+    const { birthData, chartData } = state;
+    if (!chartData?.data?.planets) return null;
+
+    const planets = chartData.data.planets;
+    
+    // Safely map planets
+    const mappedPlanets = planets.map((p) => ({
+      name: p.name,
+      sign: p.sign || "Unknown",
+      longitude: p.fullDegree,
+      nakshatra: p.nakshatra || "-",
+      pada: "-", // Not currently in API response
+    }));
+
+    return {
+      user: { name: birthData.chartName || "User" },
+      basicDetails: {
+        date: new Date(birthData.dateTime).toLocaleDateString(),
+        time: new Date(birthData.dateTime).toLocaleTimeString(),
+        location: birthData.location,
+        dayOfWeek: new Date(birthData.dateTime).toLocaleDateString("en-US", { weekday: "long" }),
+      },
+      planetaryPositions: mappedPlanets,
+      panchang: {
+        tithi: "-", // Not currently in API response
+        vara: new Date(birthData.dateTime).toLocaleDateString("en-US", { weekday: "long" }),
+        nakshatra: "-",
+        yoga: "-",
+      },
+      charts: {
+        D1: null, // SVG capture is complex, skipping for MVP or using static
+      }
+    };
+  }, [state.birthData, state.chartData]);
+
+  const handleGeneratePdf = async () => {
+    if (!reportData) return;
+    setIsGeneratingPdf(true);
+    
+    try {
+      // Small delay to ensure render
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await generatePdf("kundli-report-root", `Horoscope_${state.birthData.chartName || "Report"}.pdf`);
+    } catch (e) {
+      console.error("PDF Generation failed", e);
+      setError("Failed to generate PDF report");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -248,12 +305,12 @@ export default function BirthChartGeneratorV2({
           onSwitchToForm={() => setActiveTab("form")}
           onSwitchToDivisional={() => setActiveTab("divisional")}
           downloadingPNG={downloadingPNG}
-          downloadingPDF={downloadingPDF}
+          downloadingPDF={isGeneratingPdf || downloadingPDF} // Use combined loading state
           copiedLink={copiedLink}
           savingChart={savingChart}
           savedChartId={savedChartId}
           onDownloadPNG={handleDownloadPNG}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadPDF={handleGeneratePdf} // Override with our new generator
           onCopyLink={handleCopyShareLink}
           onSaveChart={handleSaveChart}
         />
@@ -266,6 +323,13 @@ export default function BirthChartGeneratorV2({
           selectedDivisional={state.selectedDivisional}
           onSelectDivisional={selectDivisional}
         />
+      )}
+      
+      {/* Hidden PDF Report (Rendered only when chart data exists) */}
+      {state.chartData && reportData && (
+         <div className="absolute top-0 left-0 -z-50 opacity-0 pointer-events-none overflow-hidden h-0 w-0">
+            <KundliReport data={reportData} />
+         </div>
       )}
     </div>
   );
