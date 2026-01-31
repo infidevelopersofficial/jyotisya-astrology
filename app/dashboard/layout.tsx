@@ -7,6 +7,7 @@ const DASHBOARD_LINKS = [
   { href: "/dashboard/charts", label: "Saved Charts", icon: "📂" },
   { href: "/dashboard/panchang", label: "Daily Panchang", icon: "📅" },
   { href: "/dashboard/consultations", label: "My Consultations", icon: "💬" },
+  { href: "/dashboard/transits", label: "Transits", icon: "🪐" },
 ];
 
 export default function DashboardLayout({
