@@ -59,9 +59,11 @@ export function getSignName(rashi: number): string {
 /**
  * Get house number (1-12) from planet and ascendant longitude
  */
+// Use Whole Sign system (Rashi based)
 export function getHouseFromLongitude(planetLon: number, ascLon: number): number {
-  const diff = (planetLon - ascLon + 360) % 360;
-  return Math.floor(diff / 30) + 1;
+  const planetRashi = Math.floor(planetLon / 30) + 1;
+  const ascRashi = Math.floor(ascLon / 30) + 1;
+  return ((planetRashi - ascRashi + 12) % 12) + 1;
 }
 
 /**
@@ -103,11 +105,35 @@ export function isTrikona(house: number): boolean {
  * Get approximate Lahiri ayanamsha for a given year
  */
 export function getLahiriAyanamsha(year: number): number {
-  // Lahiri ayanamsha is approximately 23°51' on Jan 1, 1950
-  // and increases by about 50.3" per year
-  const baseYear = 1950;
-  const baseValue = 23.85; // 23°51'
-  const yearlyRate = 50.3 / 3600; // Convert arc-seconds to degrees
+  // Lahiri ayanamsha at J2000 (Jan 1, 2000, 12:00 TT) is approx 23° 51' 12"
+  // Rate is approx 50.27 arc-seconds per year
+  const baseYear = 2000;
+  const baseValue = 23.8533; // 23 + 51/60 + 12/3600
+  const yearlyRate = 50.27 / 3600; // Convert arc-seconds to degrees
   
   return baseValue + (year - baseYear) * yearlyRate;
+}
+
+// Alias for compatibility
+export const getAyanamsha = getLahiriAyanamsha;
+
+/**
+ * Convert radians to degrees
+ */
+export function toDeg(radians: number): number {
+  return radians * 180 / Math.PI;
+}
+
+/**
+ * Convert degrees to radians
+ */
+export function toRad(degrees: number): number {
+  return degrees * Math.PI / 180;
+}
+
+/**
+ * Normalize degree to 0-360 range
+ */
+export function normalizeDegree(deg: number): number {
+  return (deg % 360 + 360) % 360;
 }

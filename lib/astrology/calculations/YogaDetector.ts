@@ -309,7 +309,9 @@ export function buildPlanetDataFromChart(
   
   for (const planet of planets) {
     const rashi = Math.floor(planet.fullDegree / 30) + 1;
-    const house = planet.house ?? Math.floor((planet.fullDegree - ascendant + 360) % 360 / 30) + 1;
+    // Use Whole Sign system (Rashi = House) for Yoga detection
+    // This aligns better with standard Parashari yoga definitions
+    const house = ((rashi - Math.floor(ascendant / 30) - 1 + 12) % 12) + 1;
     
     result[planet.name] = {
       longitude: planet.fullDegree,

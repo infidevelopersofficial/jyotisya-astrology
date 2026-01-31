@@ -7,6 +7,9 @@ import {
   calculateVimsottariDasha,
   getApproximateMoonLongitude,
 } from "@/lib/astrology/calculations/DashaCalculator";
+import { calculatePlanetaryPositions } from "@/lib/astrology/calculations/PlanetaryPositions";
+import { requireAuth } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/route-handler";
 import type { DashaResult } from "@/lib/astrology/calculations/DashaCalculator";
 
 // Cache TTL: 24 hours (birth data is immutable)
@@ -119,11 +122,14 @@ function validateRequest(body: unknown): { valid: true; data: DashaRequestBody }
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const startTime = performance.now();
 
-  // Rate limiting check
-  const rateLimitResponse = await rateLimiters.astrology(request);
-  if (rateLimitResponse) return rateLimitResponse;
-
   try {
+    // Authentication Check
+    await requireAuth();
+
+    // Rate limiting check
+    const rateLimitResponse = await rateLimiters.astrology(request);
+    if (rateLimitResponse) return rateLimitResponse;
+
     // Parse JSON with error handling
     let body: unknown;
     try {
@@ -152,8 +158,20 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { dateTime, yearsToCalculate, moonLongitude } = validation.data;
     const birthDate = new Date(dateTime);
 
-    // Get Moon longitude (use provided or calculate approximation)
-    const moonLon = moonLongitude ?? getApproximateMoonLongitude(birthDate);
+    // Get Moon longitude (use provided or calculate using real ephemeris)
+    let moonLon = moonLongitude;
+    
+    if (moonLon === undefined) {
+      // Calculate precise positions
+      const planets = calculatePlanetaryPositions(birthDate, validation.data.latitude, validation.data.longitude);
+      const moon = planets.find(p => p.name === "Moon");
+      if (moon) {
+        moonLon = moon.longitude;
+      } else {
+        // Fallback to approximation should not happen effectively
+        moonLon = getApproximateMoonLongitude(birthDate);
+      }
+    }
     const years = yearsToCalculate ?? 100;
 
     // Generate cache key
@@ -199,6 +217,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }, { status: 200 });
   } catch (error: unknown) {
     const duration = Math.round(performance.now() - startTime);
+    
+    if (error instanceof ApiError) {
+      logger.warn("Dasha API auth error", { error: error.message, code: error.code, duration });
+      return NextResponse.json(
+        { error: error.code, message: error.message },
+        { status: error.statusCode }
+      );
+    }
+
     logger.error("Dasha API error", { error, duration });
 
     return NextResponse.json(

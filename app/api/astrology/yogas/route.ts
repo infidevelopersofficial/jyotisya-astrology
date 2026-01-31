@@ -9,8 +9,15 @@ import {
 } from "@/lib/astrology/calculations/YogaDetector";
 import type { YogaDetectionResult } from "@/lib/astrology/calculations/YogaDetector";
 import { getRashiFromLongitude } from "@/lib/astrology/calculations/VedicMath";
+import {
+  calculatePlanetaryPositions,
+  calculateAscendant,
+} from "@/lib/astrology/calculations/PlanetaryPositions";
+import { requireAuth } from "@/lib/api/auth";
+import { ApiError } from "@/lib/api/route-handler";
 
 // Cache TTL: 24 hours (deterministic calculation)
+// Using precise calculation now
 const CACHE_TTL_24H = 24 * 60 * 60 * 1000;
 
 /**
@@ -133,60 +140,15 @@ function validateRequest(body: unknown): { valid: true; data: YogasRequestBody }
   };
 }
 
-/**
- * Generate approximate planet positions based on date
- * Note: For accurate yoga detection, pass actual chart data
- */
-function generateApproximatePlanets(birthDate: Date): PlanetInput[] {
-  const dayOfYear = Math.floor(
-    (birthDate.getTime() - new Date(birthDate.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
-  );
-  const year = birthDate.getFullYear();
 
-  // Approximate daily motion rates (degrees per day)
-  const motionRates: Record<string, number> = {
-    Sun: 0.9856,
-    Moon: 13.176,
-    Mars: 0.524,
-    Mercury: 4.09,
-    Jupiter: 0.083,
-    Venus: 1.602,
-    Saturn: 0.033,
-    Rahu: -0.053,
-    Ketu: -0.053,
-  };
-
-  // Reference positions (approximate for J2000)
-  const refPositions: Record<string, number> = {
-    Sun: 280,
-    Moon: 0,
-    Mars: 355,
-    Mercury: 250,
-    Jupiter: 35,
-    Venus: 180,
-    Saturn: 45,
-    Rahu: 150,
-    Ketu: 330,
-  };
-
-  return VALID_PLANETS.map((name) => {
-    const rate = motionRates[name] ?? 1;
-    const ref = refPositions[name] ?? 0;
-    const yearOffset = (year - 2000) * rate * 365.25;
-    const dayOffset = dayOfYear * rate;
-    const degree = ((ref + yearOffset + dayOffset) % 360 + 360) % 360;
-
-    return {
-      name,
-      fullDegree: Math.round(degree * 100) / 100,
-    };
-  });
-}
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const startTime = performance.now();
 
-  // Rate limiting check
+    // Authentication Check
+    await requireAuth();
+
+    // Rate limiting check
   const rateLimitResponse = await rateLimiters.astrology(request);
   if (rateLimitResponse) return rateLimitResponse;
 
@@ -221,10 +183,34 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const hasPreCalculatedData = !!planets && !!ascendant;
 
-    // Use provided data or generate approximate positions
-    const chartPlanets = planets ?? generateApproximatePlanets(birthDate);
-    const ascendantDegree = ascendant ?? 
-      (Math.abs(birthDate.getHours() * 30 + birthDate.getMinutes() * 0.5) % 360);
+    // Use provided data or calculate using Real Ephemeris
+    let chartPlanets: PlanetInput[];
+    let ascendantDegree: number;
+
+    if (hasPreCalculatedData) {
+      chartPlanets = planets!;
+      ascendantDegree = ascendant!;
+    } else {
+      // Calculate precise positions
+      const positions = calculatePlanetaryPositions(birthDate, validation.data.latitude, validation.data.longitude);
+      
+      // Map to PlanetInput format
+      chartPlanets = positions.map(p => ({
+        name: p.name,
+        fullDegree: p.longitude,
+        // house will be calculated by buildPlanetDataFromChart
+      }));
+
+      // Calculate Ascendant
+      if (ascendant) {
+        ascendantDegree = ascendant;
+      } else {
+        ascendantDegree = calculateAscendant(birthDate, validation.data.latitude, validation.data.longitude);
+      }
+    }
+    
+    // Normalize Ascendant just in case
+    ascendantDegree = (ascendantDegree % 360 + 360) % 360;
     const ascendantRashi = getRashiFromLongitude(ascendantDegree);
 
     // Generate cache key (based on ascendant and birth date)
@@ -292,6 +278,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     }, { status: 200 });
   } catch (error: unknown) {
     const duration = Math.round(performance.now() - startTime);
+    if (error instanceof ApiError) {
+      logger.warn("Yogas API Auth/Validation Error", { error: error.message, statusCode: error.statusCode, duration });
+      return NextResponse.json(
+        { error: error.code, message: error.message },
+        { status: error.statusCode }
+      );
+    }
     logger.error("Yogas API error", { error, duration });
 
     return NextResponse.json(
