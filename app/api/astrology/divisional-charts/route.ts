@@ -98,7 +98,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     });
 
     // Step 2: Calculate Requested Divisional Charts
-    const results: Record<string, any> = {};
+    const resultsMap = new Map<string, any>();
     const chartsToCalc = requestedChart === "all" ? Object.keys(SUPPORTED_VARGAS) : [requestedChart];
 
     for (const key of chartsToCalc) {
@@ -114,7 +114,7 @@ export async function POST(request: Request): Promise<NextResponse> {
           };
         }
         
-        results[key] = {
+        resultsMap.set(key, {
           chart: key,
           division: SUPPORTED_VARGAS[key],
           ascendant: {
@@ -122,12 +122,12 @@ export async function POST(request: Request): Promise<NextResponse> {
             signName: getSignName(divData.ascendant.rashi)
           },
           planets: enrichedPlanets
-        };
+        });
       }
     }
 
     const response = {
-      charts: results,
+      charts: Object.fromEntries(resultsMap),
       backend: "internal_ts_v2",
     };
 

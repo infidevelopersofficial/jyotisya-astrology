@@ -34,7 +34,7 @@ export interface YogaDetectionResult {
  * Detect Raja Yogas (combinations for power and authority)
  */
 function detectRajaYogas(
-  planets: Record<string, PlanetData>,
+  planets: Map<string, PlanetData>,
   ascRashi: number
 ): Yoga[] {
   const yogas: Yoga[] = [];
@@ -60,8 +60,8 @@ function detectRajaYogas(
     for (const tl of trikonaLords) {
       if (kl === tl) continue;
       
-      const klData = planets[kl];
-      const tlData = planets[tl];
+      const klData = planets.get(kl);
+      const tlData = planets.get(tl);
       
       if (!klData || !tlData) continue;
       
@@ -86,7 +86,7 @@ function detectRajaYogas(
  * Detect Dhana Yogas (combinations for wealth)
  */
 function detectDhanaYogas(
-  planets: Record<string, PlanetData>,
+  planets: Map<string, PlanetData>,
   ascRashi: number
 ): Yoga[] {
   const yogas: Yoga[] = [];
@@ -99,8 +99,8 @@ function detectDhanaYogas(
   const eleventhLord = RASHI_LORDS[eleventhHouseRashi];
   
   if (secondLord && eleventhLord && secondLord !== eleventhLord) {
-    const secondData = planets[secondLord];
-    const eleventhData = planets[eleventhLord];
+    const secondData = planets.get(secondLord);
+    const eleventhData = planets.get(eleventhLord);
     
     if (secondData && eleventhData && secondData.rashi === eleventhData.rashi) {
       yogas.push({
@@ -115,7 +115,7 @@ function detectDhanaYogas(
   }
   
   // Jupiter in 2nd or 11th house
-  const jupiter = planets["Jupiter"];
+  const jupiter = planets.get("Jupiter");
   if (jupiter && (jupiter.house === 2 || jupiter.house === 11)) {
     yogas.push({
       name: "Jupiter Dhana Yoga",
@@ -134,7 +134,7 @@ function detectDhanaYogas(
  * Detect Pancha Mahapurusha Yogas (5 great person yogas)
  */
 function detectMahapurushaYogas(
-  planets: Record<string, PlanetData>
+  planets: Map<string, PlanetData>
 ): Yoga[] {
   const yogas: Yoga[] = [];
   
@@ -162,7 +162,7 @@ function detectMahapurushaYogas(
   };
   
   for (const [planet, config] of Object.entries(mahapurushaConfig)) {
-    const planetData = planets[planet];
+    const planetData = planets.get(planet);
     if (!planetData) continue;
     
     const house = planetData.house;
@@ -192,12 +192,12 @@ function detectMahapurushaYogas(
  * Detect Gaja Kesari Yoga (Jupiter-Moon combination)
  */
 function detectGajaKesariYoga(
-  planets: Record<string, PlanetData>
+  planets: Map<string, PlanetData>
 ): Yoga[] {
   const yogas: Yoga[] = [];
   
-  const jupiter = planets["Jupiter"];
-  const moon = planets["Moon"];
+  const jupiter = planets.get("Jupiter");
+  const moon = planets.get("Moon");
   
   if (!jupiter || !moon) return yogas;
   
@@ -224,16 +224,16 @@ function detectGajaKesariYoga(
  * Detect Neecha Bhanga Raja Yoga (cancellation of debilitation)
  */
 function detectNeechaBhangaYoga(
-  planets: Record<string, PlanetData>
+  planets: Map<string, PlanetData>
 ): Yoga[] {
   const yogas: Yoga[] = [];
   
-  for (const [planetName, planetData] of Object.entries(planets)) {
+  for (const [planetName, planetData] of planets.entries()) {
     if (!isDebilitated(planetName, planetData.rashi)) continue;
     
     // Check if the lord of debilitation sign is in Kendra
     const debSignLord = getRashiLord(planetData.rashi);
-    const lordData = planets[debSignLord];
+    const lordData = planets.get(debSignLord);
     
     if (lordData && KENDRAS.includes(lordData.house)) {
       yogas.push({
@@ -254,7 +254,7 @@ function detectNeechaBhangaYoga(
  * Main function to detect all yogas in a chart
  */
 export function detectYogas(
-  planets: Record<string, PlanetData>,
+  planets: Map<string, PlanetData>,
   ascendantRashi: number
 ): YogaDetectionResult {
   const allYogas: Yoga[] = [];
@@ -300,12 +300,13 @@ export function detectYogas(
 
 /**
  * Build planet data from birth chart response
+ * Returns a Map instead of Record for security (prevents prototype pollution)
  */
 export function buildPlanetDataFromChart(
   planets: Array<{ name: string; fullDegree: number; house?: number }>,
   ascendant: number
-): Record<string, PlanetData> {
-  const result: Record<string, PlanetData> = {};
+): Map<string, PlanetData> {
+  const result = new Map<string, PlanetData>();
   
   for (const planet of planets) {
     const rashi = Math.floor(planet.fullDegree / 30) + 1;
@@ -313,18 +314,18 @@ export function buildPlanetDataFromChart(
     // This aligns better with standard Parashari yoga definitions
     const house = ((rashi - Math.floor(ascendant / 30) - 1 + 12) % 12) + 1;
     
-    // Security check for prototype pollution
+    // Security check for prototype pollution (redundant with Map but good practice)
     if (planet.name === "__proto__" || planet.name === "constructor" || planet.name === "prototype") {
       continue;
     }
 
-    result[planet.name] = {
+    result.set(planet.name, {
       longitude: planet.fullDegree,
       rashi,
       house,
       isExalted: isExalted(planet.name, rashi),
       isDebilitated: isDebilitated(planet.name, rashi),
-    };
+    });
   }
   
   return result;

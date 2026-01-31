@@ -224,7 +224,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       
       return NextResponse.json({
         ascendant_rashi: ascendantRashi,
-        planets: buildPlanetDataFromChart(chartPlanets, ascendantDegree),
+        planets: Object.fromEntries(buildPlanetDataFromChart(chartPlanets, ascendantDegree)),
         yogas: cachedResult.yogas,
         categories: cachedResult.categories,
         summary: cachedResult.summary,
@@ -260,7 +260,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({
       ascendant_rashi: ascendantRashi,
-      planets: planetData,
+      planets: Object.fromEntries(planetData),
       yogas: result.yogas,
       categories: result.categories,
       summary: result.summary,
