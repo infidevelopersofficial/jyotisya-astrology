@@ -10,14 +10,11 @@ import type { NextRequest } from "next/server";
  * - Cannot import @sentry/nextjs or any Node.js-specific packages
  */
 
-export function middleware(_request: NextRequest) {
-  try {
-    // Basic middleware logic - no Node.js dependencies
-    return NextResponse.next();
-
-    // NOTE: If you need Supabase session management, uncomment the following:
-    // import { updateSession } from './lib/supabase/middleware';
-    // return updateSession(_request);
+import { updateSession } from './lib/supabase/middleware';
+ 
+ export function middleware(_request: NextRequest) {
+   try {
+     return updateSession(_request);
   } catch (error) {
     // Log error for Vercel monitoring (console.error is Edge-compatible)
     console.error("[Middleware] Error:", error);

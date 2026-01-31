@@ -191,4 +191,13 @@ export const rateLimiters = {
     limit: 3,
     window: 60 * 60 * 1000,
   }),
+
+  /**
+   * Rate limit for astrology calculation endpoints
+   * 30 requests per minute (chart calculations are expensive)
+   */
+  astrology: createRateLimiter({
+    limit: 30,
+    window: 60 * 1000,
+  }),
 };

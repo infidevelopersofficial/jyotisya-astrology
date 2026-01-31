@@ -13,6 +13,7 @@ import UserDropdown from "@components/layout/user-dropdown";
 const LINKS = [
   { href: "/", key: "home" },
   { href: "/consultations", key: "consult" },
+  { href: "/matching", key: "match" },
   { href: "/dashboard", key: "dashboard" },
   { href: "/shop", key: "shop" },
 ] as const;

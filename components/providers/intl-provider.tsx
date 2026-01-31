@@ -19,7 +19,13 @@ const STORAGE_KEY = "jyotishya-locale";
 const translations = {
   en: {
     nav: {
-      links: { home: "Home", consult: "Consult", dashboard: "Dashboard", shop: "Marketplace" },
+      links: {
+        home: "Home",
+        consult: "Consult",
+        dashboard: "Dashboard",
+        match: "Matchmaking",
+        shop: "Marketplace"
+      },
       actions: { signIn: "Sign In", book: "Book Muhurat" },
     },
     hero: {
@@ -42,7 +48,13 @@ const translations = {
   },
   hi: {
     nav: {
-      links: { home: "होम", consult: "परामर्श", dashboard: "डैशबोर्ड", shop: "मार्केटप्लेस" },
+      links: {
+        home: "होम",
+        consult: "परामर्श",
+        dashboard: "डैशबोर्ड",
+        match: "कुंडली मिलान",
+        shop: "मार्केटप्लेस"
+      },
       actions: { signIn: "साइन इन", book: "मुहूर्त बुक करें" },
     },
     hero: {
@@ -69,6 +81,7 @@ const translations = {
         home: "முகப்பு",
         consult: "ஆலோசனை",
         dashboard: "டாஷ்போர்டு",
+        match: "பொருத்தம்",
         shop: "மார்க்கெட்ப்ளேஸ்",
       },
       actions: { signIn: "உள்நுழை", book: "முஹூர்த்தம் புக்" },
