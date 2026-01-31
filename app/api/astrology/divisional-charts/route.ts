@@ -102,8 +102,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     const chartsToCalc = requestedChart === "all" ? Object.keys(SUPPORTED_VARGAS) : [requestedChart];
 
     for (const key of chartsToCalc) {
-      if (SUPPORTED_VARGAS[key]) {
-        const divData = calculateDivisionalChart(key, basePlanets, SUPPORTED_VARGAS[key]);
+      if (Object.prototype.hasOwnProperty.call(SUPPORTED_VARGAS, key)) {
+        const divData = calculateDivisionalChart(key, basePlanets, SUPPORTED_VARGAS[key] as number);
         
         // Enrich with metadata like Sign Names
         const enrichedPlanets: Record<string, any> = {};

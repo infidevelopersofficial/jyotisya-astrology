@@ -313,6 +313,11 @@ export function buildPlanetDataFromChart(
     // This aligns better with standard Parashari yoga definitions
     const house = ((rashi - Math.floor(ascendant / 30) - 1 + 12) % 12) + 1;
     
+    // Security check for prototype pollution
+    if (planet.name === "__proto__" || planet.name === "constructor" || planet.name === "prototype") {
+      continue;
+    }
+
     result[planet.name] = {
       longitude: planet.fullDegree,
       rashi,

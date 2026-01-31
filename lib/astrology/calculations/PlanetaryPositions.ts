@@ -11,10 +11,6 @@ import { julian } from 'astronomia';
 import { planetposition } from 'astronomia';
 // @ts-ignore
 import { moonposition } from 'astronomia';
-// @ts-ignore
-import { sidereal } from 'astronomia';
-// @ts-ignore
-import { globe } from 'astronomia';
 
 // Load VSOP87 calculation data
 // @ts-ignore
