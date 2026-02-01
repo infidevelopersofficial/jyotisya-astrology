@@ -234,37 +234,3 @@ export interface CachedResponse<T> {
   source: ServiceBackend;
   from_cache?: boolean;
 }
-
-export interface TransitRequest {
-  dateTime: string; // Birth date
-  latitude: number;
-  longitude: number;
-  timezone: number;
-  transitDate?: string; // Optional target date (defaults to now)
-}
-
-export interface TransitsResponse {
-  transitTime: string;
-  currentPositions: Record<string, number>;
-  activeTransits: {
-    transitPlanet: string;
-    transitLongitude: number;
-    natalPlanet: string;
-    natalLongitude: number;
-    aspect: string;
-    nature: "intense" | "challenging" | "harmonious";
-    exactness: number;
-    orb: number;
-    effect: string;
-    significance: "critical" | "major" | "notable" | "minor";
-    significations: string[];
-  }[];
-  summary: {
-    totalAspects: number;
-    majorTransits: number;
-    challengingCount: number;
-    harmoniousCount: number;
-    overallTone: "challenging" | "favorable" | "mixed";
-    interpretation: string;
-  };
-}
