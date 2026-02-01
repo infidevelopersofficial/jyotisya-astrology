@@ -24,13 +24,10 @@ vi.mock("@/lib/monitoring/logger", () => ({
 }));
 
 // Helper to create a mock NextRequest
-function createMockNextRequest(url: string, init?: RequestInit): any {
-  const request = new Request(url, init);
-  return {
-    ...request,
-    nextUrl: new URL(url),
-    json: () => request.json(),
-  };
+import { NextRequest } from "next/server";
+
+function createMockNextRequest(url: string, init?: RequestInit): NextRequest {
+  return new NextRequest(url, init as any);
 }
 
 describe("POST /api/v1/astrology/panchang", () => {

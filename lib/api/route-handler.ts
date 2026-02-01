@@ -60,25 +60,28 @@ export function withRouteHandler<T = unknown>(
     } catch (error: unknown) {
       const duration = Date.now() - startTime;
 
-      if (error instanceof ApiError) {
+      const isApiError = error instanceof ApiError || (typeof error === 'object' && error !== null && (error as any).name === "ApiError");
+
+      if (isApiError) {
+        const apiError = error as any;
         logRequest(
           req,
-          error.statusCode,
+          apiError.statusCode || 400,
           duration,
           requestId,
-          error instanceof Error ? error.message : String(error),
+          apiError.message || String(error),
         );
         return NextResponse.json(
           {
             success: false,
             error: {
-              code: error.code,
-              message: error instanceof Error ? error.message : String(error),
-              details: error.details,
+              code: apiError.code || "UNKNOWN_ERROR",
+              message: apiError.message || String(error),
+              details: apiError.details,
             },
             meta: { timestamp: new Date().toISOString(), requestId },
           },
-          { status: error.statusCode, headers: { "X-Request-ID": requestId } },
+          { status: apiError.statusCode || 400, headers: { "X-Request-ID": requestId } },
         );
       }
 
