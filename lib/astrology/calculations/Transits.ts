@@ -145,16 +145,25 @@ function calculateAspect(transitLon: number, natalLon: number): {
  */
 export function calculateTransits(
   natalPlanets: Map<string, PlanetData>,
-  date: Date = new Date()
+  date: Date = new Date(),
+  transitPositions?: { name: string; longitude: number }[]
 ): TransitsResult {
   // 1. Get current transits
-  // We use 0,0 for lat/lon as geocentric positions are independent of location for standard astrology
-  // (Topocentric would require location, but standard transits use Geocentric)
-  const currentPositionsList = calculatePlanetaryPositions(date, 0, 0);
   const currentPositions: Record<string, number> = {};
-  
-  for (const p of currentPositionsList) {
-    currentPositions[p.name] = p.longitude;
+
+  if (transitPositions) {
+    // Use external positions if provided (Hybrid Strategy)
+    for (const p of transitPositions) {
+      currentPositions[p.name] = p.longitude;
+    }
+  } else {
+    // Fallback to local calculation
+    // We use 0,0 for lat/lon as geocentric positions are independent of location for standard astrology
+    const currentPositionsList = calculatePlanetaryPositions(date, 0, 0);
+    
+    for (const p of currentPositionsList) {
+      currentPositions[p.name] = p.longitude;
+    }
   }
 
   // 2. Analyze aspects
