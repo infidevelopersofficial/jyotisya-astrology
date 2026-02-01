@@ -45,7 +45,7 @@ interface UseDashaReturn {
   dasha: DashaResult | null;
   loading: boolean;
   error: string | null;
-  fetchDasha: (options: DashaOptions) => Promise<void>;
+  fetchDasha: (options: DashaOptions) => Promise<DashaResult | void>;
 }
 
 // Planet colors for visual display
@@ -97,10 +97,12 @@ export function useDasha(): UseDashaReturn {
 
       const data: DashaResult = await response.json();
       setDasha(data);
+      return data;
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       console.error("[useDasha] Error:", message);
+      throw err;
     } finally {
       setLoading(false);
     }

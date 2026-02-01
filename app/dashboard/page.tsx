@@ -46,6 +46,13 @@ export default async function DashboardPage() {
             icon="🌟"
           />
           <ActionCard
+            title="Reports Center"
+            description="Download professional PDF reports for Kundli, Compatibility, and Transits"
+            href="/dashboard/reports"
+            gradient="from-rose-500 to-pink-600"
+            icon="📄"
+          />
+          <ActionCard
             title="Saved Charts"
             description="View and manage your saved birth charts"
             href="/dashboard/charts"

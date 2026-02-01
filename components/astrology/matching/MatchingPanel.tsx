@@ -1,239 +1,127 @@
 "use client";
 
 import { useState } from "react";
-import {
-  useMatching,
-  KOOT_ICONS,
-  getScoreColor,
-  getVerdictColor,
-} from "@/hooks/astrology/useMatching";
+import MatchInputForm, { MatchProfile } from "./MatchInputForm";
+import MatchResult from "./MatchResult";
+import { MatchmakingResult } from "@/lib/astrology/calculations/Matchmaking";
+import MatchmakingReport from "@/components/reports/MatchmakingReport";
+import { generatePdf } from "@/lib/reports/generatePdf";
+import { useToast } from "@/components/ui/toast";
 
-interface MatchingPanelProps {
-  className?: string;
-}
+export default function MatchingPanel() {
+  const [result, setResult] = useState<MatchmakingResult | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  
+  const [profiles, setProfiles] = useState({ 
+     boyName: "", boyTime: "", boyLoc: "",
+     girlName: "", girlTime: "", girlLoc: "" 
+  });
 
-export default function MatchingPanel({ className = "" }: MatchingPanelProps) {
-  const { result, loading, error, calculateMatch } = useMatching();
-  const [showForm, setShowForm] = useState(true);
-
-  // Form state
-  const [brideMoon, setBrideMoon] = useState("");
-  const [groomMoon, setGroomMoon] = useState("");
-  const [brideName, setBrideName] = useState("");
-  const [groomName, setGroomName] = useState("");
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const brideMoonLongitude = parseFloat(brideMoon);
-    const groomMoonLongitude = parseFloat(groomMoon);
-
-    if (isNaN(brideMoonLongitude) || isNaN(groomMoonLongitude)) {
-      return;
-    }
-
-    await calculateMatch({
-      brideMoonLongitude,
-      groomMoonLongitude,
-      brideName: brideName || "Bride",
-      groomName: groomName || "Groom",
+  const handleMatch = async (boy: MatchProfile, girl: MatchProfile) => {
+    setLoading(true);
+    setError(null);
+    setProfiles({ 
+       boyName: boy.name, boyTime: boy.dateTime, boyLoc: boy.location,
+       girlName: girl.name, girlTime: girl.dateTime, girlLoc: girl.location
     });
 
-    setShowForm(false);
+    try {
+      const response = await fetch("/api/astrology/matchmaking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          boy: { 
+             dateTime: boy.dateTime,
+             latitude: boy.latitude, 
+             longitude: boy.longitude 
+          },
+          girl: { 
+             dateTime: girl.dateTime, 
+             latitude: girl.latitude, 
+             longitude: girl.longitude 
+          }
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to calculate match");
+      }
+
+      const data = await response.json();
+      setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReset = () => {
-    setShowForm(true);
+  const handleDownloadPdf = async () => {
+    if (!result) return;
+    setIsGeneratingPdf(true);
+    try {
+      await new Promise(r => setTimeout(r, 500)); // Render wait
+      await generatePdf("matchmaking-report-root", `Match_${profiles.boyName}_${profiles.girlName}.pdf`);
+      toast("Match Report Downloaded Successfully", "success");
+    } catch (e) {
+      console.error(e);
+      setError("Failed to generate PDF");
+      toast("Failed to generate PDF", "error");
+    } finally {
+       setIsGeneratingPdf(false);
+    }
   };
 
   return (
-    <div className={`rounded-2xl border border-pink-500/30 bg-gradient-to-br from-pink-500/10 to-rose-500/10 p-6 ${className}`}>
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm relative">
       {/* Header */}
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
-          <span className="text-2xl">💑</span>
-          Kundli Matching
-        </h3>
-        <span className="rounded-full bg-pink-500/20 px-3 py-1 text-xs font-medium text-pink-300">
-          Ashtakoot Milan
-        </span>
+      <div className="mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+         <div>
+            <h2 className="text-2xl font-bold text-white">Check Compatibility</h2>
+            <p className="text-sm text-slate-400">Enter birth details for both individuals</p>
+         </div>
+         
+         {result && (
+            <button
+               onClick={handleDownloadPdf}
+               disabled={isGeneratingPdf}
+               className="flex items-center gap-2 rounded-full border border-orange-500/30 bg-orange-500/10 px-4 py-2 text-sm font-medium text-orange-300 transition hover:bg-orange-500/20 disabled:opacity-50"
+            >
+               {isGeneratingPdf ? "Generating..." : "📄 Download Report"}
+            </button>
+         )}
       </div>
 
-      {/* Info Text */}
-      <div className="mb-6 rounded-lg bg-white/5 p-4">
-        <p className="text-sm text-slate-300">
-          <strong>Ashtakoot Milan</strong> is an 8-factor compatibility system used in Vedic
-          astrology for marriage matching. It analyzes the Moon positions of both individuals
-          to calculate a compatibility score out of 36 points.
-        </p>
-      </div>
-
-      {/* Form */}
-      {showForm && (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            {/* Bride Section */}
-            <div className="rounded-xl bg-pink-500/10 p-4 border border-pink-500/20">
-              <p className="mb-3 text-sm font-medium text-pink-300">👰 Bride Details</p>
-              <div className="space-y-3">
-                <div>
-                  <label className="mb-1 block text-xs text-slate-400">Name (optional)</label>
-                  <input
-                    type="text"
-                    value={brideName}
-                    onChange={(e) => setBrideName(e.target.value)}
-                    placeholder="Bride's name"
-                    className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-pink-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-slate-400">
-                    Moon Longitude (0-360°) <span className="text-pink-400">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="360"
-                    value={brideMoon}
-                    onChange={(e) => setBrideMoon(e.target.value)}
-                    placeholder="e.g. 145.5"
-                    required
-                    className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-pink-500/50"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Groom Section */}
-            <div className="rounded-xl bg-blue-500/10 p-4 border border-blue-500/20">
-              <p className="mb-3 text-sm font-medium text-blue-300">🤵 Groom Details</p>
-              <div className="space-y-3">
-                <div>
-                  <label className="mb-1 block text-xs text-slate-400">Name (optional)</label>
-                  <input
-                    type="text"
-                    value={groomName}
-                    onChange={(e) => setGroomName(e.target.value)}
-                    placeholder="Groom's name"
-                    className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="mb-1 block text-xs text-slate-400">
-                    Moon Longitude (0-360°) <span className="text-blue-400">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="360"
-                    value={groomMoon}
-                    onChange={(e) => setGroomMoon(e.target.value)}
-                    placeholder="e.g. 280.3"
-                    required
-                    className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-slate-500 outline-none focus:ring-2 focus:ring-blue-500/50"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-gradient-to-r from-pink-500 to-rose-500 py-3 font-semibold text-white transition hover:from-pink-600 hover:to-rose-600 disabled:opacity-50"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                Calculating...
-              </span>
-            ) : (
-              "Calculate Compatibility"
-            )}
-          </button>
-        </form>
-      )}
-
-      {/* Error */}
       {error && (
-        <div className="mt-4 rounded-lg bg-red-500/20 p-4 border border-red-500/30">
-          <p className="text-sm text-red-300">{error}</p>
+        <div className="mb-6 rounded-lg bg-red-500/10 p-4 border border-red-500/20 text-red-300">
+          {error}
         </div>
       )}
 
-      {/* Results */}
-      {result && !showForm && (
-        <div className="space-y-6">
-          {/* Score Overview */}
-          <div className="rounded-xl bg-gradient-to-r from-pink-600/30 to-rose-600/30 p-5 border border-pink-400/20">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-pink-200">Compatibility Score</p>
-                <p className="text-4xl font-bold text-white">
-                  {result.totalScore}
-                  <span className="text-xl text-pink-300">/{result.maxScore}</span>
-                </p>
-                <p className="text-sm text-slate-400">{result.percentage}% match</p>
-              </div>
-              <div className="text-right">
-                <p className={`text-xl font-bold ${getVerdictColor(result.verdict)}`}>
-                  {result.verdict}
-                </p>
-                <p className="mt-1 text-sm text-slate-300">{result.recommendation}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Couple Info */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-lg bg-pink-500/10 p-4 border border-pink-500/20">
-              <p className="font-semibold text-pink-300">👰 {result.bride.name}</p>
-              <p className="text-sm text-slate-400">
-                {result.bride.nakshatra} • {result.bride.rashi}
-              </p>
-            </div>
-            <div className="rounded-lg bg-blue-500/10 p-4 border border-blue-500/20">
-              <p className="font-semibold text-blue-300">🤵 {result.groom.name}</p>
-              <p className="text-sm text-slate-400">
-                {result.groom.nakshatra} • {result.groom.rashi}
-              </p>
-            </div>
-          </div>
-
-          {/* Koot Details */}
-          <div>
-            <p className="mb-4 text-sm font-medium text-slate-300">Compatibility Breakdown</p>
-            <div className="space-y-2">
-              {result.koots.map((koot, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-3 rounded-lg bg-white/5 p-3 hover:bg-white/10 transition"
-                >
-                  <span className="text-xl">{KOOT_ICONS[koot.name] || "•"}</span>
-                  <div className="flex-1">
-                    <p className="font-medium text-white">{koot.name}</p>
-                    <p className="text-xs text-slate-400">{koot.description}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className={`font-bold ${getScoreColor(koot.score, koot.maxScore)}`}>
-                      {koot.score}/{koot.maxScore}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Reset Button */}
-          <button
-            onClick={handleReset}
-            className="w-full rounded-lg border border-pink-500/30 py-2 text-pink-300 transition hover:bg-pink-500/10"
-          >
-            Calculate Another Match
-          </button>
-        </div>
+      {!result ? (
+        <MatchInputForm loading={loading} onSubmit={handleMatch} />
+      ) : (
+        <MatchResult 
+           result={result} 
+           profiles={{ boyName: profiles.boyName, girlName: profiles.girlName }} 
+           onReset={() => setResult(null)} 
+        />
+      )}
+      
+      {/* Hidden Report */}
+      {result && (
+         <div className="absolute top-0 left-0 -z-50 h-0 w-0 overflow-hidden opacity-0">
+            <MatchmakingReport 
+               data={{
+                  result,
+                  boy: { name: profiles.boyName, dateTime: profiles.boyTime, location: profiles.boyLoc },
+                  girl: { name: profiles.girlName, dateTime: profiles.girlTime, location: profiles.girlLoc }
+               }} 
+            />
+         </div>
       )}
     </div>
   );

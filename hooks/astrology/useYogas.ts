@@ -18,7 +18,7 @@ interface UseYogasReturn {
   summary: YogaSummary | null;
   loading: boolean;
   error: string | null;
-  fetchYogas: (options: YogasOptions) => Promise<void>;
+  fetchYogas: (options: YogasOptions) => Promise<YogasResponse | void>;
 }
 
 // Yoga type display names and colors
@@ -65,10 +65,12 @@ export function useYogas(): UseYogasReturn {
       setYogas(data.yogas || []);
       setCategories(data.categories || {});
       setSummary(data.summary || null);
+      return data; // Return data for immediate usage
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unknown error";
       setError(message);
       console.error("[useYogas] Error:", message);
+      throw err; // Re-throw to caller
     } finally {
       setLoading(false);
     }

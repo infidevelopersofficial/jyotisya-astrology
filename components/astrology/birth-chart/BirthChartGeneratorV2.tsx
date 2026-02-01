@@ -6,6 +6,16 @@ import { useBirthChartActions } from "@/hooks/astrology/useBirthChartActions";
 import BirthChartForm from "./BirthChartForm";
 import BirthChartDisplay from "./BirthChartDisplay";
 import DivisionalChartsPanel from "./DivisionalChartsPanel";
+import KundliReport, { KundliReportData } from "@/components/reports/KundliReport";
+import { generatePdf } from "@/lib/reports/generatePdf";
+import { useToast } from "@/components/ui/toast"; 
+import { useMemo, useState } from "react";
+import { useYogas } from "@/hooks/astrology/useYogas";
+import { useDasha } from "@/hooks/astrology/useDasha";
+import { Yoga, YogaSummary, DashaResult } from "@/types/astrology/birthChart.types";
+import { calculateDignity, calculateFunctionalNature, calculateStrengthScore } from "@/lib/astrology/calculations/Dignity";
+import { NAKSHATRA_DATA } from "@/lib/astrology/calculations/NakshatraInfo";
+import { generateRemedies, Remedy } from "@/lib/astrology/calculations/Remedies";
 
 interface BirthChartGeneratorProps {
   userId: string;
@@ -37,7 +47,6 @@ export default function BirthChartGeneratorV2({
     savingChart,
     savedChartId,
     handleDownloadPNG,
-    handleDownloadPDF,
     handleCopyShareLink,
     handleSaveChart,
   } = useBirthChartActions({
@@ -46,6 +55,177 @@ export default function BirthChartGeneratorV2({
     selectedDivisional: state.selectedDivisional,
     setError,
   });
+
+  const { toast } = useToast(); 
+  
+  // Hooks for Advanced Report Data
+  const { fetchYogas } = useYogas();
+  const { fetchDasha } = useDasha();
+  
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const [reportExtras, setReportExtras] = useState<{
+    yogas?: { list: Yoga[]; summary: YogaSummary | null };
+    dasha?: { current: string; periods: any[] };
+    interpretation?: any;
+  }>({});
+
+  // Prepare data for the PDF report
+  const reportData = useMemo<KundliReportData | null>(() => {
+    const { birthData, chartData } = state;
+    if (!chartData?.data?.planets) return null;
+
+    const planets = chartData.data.planets;
+    
+
+    const ascendant = chartData.data.ascendant || 0;
+    const ascendantSign = Math.floor(ascendant / 30) + 1; // 1-12
+    
+    // Safely map planets with Dignity Calculation
+    const mappedPlanets = planets.map((p) => {
+       const signNum = Math.floor(p.normDegree / 30) + 1;
+       
+       // Calculate Rulership (Approximate Host for Dignity)
+       // This needs a helper really, but we can do a simplified check for now OR
+       // improve calculateDignity to take sign number since we have OWN_SIGNS.
+       // My calculateDignity uses signPosition (number). HostPlanet is needed for friendship.
+       // Let's create a quick host lookup here or update Dignity.ts? 
+       // For now, I will use a simple mapping for host.
+       
+       const signOwners = [null, "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
+       const host = signOwners[signNum] || "Neutral";
+
+       const dignity = calculateDignity(p.name, signNum, p.normDegree % 30, host);
+       const nature = calculateFunctionalNature(p.name, ascendantSign);
+       const strength = calculateStrengthScore(dignity, p.isRetro === true || p.isRetro === "true");
+
+       return {
+         name: p.name,
+         sign: p.sign || "Unknown",
+         longitude: p.fullDegree,
+         nakshatra: p.nakshatra || "-",
+         pada: "-", 
+         // Advanced Props
+         house: 1, // Placeholder, calculated later in D1
+         isRetro: !!p.isRetro,
+         dignity,
+         nature,
+         strength
+       };
+    });
+
+    // Remedies Generation
+    let chartRemedies: Remedy[] = [];
+    mappedPlanets.forEach(p => {
+       const newRemedies = generateRemedies(p.name, p.nature, p.strength, p.dignity);
+       chartRemedies = [...chartRemedies, ...newRemedies];
+    });
+
+
+    // Nakshatra Deep Dive
+    const moon = mappedPlanets.find(p => p.name === "Moon");
+    const nakshatraInfo = moon && moon.nakshatra ? NAKSHATRA_DATA[moon.nakshatra] : undefined;
+
+
+    return {
+      user: { name: birthData.chartName || "User" },
+      basicDetails: {
+        date: new Date(birthData.dateTime).toLocaleDateString(),
+        time: new Date(birthData.dateTime).toLocaleTimeString(),
+        location: birthData.location,
+        dayOfWeek: new Date(birthData.dateTime).toLocaleDateString("en-US", { weekday: "long" }),
+      },
+      planetaryPositions: mappedPlanets,
+      nakshatraInfo, 
+      remedies: chartRemedies, // Pass remedies
+      panchang: {
+        tithi: "-", // Not currently in API response
+        vara: new Date(birthData.dateTime).toLocaleDateString("en-US", { weekday: "long" }),
+        nakshatra: "-",
+        yoga: "-",
+      },
+      charts: {
+        D1: {
+            ascendant: chartData.data.ascendant || 0,
+            planets: mappedPlanets.map(p => ({
+               name: p.name,
+               house: planets.find(pl => pl.name === p.name)?.house || 1,
+               sign: p.sign,
+               degree: p.longitude,
+               isRetro: false // TODO: Pass isRetro if available
+            }))
+        }
+      },
+      ...reportExtras // Spread extra data (yogas, dasha) when available
+    };
+  }, [state.birthData, state.chartData, reportExtras]);
+
+  const handleGeneratePdf = async (interpretation?: any) => {
+    if (!state.birthData) return;
+    setIsGeneratingPdf(true);
+    
+    try {
+      // 1. Fetch Advanced Data on Demand
+      // We assume date/lat/lon are valid if chartData exists
+      const commonOptions = {
+         dateTime: state.birthData.dateTime,
+         latitude: state.birthData.latitude,
+         longitude: state.birthData.longitude,
+         timezone: state.birthData.timezone
+      };
+
+      console.log("Fetching Advanced Report Data...");
+      
+      // Parallel Fetch
+      const [yogaData, dashaData] = await Promise.all([
+         fetchYogas(commonOptions).catch(e => { console.error("Yoga fetch failed", e); return undefined; }),
+         fetchDasha({ ...commonOptions, yearsToCalculate: 80 }).catch(e => { console.error("Dasha fetch failed", e); return undefined; })
+      ]);
+
+      // 2. Process Dasha Data for Report
+      let dashaProcessed = undefined;
+      // @ts-ignore - checking if dashaData is valid DashaResult
+      if (dashaData && dashaData.mahadashas) { 
+         // @ts-ignore
+         const res = dashaData as DashaResult;
+         dashaProcessed = {
+            current: `${res.currentMahadasha} / ${res.currentAntardasha}`,
+            periods: res.mahadashas.map((m: any) => ({
+               planet: m.planet,
+               start_date: m.start_date,
+               end_date: m.end_date
+            }))
+         };
+      }
+
+      // 3. Update State to Render Hidden Report
+      setReportExtras({
+         // @ts-ignore
+         yogas: yogaData ? { list: yogaData.yogas, summary: yogaData.summary } : undefined,
+         dasha: dashaProcessed,
+         interpretation: interpretation // Pass interpretation from UI if available
+      });
+
+      // 4. Wait for Render (Critical)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      if (!document.getElementById("kundli-report-root")) {
+         throw new Error("Report element not found");
+      }
+
+      const fileName = `${state.birthData.chartName?.replace(/\s+/g, "_") || "Report"}_Kundli.pdf`;
+      await generatePdf("kundli-report-root", fileName);
+      
+      toast("Detailed Kundli Report Downloaded", "success");
+    } catch (e) {
+      console.error("PDF Generation failed", e);
+      setError("Failed to generate PDF report");
+      toast("PDF Generation Failed", "error");
+    } finally {
+      setIsGeneratingPdf(false);
+      // Optional: Clear extras after download to free memory? 
+      // setReportExtras({});
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -248,12 +428,12 @@ export default function BirthChartGeneratorV2({
           onSwitchToForm={() => setActiveTab("form")}
           onSwitchToDivisional={() => setActiveTab("divisional")}
           downloadingPNG={downloadingPNG}
-          downloadingPDF={downloadingPDF}
+          downloadingPDF={isGeneratingPdf || downloadingPDF} // Use combined loading state
           copiedLink={copiedLink}
           savingChart={savingChart}
           savedChartId={savedChartId}
           onDownloadPNG={handleDownloadPNG}
-          onDownloadPDF={handleDownloadPDF}
+          onDownloadPDF={handleGeneratePdf} // Override with our new generator
           onCopyLink={handleCopyShareLink}
           onSaveChart={handleSaveChart}
         />
@@ -266,6 +446,13 @@ export default function BirthChartGeneratorV2({
           selectedDivisional={state.selectedDivisional}
           onSelectDivisional={selectDivisional}
         />
+      )}
+      
+      {/* Hidden PDF Report (Rendered only when chart data exists) */}
+      {state.chartData && reportData && (
+         <div className="absolute top-0 left-0 -z-50 opacity-0 pointer-events-none overflow-hidden h-0 w-0">
+            <KundliReport data={reportData} />
+         </div>
       )}
     </div>
   );

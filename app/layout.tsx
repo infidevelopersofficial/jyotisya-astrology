@@ -9,6 +9,7 @@ import { IntlProvider } from "@components/providers/intl-provider";
 import { QueryProvider } from "@components/providers/query-provider";
 import AuthListenerProvider from "@components/providers/auth-listener-provider";
 import "@/lib/env"; // Validate environment variables at startup
+import { ToastProvider } from "@components/ui/toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -56,10 +57,12 @@ export default function RootLayout({
           <IntlProvider>
             <QueryProvider>
               <AuthListenerProvider>
-                <MainNav />
-                {children}
-                <Footer />
-                <CookieBanner />
+                <ToastProvider>
+                  <MainNav />
+                  {children}
+                  <Footer />
+                  <CookieBanner />
+                </ToastProvider>
               </AuthListenerProvider>
             </QueryProvider>
           </IntlProvider>

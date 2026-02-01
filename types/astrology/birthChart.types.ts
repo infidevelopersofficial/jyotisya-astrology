@@ -181,3 +181,31 @@ export interface DivisionalChartsResponse {
     ascendant_longitude: number;
   };
 }
+export interface Antardasha {
+  planet: string;
+  start_date: string;
+  end_date: string;
+  duration_days: number;
+  is_current: boolean;
+}
+
+export interface Mahadasha {
+  planet: string;
+  start_date: string;
+  end_date: string;
+  duration_years: number;
+  is_current: boolean;
+  antardashas: Antardasha[];
+}
+
+export interface DashaResult {
+  birthNakshatra: string;
+  nakshatraLord: string;
+  moonLongitude: number;
+  currentMahadasha: string;
+  currentAntardasha: string;
+  mahadashas: Mahadasha[];
+  ayanamsha: string;
+  ayanamshaValue: number;
+  source: string;
+}
