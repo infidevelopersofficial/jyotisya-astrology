@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
 import { Card } from "@digital-astrology/ui";
+import TransitReport from "@/components/reports/TransitReport";
+import { generatePdf } from "@/lib/reports/generatePdf";
+import { useToast } from "@/components/ui/toast";
 
 interface TransitAspect {
   transitPlanet: string;
@@ -32,6 +35,8 @@ interface TransitViewProps {
     latitude: number;
     longitude: number;
     timezone: number;
+    location: string;
+    userName: string;
   };
 }
 
@@ -39,7 +44,9 @@ export default function TransitView({ birthDetails }: TransitViewProps) {
   const [data, setData] = useState<TransitsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { user } = useSupabaseAuth();
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
+  const { user } = useSupabaseAuth(); // Keep for auth check if needed, but prefer props for report
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchTransits() {
@@ -110,8 +117,50 @@ export default function TransitView({ birthDetails }: TransitViewProps) {
     }
   };
 
+  const handleDownloadPdf = async () => {
+    if (!data) return;
+    setIsGeneratingPdf(true);
+    try {
+      // Small delay to ensure render
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const safeName = birthDetails.userName.replace(/[^a-zA-Z0-9]/g, "_") || "User";
+      const dateStr = birthDetails.dateTime.split("T")[0];
+      const filename = `Transits_${safeName}_${dateStr}.pdf`;
+
+      await generatePdf("transit-report-root", filename);
+      toast("PDF Downloaded Successfully", "success");
+    } catch (e) {
+      console.error("PDF Generation failed", e);
+      toast("Failed to generate PDF. Please try again.", "error");
+    } finally {
+      setIsGeneratingPdf(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
+      {/* Header Actions */}
+      <div className="flex justify-end">
+         <button
+            onClick={handleDownloadPdf}
+            disabled={isGeneratingPdf}
+            className="flex items-center gap-2 rounded-lg bg-white/5 border border-white/10 px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-50"
+         >
+            {isGeneratingPdf ? (
+               <>
+                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                  <span>Generating...</span>
+               </>
+            ) : (
+               <>
+                  <span>📄</span>
+                  <span>Download Report</span>
+               </>
+            )}
+         </button>
+      </div>
+
       {/* Summary Card */}
       <div className={`rounded-xl border p-6 ${getToneColor(summary.overallTone)}`}>
         <h3 className="mb-2 text-lg font-semibold">Cosmic Weather Report</h3>
@@ -158,6 +207,18 @@ export default function TransitView({ birthDetails }: TransitViewProps) {
             </div>
           </div>
         ))}
+      </div>
+
+      {/* Hidden PDF Report */}
+      <div className="absolute top-0 left-0 -z-50 h-0 w-0 overflow-hidden opacity-0">
+         <TransitReport 
+            data={data} 
+            user={{
+               name: birthDetails.userName || user?.user_metadata?.name || "User",
+               dateTime: birthDetails.dateTime,
+               location: birthDetails.location || "Unknown Location"
+            }} 
+         />
       </div>
     </div>
   );

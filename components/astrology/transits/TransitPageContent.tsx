@@ -94,6 +94,8 @@ export default function TransitPageContent({ initialBirthData }: TransitPageCont
                     latitude: birthData.latitude,
                     longitude: birthData.longitude,
                     timezone: birthData.timezone,
+                    location: birthData.location || "",
+                    userName: birthData.chartName || "User",
                 }}
             />
         </div>

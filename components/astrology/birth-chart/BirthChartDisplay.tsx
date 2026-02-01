@@ -38,7 +38,7 @@ interface BirthChartDisplayProps {
   savingChart: boolean;
   savedChartId: string | null;
   onDownloadPNG: () => void;
-  onDownloadPDF: () => void;
+  onDownloadPDF: (interpretation?: any) => void;
   onCopyLink: () => void;
   onSaveChart: () => void;
 }
@@ -268,7 +268,7 @@ export default function BirthChartDisplay({
             </button>
 
             <button
-              onClick={onDownloadPDF}
+              onClick={() => onDownloadPDF(interpretation)}
               disabled={downloadingPDF}
               className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
               title="Download as PDF"

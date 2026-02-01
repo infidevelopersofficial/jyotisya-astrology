@@ -6,12 +6,14 @@ import MatchResult from "./MatchResult";
 import { MatchmakingResult } from "@/lib/astrology/calculations/Matchmaking";
 import MatchmakingReport from "@/components/reports/MatchmakingReport";
 import { generatePdf } from "@/lib/reports/generatePdf";
+import { useToast } from "@/components/ui/toast";
 
 export default function MatchingPanel() {
   const [result, setResult] = useState<MatchmakingResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
   
   const [profiles, setProfiles] = useState({ 
      boyName: "", boyTime: "", boyLoc: "",
@@ -63,9 +65,11 @@ export default function MatchingPanel() {
     try {
       await new Promise(r => setTimeout(r, 500)); // Render wait
       await generatePdf("matchmaking-report-root", `Match_${profiles.boyName}_${profiles.girlName}.pdf`);
+      toast("Match Report Downloaded Successfully", "success");
     } catch (e) {
       console.error(e);
       setError("Failed to generate PDF");
+      toast("Failed to generate PDF", "error");
     } finally {
        setIsGeneratingPdf(false);
     }
