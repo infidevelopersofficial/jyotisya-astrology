@@ -69,6 +69,14 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
   const [error, setError] = useState<string | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // Sync with external value changes (e.g., when editing profile)
+  useEffect(() => {
+    if (value.city && value.city !== searchQuery) {
+      setSearchQuery(value.city);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value.city]);
+
   // Click outside to close suggestions
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
