@@ -7,7 +7,13 @@ import BirthChartForm from "./BirthChartForm";
 import BirthChartDisplay from "./BirthChartDisplay";
 import DivisionalChartsPanel from "./DivisionalChartsPanel";
 import KundliReport, { KundliReportData } from "@/components/reports/KundliReport";
-import { generatePdf } from "@/lib/reports/generatePdf";
+import { exportChartAsPdf, exportReportAsPdf, isPdfExportEnabled } from "@/lib/pdf";
+import {
+  getFullChartName,
+  getFormattedBirthDateTime,
+  buildDownloadFilename,
+  DIVISIONAL_CHARTS,
+} from "@/services/astrology/birthChartService";
 import { useToast } from "@/components/ui/toast"; 
 import { useMemo, useState } from "react";
 import { useYogas } from "@/hooks/astrology/useYogas";
@@ -159,6 +165,35 @@ export default function BirthChartGeneratorV2({
     };
   }, [state.birthData, state.chartData, reportExtras]);
 
+  const handleDownloadChartPDF = async () => {
+    if (!state.birthData) return;
+    try {
+      const fullChartName = getFullChartName(
+        state.birthData,
+        state.selectedDivisional,
+        DIVISIONAL_CHARTS
+      );
+      const filename = buildDownloadFilename(
+        state.birthData,
+        state.selectedDivisional,
+        "pdf"
+      );
+      const formatted = getFormattedBirthDateTime(state.birthData.dateTime);
+      await exportChartAsPdf({
+        elementId: "rasi-chart",
+        fileName: filename,
+        chartName: fullChartName,
+        birthDate: formatted.full,
+        birthPlace: state.birthData.location,
+      });
+      toast("Chart PDF Downloaded", "success");
+    } catch (e) {
+      console.error("Chart PDF download failed:", e);
+      setError("Failed to download chart as PDF. Please try again.");
+      toast("Chart PDF Download Failed", "error");
+    }
+  };
+
   const handleGeneratePdf = async (interpretation?: any) => {
     if (!state.birthData) return;
     setIsGeneratingPdf(true);
@@ -213,7 +248,7 @@ export default function BirthChartGeneratorV2({
       }
 
       const fileName = `${state.birthData.chartName?.replace(/\s+/g, "_") || "Report"}_Kundli.pdf`;
-      await generatePdf("kundli-report-root", fileName);
+      await exportReportAsPdf({ elementId: "kundli-report-root", fileName });
       
       toast("Detailed Kundli Report Downloaded", "success");
     } catch (e) {
@@ -433,7 +468,8 @@ export default function BirthChartGeneratorV2({
           savingChart={savingChart}
           savedChartId={savedChartId}
           onDownloadPNG={handleDownloadPNG}
-          onDownloadPDF={handleGeneratePdf} // Override with our new generator
+          onDownloadPDF={handleGeneratePdf}
+          onDownloadChartPDF={isPdfExportEnabled() ? handleDownloadChartPDF : undefined}
           onCopyLink={handleCopyShareLink}
           onSaveChart={handleSaveChart}
         />
