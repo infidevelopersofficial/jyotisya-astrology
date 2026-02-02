@@ -10,6 +10,7 @@
 import html2canvas from "html2canvas";
 import { jsPDF } from "jspdf";
 import type { ChartExportOptions, ReportExportOptions } from "./types";
+import { PDF_LIMITS } from "./types";
 
 /** Desktop-optimized scale (analysis §4.2, §7.1) - balance quality vs performance */
 const DESKTOP_SCALE = 2;
@@ -135,6 +136,12 @@ export async function exportReportAsPdf(
 
   if (pages.length === 0) {
     throw new Error("No pages found in report root");
+  }
+
+  if (pages.length > PDF_LIMITS.MAX_PDF_PAGES) {
+    throw new Error(
+      `Report exceeds maximum page limit (${PDF_LIMITS.MAX_PDF_PAGES} pages)`
+    );
   }
 
   const scale = isMobileDevice() ? 1 : DESKTOP_SCALE;

@@ -44,5 +44,21 @@ describe("lib/pdf/pdf-generator", () => {
         })
       ).rejects.toThrow("No pages found in report root");
     });
+
+    it("throws when page count exceeds MAX_PDF_PAGES", async () => {
+      const root = document.createElement("div");
+      root.id = "report-root";
+      for (let i = 0; i < 51; i++) {
+        root.appendChild(document.createElement("div"));
+      }
+      document.body.appendChild(root);
+
+      await expect(
+        exportReportAsPdf({
+          elementId: "report-root",
+          fileName: "report.pdf",
+        })
+      ).rejects.toThrow("exceeds maximum page limit");
+    });
   });
 });
