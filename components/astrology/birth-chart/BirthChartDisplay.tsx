@@ -22,6 +22,7 @@ import InterpretationModal from "./InterpretationModal";
 import { useChartInterpretation } from "@/hooks/astrology/useChartInterpretation";
 import DashaPanel from "./DashaPanel";
 import YogasPanel from "./YogasPanel";
+import PDFExportButton from "@/components/pdf/PDFExportButton";
 
 interface BirthChartDisplayProps {
   birthData: BirthData;
@@ -39,6 +40,7 @@ interface BirthChartDisplayProps {
   savedChartId: string | null;
   onDownloadPNG: () => void;
   onDownloadPDF: (interpretation?: any) => void;
+  onDownloadChartPDF?: () => void | Promise<void>;
   onCopyLink: () => void;
   onSaveChart: () => void;
 }
@@ -58,6 +60,7 @@ export default function BirthChartDisplay({
   savedChartId,
   onDownloadPNG,
   onDownloadPDF,
+  onDownloadChartPDF,
   onCopyLink,
   onSaveChart,
 }: BirthChartDisplayProps) {
@@ -267,24 +270,34 @@ export default function BirthChartDisplay({
               )}
             </button>
 
-            <button
-              onClick={() => onDownloadPDF(interpretation)}
-              disabled={downloadingPDF}
-              className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
-              title="Download as PDF"
-            >
-              {downloadingPDF ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                  <span>PDF</span>
-                </>
-              ) : (
-                <>
-                  <span>📄</span>
-                  <span>PDF</span>
-                </>
-              )}
-            </button>
+            {onDownloadChartPDF ? (
+              <PDFExportButton
+                onExportChart={onDownloadChartPDF}
+                onExportReport={() => onDownloadPDF(interpretation)}
+                disabled={downloadingPDF}
+                showReportOption={true}
+                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
+              />
+            ) : (
+              <button
+                onClick={() => onDownloadPDF(interpretation)}
+                disabled={downloadingPDF}
+                className="flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 px-3 sm:px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition-all hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none min-h-[44px] active:scale-[0.98]"
+                title="Download as PDF"
+              >
+                {downloadingPDF ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
+                    <span>PDF</span>
+                  </>
+                ) : (
+                  <>
+                    <span>📄</span>
+                    <span>PDF</span>
+                  </>
+                )}
+              </button>
+            )}
 
             <button
               onClick={onCopyLink}
