@@ -7,7 +7,7 @@ import BirthChartForm from "./BirthChartForm";
 import BirthChartDisplay from "./BirthChartDisplay";
 import DivisionalChartsPanel from "./DivisionalChartsPanel";
 import KundliReport, { KundliReportData } from "@/components/reports/KundliReport";
-import { exportChartAsPdf, exportReportAsPdf } from "@/lib/pdf";
+import { exportChartAsPdf, exportReportAsPdf, isPdfExportEnabled } from "@/lib/pdf";
 import {
   getFullChartName,
   getFormattedBirthDateTime,
@@ -167,25 +167,31 @@ export default function BirthChartGeneratorV2({
 
   const handleDownloadChartPDF = async () => {
     if (!state.birthData) return;
-    const fullChartName = getFullChartName(
-      state.birthData,
-      state.selectedDivisional,
-      DIVISIONAL_CHARTS
-    );
-    const filename = buildDownloadFilename(
-      state.birthData,
-      state.selectedDivisional,
-      "pdf"
-    );
-    const formatted = getFormattedBirthDateTime(state.birthData.dateTime);
-    await exportChartAsPdf({
-      elementId: "rasi-chart",
-      fileName: filename,
-      chartName: fullChartName,
-      birthDate: formatted.full,
-      birthPlace: state.birthData.location,
-    });
-    toast("Chart PDF Downloaded", "success");
+    try {
+      const fullChartName = getFullChartName(
+        state.birthData,
+        state.selectedDivisional,
+        DIVISIONAL_CHARTS
+      );
+      const filename = buildDownloadFilename(
+        state.birthData,
+        state.selectedDivisional,
+        "pdf"
+      );
+      const formatted = getFormattedBirthDateTime(state.birthData.dateTime);
+      await exportChartAsPdf({
+        elementId: "rasi-chart",
+        fileName: filename,
+        chartName: fullChartName,
+        birthDate: formatted.full,
+        birthPlace: state.birthData.location,
+      });
+      toast("Chart PDF Downloaded", "success");
+    } catch (e) {
+      console.error("Chart PDF download failed:", e);
+      setError("Failed to download chart as PDF. Please try again.");
+      toast("Chart PDF Download Failed", "error");
+    }
   };
 
   const handleGeneratePdf = async (interpretation?: any) => {
@@ -463,7 +469,7 @@ export default function BirthChartGeneratorV2({
           savedChartId={savedChartId}
           onDownloadPNG={handleDownloadPNG}
           onDownloadPDF={handleGeneratePdf}
-          onDownloadChartPDF={handleDownloadChartPDF}
+          onDownloadChartPDF={isPdfExportEnabled() ? handleDownloadChartPDF : undefined}
           onCopyLink={handleCopyShareLink}
           onSaveChart={handleSaveChart}
         />
