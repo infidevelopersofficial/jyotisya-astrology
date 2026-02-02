@@ -20,12 +20,27 @@ function isBrowser(): boolean {
   return typeof window !== "undefined" && typeof document !== "undefined";
 }
 
-/** Detect mobile for quality scaling (analysis §4.3) - Phase-2 will expand */
+/** Detect mobile for quality scaling (analysis §4.3) */
 function isMobileDevice(): boolean {
   if (!isBrowser()) return false;
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
   );
+}
+
+/**
+ * Memory-aware scale (analysis §4.3, §7.4):
+ * - Desktop: scale 2
+ * - iOS Safari: scale 1 (strict memory constraints)
+ * - Other mobile: scale 2 if deviceMemory >= 4GB, else 1
+ */
+function getExportScale(): number {
+  if (!isBrowser()) return DESKTOP_SCALE;
+  if (!isMobileDevice()) return DESKTOP_SCALE;
+  if (/iPhone|iPad|iPod/.test(navigator.userAgent)) return 1; // iOS: prefer stability
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  if (memory == null) return 1; // Unknown: prefer stability
+  return memory >= 4 ? DESKTOP_SCALE : 1;
 }
 
 /**
@@ -44,7 +59,7 @@ export async function exportChartAsPdf(
     throw new Error(`Element with ID "${options.elementId}" not found`);
   }
 
-  const scale = isMobileDevice() ? 1 : DESKTOP_SCALE;
+  const scale = getExportScale();
 
   const canvas = await html2canvas(element, {
     scale,
@@ -144,7 +159,7 @@ export async function exportReportAsPdf(
     );
   }
 
-  const scale = isMobileDevice() ? 1 : DESKTOP_SCALE;
+  const scale = getExportScale();
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
