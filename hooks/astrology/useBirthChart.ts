@@ -98,7 +98,7 @@ export function useBirthChart() {
     if (divisionalData[chartType]) return;
 
     try {
-        const response = await fetch("/api/astrology/birth-chart", {
+        const response = await fetch("/api/astrology/divisional-charts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -106,7 +106,7 @@ export function useBirthChart() {
               latitude: birthData.latitude,
               longitude: birthData.longitude,
               timezone: birthData.timezone,
-              chartType: chartType
+              chart: chartType // API expects 'chart', not 'chartType'
             }),
           });
     

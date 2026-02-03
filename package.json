@@ -22,6 +22,7 @@
     "clean": "rm -rf .next out node_modules/.cache"
   },
   "dependencies": {
+    "@ai-sdk/google": "^3.0.20",
     "@ai-sdk/openai": "^3.0.14",
     "@ai-sdk/react": "^3.0.47",
     "@fontsource/roboto": "^5.2.9",
@@ -50,6 +51,9 @@
     "pg": "^8.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-markdown": "^10.1.0",
+    "semver": "^7.7.3",
+    "tailwindcss-typography": "^3.1.0",
     "vedic-astro": "^0.1.1",
     "zod": "^3.22.4",
     "zustand": "^4.5.2"

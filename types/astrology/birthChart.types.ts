@@ -45,7 +45,7 @@ export interface ChartSVGResponse {
   from_cache?: boolean;
 }
 
-export type TabType = "form" | "chart" | "divisional";
+export type TabType = "form" | "chart" | "divisional" | "ai-insights";
 
 export interface DivisionalChart {
   code: string;

@@ -6,6 +6,7 @@ import { useBirthChartActions } from "@/hooks/astrology/useBirthChartActions";
 import BirthChartForm from "./BirthChartForm";
 import BirthChartDisplay from "./BirthChartDisplay";
 import DivisionalChartsPanel from "./DivisionalChartsPanel";
+import AIInterpretationPanel from "../AIInterpretationPanel";
 import KundliReport, { KundliReportData } from "@/components/reports/KundliReport";
 import { exportChartAsPdf, exportReportAsPdf, isPdfExportEnabled } from "@/lib/pdf";
 import {
@@ -22,6 +23,7 @@ import { Yoga, YogaSummary, DashaResult } from "@/types/astrology/birthChart.typ
 import { calculateDignity, calculateFunctionalNature, calculateStrengthScore } from "@/lib/astrology/calculations/Dignity";
 import { NAKSHATRA_DATA } from "@/lib/astrology/calculations/NakshatraInfo";
 import { generateRemedies, Remedy } from "@/lib/astrology/calculations/Remedies";
+import { transformChartData } from "@/services/astrology/birthChartTransformers";
 
 interface BirthChartGeneratorProps {
   userId: string;
@@ -73,6 +75,7 @@ export default function BirthChartGeneratorV2({
     yogas?: { list: Yoga[]; summary: YogaSummary | null };
     dasha?: { current: string; periods: any[] };
     interpretation?: any;
+    charts?: { D9?: any, D10?: any }; // Add Type Support for Divisional
   }>({});
 
   // Prepare data for the PDF report
@@ -132,6 +135,8 @@ export default function BirthChartGeneratorV2({
     const nakshatraInfo = moon && moon.nakshatra ? NAKSHATRA_DATA[moon.nakshatra] : undefined;
 
 
+    const { charts: extraCharts, ...otherExtras } = reportExtras;
+
     return {
       user: { name: birthData.chartName || "User" },
       basicDetails: {
@@ -157,11 +162,31 @@ export default function BirthChartGeneratorV2({
                house: planets.find(pl => pl.name === p.name)?.house || 1,
                sign: p.sign,
                degree: p.longitude,
-               isRetro: false // TODO: Pass isRetro if available
+               isRetro: false
             }))
-        }
+        },
+        D9: extraCharts?.D9 ? {
+           ascendant: extraCharts.D9.ascendant || 0,
+           planets: (extraCharts.D9.planets || []).map((p: any) => ({
+             name: p.name,
+             house: p.house || 1,
+             sign: p.sign,
+             degree: p.fullDegree || p.longitude,
+             isRetro: !!p.isRetro
+           }))
+        } : undefined,
+        D10: extraCharts?.D10 ? {
+           ascendant: extraCharts.D10.ascendant || 0,
+           planets: (extraCharts.D10.planets || []).map((p: any) => ({
+             name: p.name,
+             house: p.house || 1,
+             sign: p.sign,
+             degree: p.fullDegree || p.longitude,
+             isRetro: !!p.isRetro
+           }))
+        } : undefined
       },
-      ...reportExtras // Spread extra data (yogas, dasha) when available
+      ...otherExtras 
     };
   }, [state.birthData, state.chartData, reportExtras]);
 
@@ -210,10 +235,28 @@ export default function BirthChartGeneratorV2({
 
       console.log("Fetching Advanced Report Data...");
       
+      // Define a fetcher for divisional charts
+      const fetchDivional = async (chart: string) => {
+         try {
+           const res = await fetch("/api/astrology/divisional-charts", {
+             method: "POST",
+             headers: { "Content-Type": "application/json" },
+             body: JSON.stringify({ ...commonOptions, chart }),
+           });
+           if(!res.ok) throw new Error("Failed");
+           const data = await res.json();
+           
+           // Transform the raw data to calculate correct houses
+           return transformChartData(data);
+         } catch(e) { console.error(`D${chart} fetch failed`, e); return undefined; }
+      };
+
       // Parallel Fetch
-      const [yogaData, dashaData] = await Promise.all([
+      const [yogaData, dashaData, d9Data, d10Data] = await Promise.all([
          fetchYogas(commonOptions).catch(e => { console.error("Yoga fetch failed", e); return undefined; }),
-         fetchDasha({ ...commonOptions, yearsToCalculate: 80 }).catch(e => { console.error("Dasha fetch failed", e); return undefined; })
+         fetchDasha({ ...commonOptions, yearsToCalculate: 80 }).catch(e => { console.error("Dasha fetch failed", e); return undefined; }),
+         fetchDivional("D9"),
+         fetchDivional("D10")
       ]);
 
       // 2. Process Dasha Data for Report
@@ -237,7 +280,11 @@ export default function BirthChartGeneratorV2({
          // @ts-ignore
          yogas: yogaData ? { list: yogaData.yogas, summary: yogaData.summary } : undefined,
          dasha: dashaProcessed,
-         interpretation: interpretation // Pass interpretation from UI if available
+         interpretation: interpretation, // Pass interpretation from UI if available
+         charts: {
+            D9: d9Data?.data, // Access .data from transformChartData return
+            D10: d10Data?.data
+         }
       });
 
       // 4. Wait for Render (Critical)
@@ -435,7 +482,21 @@ export default function BirthChartGeneratorV2({
           }`}
         >
           <span className="text-lg sm:text-xl">📊</span>
-          <span className="text-sm sm:text-base">Explore</span>
+          <span className="text-sm sm:text-base hidden sm:inline">Explore</span>
+          <span className="text-sm sm:text-base sm:hidden">More</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab("ai-insights")}
+          disabled={!state.chartData}
+          className={`flex flex-1 items-center justify-center gap-2.5 rounded-xl px-4 sm:px-6 py-3.5 sm:py-4 font-semibold transition-all min-h-[48px] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40 ${
+            activeTab === "ai-insights"
+              ? "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25"
+              : "border border-white/10 bg-white/5 text-slate-300 hover:bg-white/10 hover:text-white disabled:hover:bg-white/5"
+          }`}
+        >
+          <span className="text-lg sm:text-xl">🤖</span>
+          <span className="text-sm sm:text-base">Ask AI</span>
         </button>
       </div>
 
@@ -482,6 +543,13 @@ export default function BirthChartGeneratorV2({
           selectedDivisional={state.selectedDivisional}
           onSelectDivisional={selectDivisional}
         />
+      )}
+
+      {activeTab === "ai-insights" && state.chartData && (
+         <AIInterpretationPanel 
+            chartData={state.chartData.data}
+            chartName={state.birthData.chartName || "User"}
+         />
       )}
       
       {/* Hidden PDF Report (Rendered only when chart data exists) */}
