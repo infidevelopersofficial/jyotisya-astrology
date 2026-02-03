@@ -78,7 +78,7 @@ The system analyzes *Shadbala* (planetary strength) and *Avasthas* (dignity) to 
     }
 
     // 2. Stream the response (Real Mode - Gemini 1.5 Flash)
-    console.log(`🌟 Entering Real AI Mode. Key present: ${apiKey.slice(0,5)}...`);
+    console.log("🌟 Entering Real AI Mode. Key present:", !!apiKey);
     
     // Create custom provider instance to ensure key is used
     const google = createGoogleGenerativeAI({
