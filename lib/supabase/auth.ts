@@ -45,21 +45,29 @@ export const supabaseAuth = {
    * Sign in with Magic Link (passwordless email link)
    */
   async signInWithMagicLink(email: string, redirectTo?: string) {
-    const supabase = createClient();
+  const supabase = createClient();
 
-    if (!validateEmail(email)) {
-      throw new Error("Please enter a valid email address");
-    }
+  if (!validateEmail(email)) {
+    throw new Error("Please enter a valid email address");
+  }
 
-    const callbackUrl = redirectTo || `${window.location.origin}/auth/callback`;
+  // Optional: Explicit env check (window.location.origin already handles this)
+  const origin = typeof window !== 'undefined' 
+    ? window.location.origin 
+    : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  
+  const callbackUrl = redirectTo || `${origin}/auth/callback`;
 
-    return await supabase.auth.signInWithOtp({
-      email: email.trim().toLowerCase(),
-      options: {
-        emailRedirectTo: callbackUrl,
-      },
-    });
-  },
+  console.log('Using callbackUrl:', callbackUrl); // Debug log
+
+  return await supabase.auth.signInWithOtp({
+    email: email.trim().toLowerCase(),
+    options: {
+      emailRedirectTo: callbackUrl,
+    },
+  });
+}
+,
 
   /**
    * Sign in with OTP (email or phone)
@@ -77,8 +85,15 @@ export const supabaseAuth = {
       if (!validateEmail(emailOrPhone)) {
         throw new Error("Please enter a valid email address");
       }
+      const origin = typeof window !== 'undefined' 
+        ? window.location.origin 
+        : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
       return await supabase.auth.signInWithOtp({
         email: emailOrPhone.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: `${origin}/auth/callback`,
+        },
       });
     } else {
       if (!validatePhone(emailOrPhone)) {

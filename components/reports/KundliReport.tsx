@@ -60,6 +60,26 @@ export interface KundliReportData {
         isRetro: boolean;
       }>;
     } | null;
+    D9?: {
+      ascendant: number;
+      planets: Array<{
+        name: string;
+        house: number;
+        sign: string;
+        degree: number;
+        isRetro: boolean;
+      }>;
+    };
+    D10?: {
+      ascendant: number;
+      planets: Array<{
+        name: string;
+        house: number;
+        sign: string;
+        degree: number;
+        isRetro: boolean;
+      }>;
+    };
   };
   yogas?: {
     list: Yoga[];
@@ -266,6 +286,39 @@ export default function KundliReport({ data }: KundliReportProps) {
                             planets={data.charts.D1.planets}
                             ascendantSign={Math.floor(data.charts.D1.ascendant / 30) + 1}
                          />
+                      </div>
+                   </div>
+                )}
+                
+                {/* Divisional Charts D9 & D10 */}
+                {(data.charts.D9 || data.charts.D10) && (
+                   <div className="mb-8">
+                      <h3 className="text-lg font-bold text-slate-800 mb-6 border-l-4 border-blue-500 pl-3">
+                         Divisional Charts
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                         {data.charts.D9 && (
+                            <div className="flex flex-col items-center">
+                               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Navamsa (D9)</h4>
+                               <div className="w-full aspect-square max-w-[300px] p-2 bg-blue-50/30 rounded-lg border border-blue-100 flex items-center justify-center">
+                                  <NorthIndianChart 
+                                     planets={data.charts.D9.planets}
+                                     ascendantSign={Math.floor(data.charts.D9.ascendant / 30) + 1}
+                                  />
+                               </div>
+                            </div>
+                         )}
+                         {data.charts.D10 && (
+                            <div className="flex flex-col items-center">
+                               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Dasamsa (D10)</h4>
+                               <div className="w-full aspect-square max-w-[300px] p-2 bg-purple-50/30 rounded-lg border border-purple-100 flex items-center justify-center">
+                                  <NorthIndianChart 
+                                     planets={data.charts.D10.planets}
+                                     ascendantSign={Math.floor(data.charts.D10.ascendant / 30) + 1}
+                                  />
+                               </div>
+                            </div>
+                         )}
                       </div>
                    </div>
                 )}
