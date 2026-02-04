@@ -36,26 +36,66 @@ const LINKS = [
 export default function DashboardSidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+
+  // Handle window resize to switch modes
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setIsMobileOpen(false); // Close mobile menu when switching to desktop
+      }
+    };
+    
+    // Initial check
+    checkMobile();
+    
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileOpen(false);
   }, [pathname]);
 
-  // Handle window resize to auto-collapse on smaller screens if needed, 
-  // but usually we just rely on media queries for hiding.
-  
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileOpen]);
+
+  const sidebarVariants = {
+    mobile: {
+      width: "85%", // Covers most of the screen but leaves a sliver
+      x: isMobileOpen ? 0 : "-100%",
+      transition: { type: "spring", damping: 25, stiffness: 200 }
+    },
+    desktop: {
+      width: isCollapsed ? 80 : 288,
+      x: 0,
+      transition: { type: "spring", damping: 25, stiffness: 200 }
+    }
+  };
+
   return (
     <>
       {/* Mobile Trigger Button - Visible only on mobile */}
-      <div className="md:hidden fixed top-20 left-4 z-40">
+      <div className="md:hidden fixed top-4 left-4 z-50">
         <button
           onClick={() => setIsMobileOpen(true)}
           className={cn(
-            "p-2 rounded-lg bg-[#050816] border border-white/10 text-white shadow-lg",
-            isMobileOpen && "hidden"
+            "p-2.5 rounded-lg bg-[#050816] border border-white/20 text-white shadow-xl backdrop-blur-sm",
+            isMobileOpen && "hidden" // Hide trigger when menu is open
           )}
+          aria-label="Open Menu"
         >
           <Menu className="w-6 h-6" />
         </button>
@@ -63,13 +103,13 @@ export default function DashboardSidebar() {
 
       {/* Mobile Overlay */}
       <AnimatePresence>
-        {isMobileOpen && (
+        {isMobileOpen && isMobile && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={() => setIsMobileOpen(false)}
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md md:hidden"
           />
         )}
       </AnimatePresence>
@@ -77,55 +117,48 @@ export default function DashboardSidebar() {
       {/* Sidebar Container */}
       <motion.aside
         className={cn(
-            "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#050816] border-r border-white/5 md:sticky md:top-20 md:h-[calc(100vh-80px)]",
-            isCollapsed ? "w-[80px]" : "w-72"
+            "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#050816] border-r border-white/5 shadow-2xl md:shadow-none md:sticky md:top-0 md:h-screen",
         )}
         initial={false}
-        animate={{
-          width: isMobileOpen 
-            ? 280 // Mobile width
-            : isCollapsed 
-                ? 80 
-                : 288, // Desktop expanded width (w-72 = 18rem = 288px)
-          x: isMobileOpen ? 0 : "0%", // Reset transform
-        }}
-        // Mobile slide-in logic is handled by class toggling or x transform 
-        // simpler to handle mobile visibility via classes and fixed positioning
+        animate={isMobile ? "mobile" : "desktop"}
+        variants={sidebarVariants}
       >
         <div className={cn(
-            "flex h-full flex-col px-3 py-4 transition-all duration-300 relative",
-            // Mobile specific styles: hidden by default unless open
-            "md:flex", 
-            !isMobileOpen && "hidden md:flex" 
+            "flex h-full flex-col px-3 py-4 bg-[#050816] w-full",
+            // Remove the 'hidden' logic here, relying on sidebar translation instead
         )}>
-            {/* Close Button (Mobile Only) */}
-            <div className="md:hidden flex justify-end mb-4 px-2">
+            {/* Mobile Header: Close Button & Logo */}
+            <div className="md:hidden flex items-center justify-between mb-6 px-2">
+                <span className="text-lg font-bold text-white tracking-wide">Jyotishya</span>
                 <button 
                     onClick={() => setIsMobileOpen(false)}
-                    className="p-2 text-slate-400 hover:text-white"
+                    className="p-2 -mr-2 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
                 >
                     <X className="w-6 h-6" />
                 </button>
             </div>
 
-            {/* Logo/Header Area (Optional, or just spacer) */}
-            <div className={cn("mb-6 flex items-center px-2", isCollapsed ? "justify-center" : "justify-between")}>
+            {/* Desktop Header */}
+            <div className={cn("hidden md:flex mb-6 items-center px-2", isCollapsed ? "justify-center" : "justify-between")}>
                  {!isCollapsed && (
                      <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Menu</span>
                  )}
                  {/* Desktop Collapse Toggle */}
                  <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="hidden md:flex p-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
+                    className="p-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
                  >
                     {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
                  </button>
             </div>
 
             {/* Navigation Links */}
-            <nav className="space-y-2 flex-1">
+            <nav className="space-y-2 flex-1 overflow-y-auto no-scrollbar">
                 {LINKS.map((link) => {
                     const isActive = pathname === link.href;
+                    // On mobile, show labels even if "isCollapsed" might be true (conceptually mobile doesn't collapse)
+                    const showLabel = isMobile || !isCollapsed; 
+
                     return (
                         <Link
                             key={link.href}
@@ -135,7 +168,8 @@ export default function DashboardSidebar() {
                                 isActive 
                                     ? "bg-gradient-to-r from-orange-500/10 to-pink-500/10 text-orange-400" 
                                     : "text-slate-400 hover:bg-white/5 hover:text-white",
-                                isCollapsed ? "justify-center" : ""
+                                // Center icon if collapsed on desktop
+                                (!isMobile && isCollapsed) ? "justify-center" : ""
                             )}
                         >
                             {isActive && (
@@ -148,24 +182,23 @@ export default function DashboardSidebar() {
                                 />
                             )}
                             <link.icon className={cn(
-                                "transition-colors",
+                                "transition-colors shrink-0",
                                 isActive ? "text-orange-400" : "text-slate-500 group-hover:text-white",
-                                isCollapsed ? "w-6 h-6" : "w-5 h-5"
+                                (!isMobile && isCollapsed) ? "w-6 h-6" : "w-5 h-5"
                             )} />
                             
-                            {!isCollapsed && (
+                            {showLabel && (
                                 <motion.span
                                     initial={{ opacity: 0, x: -10 }}
                                     animate={{ opacity: 1, x: 0 }}
-                                    exit={{ opacity: 0, x: -10 }}
                                     className="whitespace-nowrap"
                                 >
                                     {link.label}
                                 </motion.span>
                             )}
                             
-                            {/* Hover Tooltip for Collapsed State */}
-                            {isCollapsed && (
+                            {/* Hover Tooltip for Collapsed State (Desktop Only) */}
+                            {!isMobile && isCollapsed && (
                                 <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
                                     {link.label}
                                 </div>
@@ -177,16 +210,16 @@ export default function DashboardSidebar() {
 
             {/* Bottom/Footer Area */}
             <div className="mt-auto border-t border-white/5 pt-4">
-                {!isCollapsed ? (
+                {(isMobile || !isCollapsed) ? (
                     <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-4 border border-indigo-500/20 overflow-hidden relative">
                         <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-indigo-500/20 w-12 h-12 rounded-full blur-xl" />
                         <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-1">Pro Tip</p>
                         <p className="text-xs text-slate-400 leading-relaxed mb-3">
                             Complete your profile to get more accurate daily predictions.
                         </p>
-                        <button className="text-xs text-indigo-300 hover:text-white font-medium transition-colors">
+                        {/* <button className="text-xs text-indigo-300 hover:text-white font-medium transition-colors">
                             Complete Profile →
-                        </button>
+                        </button> */}
                     </div>
                 ) : (
                     <div className="flex justify-center">

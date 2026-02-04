@@ -22,6 +22,9 @@ export interface Planet {
   nakshatra?: string;
   nakshatraLord?: string;
   house?: number;
+  dignity?: string;
+  strength?: number;
+  nature?: string;
 }
 
 export interface BirthChartResponse {

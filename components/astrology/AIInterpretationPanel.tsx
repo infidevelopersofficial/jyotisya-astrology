@@ -20,6 +20,12 @@ interface AIInterpretationPanelProps {
   error: string | null;
   setError: (value: string | null) => void;
   onClear?: () => void;
+  
+  // New props for variant
+  variant?: "chat" | "report";
+  title?: string;
+  subtitle?: string | React.ReactNode;
+  customPrompt?: string;
 }
 
 export default function AIInterpretationPanel({
@@ -33,6 +39,10 @@ export default function AIInterpretationPanel({
   error,
   setError,
   onClear,
+  variant = "chat",
+  title = "AI Astrologer Insights",
+  subtitle = "Get a personalized reading powered by Vedic logic.",
+  customPrompt
 }: AIInterpretationPanelProps) {
   // AbortController stays local (it's transient per-generation)
   const [abortController, setAbortController] = useState<AbortController | null>(null);
@@ -69,14 +79,18 @@ export default function AIInterpretationPanel({
           }))
       };
       
-      console.log("Generating AI reading with data:", minimalData);
+      const defaultPrompt = variant === "report" 
+        ? "Please provide a comprehensive, detailed Vedic Astrology report covering planetary positions, nature, strengths, and key predictions. Format with clear headings."
+        : "Please provide a concise, friendly summary of the key highlights of my birth chart. Keep it chatty and brief (under 200 words).";
+
+      console.log("Generating AI reading...");
 
       const response = await fetch("/api/ai/interpret", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
            chartData: minimalData,
-           prompt: "Please interpret this chart." 
+           prompt: customPrompt || defaultPrompt
         }),
         signal: controller.signal
       });
@@ -118,9 +132,9 @@ export default function AIInterpretationPanel({
       // Wait for hidden PDF element to render
       await new Promise(resolve => setTimeout(resolve, 500));
       
-      const fileName = `${chartName.replace(/\s+/g, "_")}_AI_Reading.pdf`;
+      const fileName = `${chartName.replace(/\s+/g, "_")}_${variant === "report" ? "Full_Report" : "Insights"}.pdf`;
       await exportReportAsPdf({ 
-        elementId: "ai-insights-pdf-root", 
+        elementId: `ai-pdf-root-${variant}`, 
         fileName 
       });
     } catch (err) {
@@ -137,15 +151,17 @@ export default function AIInterpretationPanel({
     }
   };
 
+  const isReport = variant === "report";
+
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className={`w-full ${isReport ? "" : "max-w-4xl mx-auto"} space-y-6`}>
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-700 pb-6">
         <div>
           <h2 className="text-2xl font-bold text-white mb-2">
-            AI Astrologer Insights <span className="text-sm font-normal text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded ml-2">Beta</span>
+            {title} {variant === "chat" && <span className="text-sm font-normal text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded ml-2">Beta</span>}
           </h2>
           <p className="text-slate-400">
-            Get a personalized reading for <span className="text-white font-medium">{chartName}</span> powered by Vedic logic.
+            {chartName} — {subtitle}
           </p>
         </div>
         
@@ -153,9 +169,13 @@ export default function AIInterpretationPanel({
         {!isLoading && !completion && (
             <button
             onClick={handleGenerate}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all active:scale-95 flex items-center gap-2"
+            className={`px-6 py-3 font-semibold rounded-xl shadow-lg transition-all active:scale-95 flex items-center gap-2 ${
+                isReport 
+                ? "bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white shadow-emerald-500/25"
+                : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-purple-500/25"
+            }`}
             >
-            <span>✨</span> Generate Reading
+            <span>{isReport ? "📑" : "✨"}</span> {isReport ? "Generate Full Report" : "Ask AI"}
             </button>
         )}
         
@@ -169,23 +189,23 @@ export default function AIInterpretationPanel({
             </button>
         )}
 
-        {/* Completed state - show action buttons */}
-        {!isLoading && completion && (
+        {/* Completed state - show action buttons (Only for Report or if explicitly enabled) */}
+        {!isLoading && completion && isReport && (
           <div className="flex gap-3 flex-wrap">
             <button
               onClick={handleDownloadPdf}
               disabled={downloadingPdf}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 
-                         hover:from-emerald-500 hover:to-teal-500 
+              className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-600 
+                         hover:from-blue-500 hover:to-cyan-500 
                          text-white font-medium rounded-xl shadow-lg 
-                         shadow-emerald-500/20 transition-all 
+                         shadow-blue-500/20 transition-all 
                          disabled:opacity-50 disabled:cursor-not-allowed
                          flex items-center gap-2"
             >
               {downloadingPdf ? (
                 <>
                   <span className="animate-spin">⏳</span>
-                  Generating PDF...
+                  Processing...
                 </>
               ) : (
                 <>
@@ -194,17 +214,22 @@ export default function AIInterpretationPanel({
                 </>
               )}
             </button>
-            
             <button
-              onClick={handleStartNew}
-              className="px-4 py-2.5 text-sm text-slate-400 hover:text-white 
-                         border border-slate-600 hover:border-slate-500 
-                         rounded-xl transition-all flex items-center gap-2"
+              onClick={() => window.print()}
+              className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-medium rounded-xl border border-slate-600 transition-all flex items-center gap-2"
             >
-              <span>🔄</span>
-              Start New Reading
+                🖨 Print
             </button>
           </div>
+        )}
+        
+        {!isLoading && completion && !isReport && onClear && (
+            <button
+               onClick={handleStartNew}
+               className="px-4 py-2.5 text-sm text-slate-400 hover:text-white border border-slate-600 rounded-xl"
+            >
+                🔄 Refresh
+            </button>
         )}
       </div>
 
@@ -216,9 +241,9 @@ export default function AIInterpretationPanel({
 
       {/* Output Area */}
       {(completion || isLoading) && (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 md:p-8 min-h-[300px] shadow-inner">
+        <div className={`bg-slate-900/50 border border-slate-800 rounded-2xl p-6 md:p-8 min-h-[100px] shadow-inner ${isReport ? "prose-lg" : ""}`}>
            {completion ? (
-            <div className="prose prose-invert prose-purple max-w-none">
+            <div className={`prose prose-invert ${isReport ? "max-w-none" : "prose-purple max-w-none"}`}>
                 <ReactMarkdown>{completion}</ReactMarkdown>
             </div>
            ) : (
@@ -228,7 +253,6 @@ export default function AIInterpretationPanel({
              </div>
            )}
            
-           {/* Typing Indicator */}
            {isLoading && completion && (
              <div className="mt-4 flex gap-1 justify-center opacity-50">
                <span className="w-2 h-2 bg-purple-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
@@ -242,23 +266,27 @@ export default function AIInterpretationPanel({
       {!completion && !isLoading && !error && (
          <div className="bg-slate-900/30 border border-slate-800/50 border-dashed rounded-2xl p-12 text-center">
             <div className="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-               📜
+               {isReport ? "📑" : "✨"}
             </div>
-            <h3 className="text-lg font-medium text-slate-300 mb-2">Ready to Reveal Your Destiny?</h3>
+            <h3 className="text-lg font-medium text-slate-300 mb-2">{isReport ? "Generate Detailed Report" : "Get Quick Insights"}</h3>
             <p className="text-slate-500 max-w-md mx-auto">
-               Our AI Astrologer analyzes planetary strength, dignities, and house positions to create a unique narrative just for you.
+               {isReport 
+                 ? "Generate a comprehensive analysis of planetary positions, dignities, and houses."
+                 : "Get a concise summary and highlights of your birth chart."}
             </p>
          </div>
       )}
 
-      {/* Hidden PDF Template (rendered when completion exists) */}
+      {/* Hidden PDF Template */}
       {completion && (
-        <div className="absolute -z-50 opacity-0 pointer-events-none h-0 w-0 overflow-hidden">
+        <div className="absolute top-0 left-0 -z-50 opacity-0 pointer-events-none h-0 w-0 overflow-hidden">
           <AIInsightsPdfTemplate
+            id={`ai-pdf-root-${variant}`}
             chartName={chartName}
             birthDetails={birthDetails}
             insight={completion}
             generatedAt={new Date()}
+            title={variant === "report" ? "Detailed Vedic Astrology Report" : "Astrological Insights"}
           />
         </div>
       )}
@@ -266,30 +294,31 @@ export default function AIInterpretationPanel({
   );
 }
 
-/**
- * Hidden PDF Template Component for html2canvas capture
- */
 function AIInsightsPdfTemplate({
+  id,
   chartName,
   birthDetails,
   insight,
   generatedAt,
+  title
 }: {
+  id: string;
   chartName: string;
   birthDetails?: { date: string; time: string; location: string };
   insight: string;
   generatedAt: Date;
+  title: string;
 }) {
   return (
     <div 
-      id="ai-insights-pdf-root" 
+      id={id} 
       className="bg-white text-slate-900 p-8"
       style={{ width: '210mm', minHeight: '297mm' }}
     >
       {/* Header */}
       <div className="text-center border-b-2 border-orange-500 pb-6 mb-6">
         <div className="text-4xl mb-2">🔮</div>
-        <h1 className="text-2xl font-bold text-slate-800">AI Jyotish Reading</h1>
+        <h1 className="text-2xl font-bold text-slate-800">{title}</h1>
         <p className="text-slate-500 mt-1">For {chartName}</p>
       </div>
 
