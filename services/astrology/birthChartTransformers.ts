@@ -103,7 +103,8 @@ function transformPlanets(
         name,
         fullDegree: (p.fullDegree as number) || (p.vargaLongitude as number) || 0,
         normDegree: (p.normDegree as number) || ((p.vargaLongitude as number) % 30) || 0,
-        isRetro: (p.isRetro as string | boolean) || false,
+        // Normalize isRetro to boolean (handles "true", true, 1, etc.)
+        isRetro: p.isRetro === true || p.isRetro === "true" || p.isRetro === 1,
         sign: (p.signName as string) || getSignName(rashi),
         house: house || 1, // Fallback to 1 if calculation fails
       });

@@ -88,6 +88,7 @@ The system analyzes *Shadbala* (planetary strength) and *Avasthas* (dignity) to 
     const result = streamText({
       model: google("gemini-flash-latest"), 
       system: systemPrompt,
+      temperature: 0, // Deterministic output for consistent readings
       messages: [
         {
           role: "user",

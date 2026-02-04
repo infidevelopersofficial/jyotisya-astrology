@@ -26,45 +26,11 @@ export const DASHA_SEQUENCE: readonly string[] = [
   "Ketu", "Venus", "Sun", "Moon", "Mars", "Rahu", "Jupiter", "Saturn", "Mercury"
 ];
 
-// Nakshatra lords (27 nakshatras)
-export const NAKSHATRA_LORDS = [
-  "Ketu",      // 1. Ashwini
-  "Venus",     // 2. Bharani
-  "Sun",       // 3. Krittika
-  "Moon",      // 4. Rohini
-  "Mars",      // 5. Mrigashira
-  "Rahu",      // 6. Ardra
-  "Jupiter",   // 7. Punarvasu
-  "Saturn",    // 8. Pushya
-  "Mercury",   // 9. Ashlesha
-  "Ketu",      // 10. Magha
-  "Venus",     // 11. Purva Phalguni
-  "Sun",       // 12. Uttara Phalguni
-  "Moon",      // 13. Hasta
-  "Mars",      // 14. Chitra
-  "Rahu",      // 15. Swati
-  "Jupiter",   // 16. Vishakha
-  "Saturn",    // 17. Anuradha
-  "Mercury",   // 18. Jyeshtha
-  "Ketu",      // 19. Mula
-  "Venus",     // 20. Purva Ashadha
-  "Sun",       // 21. Uttara Ashadha
-  "Moon",      // 22. Shravana
-  "Mars",      // 23. Dhanishtha
-  "Rahu",      // 24. Shatabhisha
-  "Jupiter",   // 25. Purva Bhadrapada
-  "Saturn",    // 26. Uttara Bhadrapada
-  "Mercury",   // 27. Revati
-];
+// Import nakshatra data from unified config (single source of truth)
+import { NAKSHATRA_LORDS, NAKSHATRA_NAMES } from './NakshatraConfig';
 
-export const NAKSHATRA_NAMES = [
-  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira",
-  "Ardra", "Punarvasu", "Pushya", "Ashlesha", "Magha",
-  "Purva Phalguni", "Uttara Phalguni", "Hasta", "Chitra", "Swati",
-  "Vishakha", "Anuradha", "Jyeshtha", "Mula", "Purva Ashadha",
-  "Uttara Ashadha", "Shravana", "Dhanishtha", "Shatabhisha",
-  "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
-];
+// Re-export for backward compatibility
+export { NAKSHATRA_LORDS, NAKSHATRA_NAMES };
 
 export interface Antardasha {
   planet: string;

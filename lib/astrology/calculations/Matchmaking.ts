@@ -15,20 +15,18 @@
  * 8. Nadi (8) - Health (Critical)
  */
 
-import { getRashiFromLongitude } from "./VedicMath";
+import { getRashiFromLongitude, getSignName, RASHI_LORDS } from "./VedicMath";
 import { calculateMangalDosha, MangalDoshaResult } from "./MangalDosha";
+import { NAKSHATRA_NAMES, getNakshatraIndex } from './NakshatraConfig';
+
+// Re-export for backward compatibility
+export const NAKSHATRAS = NAKSHATRA_NAMES;
 
 // ============================================================================
 // DATA CONSTANTS
 // ============================================================================
 
-export const NAKSHATRAS = [
-  "Ashwini", "Bharani", "Krittika", "Rohini", "Mrigashira", "Ardra",
-  "Punarvasu", "Pushya", "Ashlesha", "Magha", "Purva Phalguni", "Uttara Phalguni",
-  "Hasta", "Chitra", "Swati", "Vishakha", "Anuradha", "Jyeshtha",
-  "Mula", "Purva Ashadha", "Uttara Ashadha", "Shravana", "Dhanishta", "Shatabhisha",
-  "Purva Bhadrapada", "Uttara Bhadrapada", "Revati"
-];
+// Note: NAKSHATRAS is now imported from NakshatraConfig and re-exported above
 
 // ... (GANAS, NADIS, YONIS, PLANET_FRIENDSHIP kept if used or remove if strictly unused. 
 // I will keep constants but remove PLANET_FRIENDSHIP if truly unused)
@@ -65,20 +63,12 @@ const MAITRI_POINTS = [
   [0, 0.5, 0.5, 4, 3, 5, 5]  // Sat
 ];
 
-const RASHI_LORDS_IDX: Record<number, number> = {
-  1: 2, // Aries -> Mars
-  2: 5, // Taurus -> Venus
-  3: 3, // Gemini -> Mercury
-  4: 1, // Cancer -> Moon
-  5: 0, // Leo -> Sun
-  6: 3, // Virgo -> Mercury
-  7: 5, // Libra -> Venus
-  8: 2, // Scorpio -> Mars
-  9: 4, // Sagittarius -> Jupiter
-  10: 6, // Capricorn -> Saturn
-  11: 6, // Aquarius -> Saturn
-  12: 4  // Pisces -> Jupiter
+// Planet name to MAITRI_POINTS index mapping
+const PLANET_TO_MAITRI_IDX: Record<string, number> = {
+  Sun: 0, Moon: 1, Mars: 2, Mercury: 3, Jupiter: 4, Venus: 5, Saturn: 6
 };
+
+// Note: RASHI_LORDS is now imported from VedicMath
 
 // ============================================================================
 // TYPES
@@ -114,7 +104,7 @@ export interface MatchmakingResult {
 // ============================================================================
 
 function getNakshatra(longitude: number): number {
-  return Math.floor(longitude / (13 + 20/60)); // 0-26
+  return getNakshatraIndex(longitude); // Use shared function from NakshatraConfig
 }
 
 function calculateGana(boyNak: number, girlNak: number): number {
@@ -143,12 +133,15 @@ function calculateBhakoot(boyRashi: number, girlRashi: number): number {
 }
 
 function calculateGrahaMaitri(boyRashi: number, girlRashi: number): number {
-  const boyLord = RASHI_LORDS_IDX[boyRashi] ?? 0;
-  const girlLord = RASHI_LORDS_IDX[girlRashi] ?? 0;
+  const boyLord = RASHI_LORDS[boyRashi] ?? "Sun";
+  const girlLord = RASHI_LORDS[girlRashi] ?? "Sun";
+  
+  const boyIdx = PLANET_TO_MAITRI_IDX[boyLord] ?? 0;
+  const girlIdx = PLANET_TO_MAITRI_IDX[girlLord] ?? 0;
   
   // Safe access
-  const row = MAITRI_POINTS[boyLord];
-  return row ? (row[girlLord] ?? 0) : 0;
+  const row = MAITRI_POINTS[boyIdx];
+  return row ? (row[girlIdx] ?? 0) : 0;
 }
 
 function calculateYoni(boyNak: number, girlNak: number): number {
@@ -168,7 +161,7 @@ function calculateYoni(boyNak: number, girlNak: number): number {
   return 2; 
 }
 
-import { getSignName } from "./VedicMath"; // Need to import this for Rashi names
+// getSignName is now imported from VedicMath at top of file
 
 /**
  * Calculate Compatibility
