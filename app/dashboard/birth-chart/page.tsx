@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import BirthChartGeneratorV2 from "@/components/astrology/birth-chart/BirthChartGeneratorV2";
+import { Accordion } from "@/components/ui/AccordionSimple";
 
 export const metadata = {
   title: "Birth Chart | Jyotishya",
@@ -32,12 +33,10 @@ export default async function BirthChartPage() {
       {/* Birth Chart Generator Component */}
       <BirthChartGeneratorV2 userId={user.id} userEmail={user.email || ""} />
 
-      {/* Info Section - Enhanced for Beginners */}
-      <div className="mt-12 space-y-6">
-        {/* Main About Section */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h3 className="mb-4 text-xl font-semibold text-white">📚 About Your Birth Chart</h3>
-          <div className="grid gap-6 md:grid-cols-2">
+      {/* Info Section - Enhanced for Beginners (Collapsible) */}
+      <div className="mt-12 space-y-4">
+        <Accordion title="About Your Birth Chart" icon="📚">
+          <div className="grid gap-6 md:grid-cols-2 pt-2">
             <div className="rounded-lg border border-orange-500/20 bg-orange-500/10 p-4">
               <h4 className="mb-2 flex items-center gap-2 font-semibold text-orange-300">
                 <span className="text-xl">🌟</span>
@@ -50,8 +49,7 @@ export default async function BirthChartPage() {
               <p className="text-sm text-slate-300">
                 It captures the positions of all 9 planets (Navagraha), 12 zodiac signs (Rashis),
                 and 12 houses (Bhavas). This unique cosmic map reveals your personality, strengths,
-                challenges, and life path according to Vedic astrology principles that have been
-                practiced for thousands of years in India.
+                challenges, and life path according to Vedic astrology principles.
               </p>
             </div>
 
@@ -66,9 +64,7 @@ export default async function BirthChartPage() {
               </p>
               <p className="text-sm text-slate-300">
                 This is considered the most important part of your chart in Vedic astrology! It
-                determines your physical appearance, personality, and how you approach life. It also
-                sets the foundation for all 12 houses in your chart, making accurate birth time
-                essential.
+                determines your physical appearance, personality, and how you approach life.
               </p>
             </div>
 
@@ -83,22 +79,15 @@ export default async function BirthChartPage() {
               <ul className="space-y-1 text-sm text-slate-300">
                 <li className="flex items-start gap-2">
                   <span className="text-orange-400">•</span>
-                  <span>
-                    <strong>D1 (Rasi Chart):</strong> Your main birth chart - shows overall life
-                    journey
-                  </span>
+                  <span><strong>D1 (Rasi Chart):</strong> Main chart - general life journey</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-orange-400">•</span>
-                  <span>
-                    <strong>D9 (Navamsa):</strong> Marriage, spouse qualities, spiritual strength
-                  </span>
+                  <span><strong>D9 (Navamsa):</strong> Marriage, spiritual strength</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-orange-400">•</span>
-                  <span>
-                    <strong>D10 (Dasamsa):</strong> Career path, profession, reputation
-                  </span>
+                  <span><strong>D10 (Dasamsa):</strong> Career path, profession</span>
                 </li>
               </ul>
             </div>
@@ -109,85 +98,46 @@ export default async function BirthChartPage() {
                 Why Birth Time Matters
               </h4>
               <p className="mb-3 text-sm text-slate-300">
-                <strong>Accuracy is everything!</strong> Your ascendant (Lagna) changes
-                approximately every 2 hours, and even a difference of 4-5 minutes can shift house
-                placements.
+                <strong>Accuracy is everything!</strong> Your ascendant changes every 2 hours. Even 4-5 minutes can shift house placements.
               </p>
               <p className="text-sm text-slate-300">
-                💡 <strong>Pro tip:</strong> Always check your birth certificate or hospital records
-                for the most accurate time. If you don&apos;t know your exact birth time, consult a
-                Vedic astrologer who can perform &quot;birth time rectification&quot; using major
-                life events.
+                💡 Always check your birth certificate for the most accurate time.
               </p>
             </div>
           </div>
-        </div>
+        </Accordion>
 
-        {/* Understanding Planets Section */}
-        <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
-          <h3 className="mb-4 text-xl font-semibold text-white">🪐 The 9 Planets (Navagraha)</h3>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">☀️ Sun (Surya)</p>
-              <p className="text-xs text-slate-300">
-                Soul, father, authority, government, vitality
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">🌙 Moon (Chandra)</p>
-              <p className="text-xs text-slate-300">Mind, mother, emotions, mental peace</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">🔥 Mars (Mangal)</p>
-              <p className="text-xs text-slate-300">Energy, courage, siblings, property, sports</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">💬 Mercury (Budh)</p>
-              <p className="text-xs text-slate-300">
-                Intelligence, speech, business, communication
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">🎓 Jupiter (Guru)</p>
-              <p className="text-xs text-slate-300">
-                Wisdom, children, teacher, fortune, spirituality
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">💝 Venus (Shukra)</p>
-              <p className="text-xs text-slate-300">Love, marriage, luxury, arts, beauty</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">⏱️ Saturn (Shani)</p>
-              <p className="text-xs text-slate-300">
-                Karma, discipline, delays, longevity, hard work
-              </p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">🌑 Rahu (North Node)</p>
-              <p className="text-xs text-slate-300">Material desires, foreign lands, technology</p>
-            </div>
-            <div className="rounded-lg border border-white/10 bg-white/5 p-3">
-              <p className="mb-1 font-semibold text-white">🌑 Ketu (South Node)</p>
-              <p className="text-xs text-slate-300">Spirituality, detachment, past life karma</p>
-            </div>
+        <Accordion title="The 9 Planets (Navagraha)" icon="🪐">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 pt-2">
+            {[
+              { icon: "☀️", name: "Sun (Surya)", desc: "Soul, father, authority, vitality" },
+              { icon: "🌙", name: "Moon (Chandra)", desc: "Mind, mother, emotions, peace" },
+              { icon: "🔥", name: "Mars (Mangal)", desc: "Energy, courage, siblings, sports" },
+              { icon: "💬", name: "Mercury (Budh)", desc: "Intelligence, speech, business" },
+              { icon: "🎓", name: "Jupiter (Guru)", desc: "Wisdom, children, fortune" },
+              { icon: "💝", name: "Venus (Shukra)", desc: "Love, marriage, luxury, arts" },
+              { icon: "⏱️", name: "Saturn (Shani)", desc: "Karma, discipline, longevity" },
+              { icon: "🌑", name: "Rahu (North Node)", desc: "Desires, foreign lands, tech" },
+              { icon: "🌑", name: "Ketu (South Node)", desc: "Spirituality, detachment, karma" },
+            ].map((planet, i) => (
+              <div key={i} className="rounded-lg border border-white/10 bg-white/5 p-3">
+                <p className="mb-1 font-semibold text-white">{planet.icon} {planet.name}</p>
+                <p className="text-xs text-slate-300">{planet.desc}</p>
+              </div>
+            ))}
           </div>
-        </div>
+        </Accordion>
 
-        {/* Privacy & Technical Info */}
+         {/* Privacy & Technical Info */}
         <div className="rounded-2xl border border-green-500/20 bg-green-500/10 p-6">
           <h3 className="mb-3 flex items-center gap-2 text-lg font-semibold text-green-300">
             <span className="text-xl">🔒</span>
             Your Privacy & Data Security
           </h3>
           <div className="space-y-2 text-sm text-green-200">
-            <p>✓ Your birth details are cached securely for 24 hours to optimize API usage</p>
-            <p>✓ No personal data is shared with third parties</p>
-            <p>✓ You can download your chart anytime and delete your account whenever you wish</p>
-            <p>
-              ✓ All calculations are performed using authentic Vedic astrology algorithms (Lahiri
-              Ayanamsa)
-            </p>
+            <p>✓ Birth details cached for 24 hours only</p>
+            <p>✓ No personal data shared</p>
+            <p>✓ Authentic Lahiri Ayanamsa calculations</p>
           </div>
         </div>
       </div>

@@ -5,6 +5,7 @@ import { DIVISIONAL_CHARTS } from "@/services/astrology/birthChartService";
 import NorthIndianChart from "@/components/charts/NorthIndianChart";
 import SouthIndianChart from "@/components/charts/SouthIndianChart";
 import { useState, useEffect } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface DivisionalChartsPanelProps {
   svgData: { [key: string]: ChartSVGResponse };
@@ -24,6 +25,7 @@ export default function DivisionalChartsPanel({
   const advancedCharts = DIVISIONAL_CHARTS.filter((c) => !c.beginner);
   
   const [chartStyle, setChartStyle] = useState<"north" | "south">("north");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Load preference on mount
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function DivisionalChartsPanel({
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Header code unchanged ... */}
       <div className="rounded-xl border border-blue-500/20 bg-blue-500/5 p-5">
         <p className="mb-2 flex items-center gap-2 text-lg font-semibold text-blue-100">
           <span className="text-2xl">🔍</span>
@@ -57,7 +59,7 @@ export default function DivisionalChartsPanel({
 
       {/* Chart Selection Grid */}
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Beginner Charts */}
+        {/* Beginner Charts - Always Visible */}
         <div className="space-y-3">
           <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
             <span>⭐</span>
@@ -90,14 +92,19 @@ export default function DivisionalChartsPanel({
           </div>
         </div>
 
-        {/* Advanced Charts */}
+        {/* Advanced Charts - Collapsible on Mobile */}
         <div className="space-y-3">
-          <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
-            <span>🎓</span>
-            <span>Advanced</span>
-          </h3>
+          <div className="flex items-center justify-between" onClick={() => setShowAdvanced(!showAdvanced)}>
+              <h3 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-slate-400">
+                <span>🎓</span>
+                <span>Advanced</span>
+              </h3>
+              <button className="md:hidden p-1 text-slate-400">
+                  {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+          </div>
 
-          <div className="space-y-2.5">
+          <div className={`space-y-2.5 ${!showAdvanced ? "hidden md:block" : "block animate-in fade-in slide-in-from-top-2"}`}>
             {advancedCharts.map((chart) => (
               <button
                 key={chart.code}
@@ -121,6 +128,15 @@ export default function DivisionalChartsPanel({
               </button>
             ))}
           </div>
+          
+          {!showAdvanced && (
+              <button 
+                  onClick={() => setShowAdvanced(true)}
+                  className="md:hidden w-full py-2 text-xs font-medium text-slate-500 hover:text-white border border-dashed border-white/10 rounded-lg hover:bg-white/5 transition-colors"
+                >
+                  Show {advancedCharts.length} more charts
+              </button>
+          )}
         </div>
       </div>
 

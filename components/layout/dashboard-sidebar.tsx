@@ -77,26 +77,24 @@ export default function DashboardSidebar() {
       {/* Sidebar Container */}
       <motion.aside
         className={cn(
-            "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#050816] border-r border-white/5 md:sticky md:top-20 md:h-[calc(100vh-80px)]",
+            "fixed inset-y-0 left-0 z-50 flex flex-col bg-[#050816] border-r border-white/5 md:sticky md:top-0 md:h-screen",
             isCollapsed ? "w-[80px]" : "w-72"
         )}
         initial={false}
         animate={{
           width: isMobileOpen 
-            ? 280 // Mobile width
+            ? "100%" // Full width on mobile
             : isCollapsed 
                 ? 80 
-                : 288, // Desktop expanded width (w-72 = 18rem = 288px)
-          x: isMobileOpen ? 0 : "0%", // Reset transform
+                : 288,
+          x: isMobileOpen ? 0 : "0%",
         }}
-        // Mobile slide-in logic is handled by class toggling or x transform 
-        // simpler to handle mobile visibility via classes and fixed positioning
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
       >
         <div className={cn(
-            "flex h-full flex-col px-3 py-4 transition-all duration-300 relative",
-            // Mobile specific styles: hidden by default unless open
-            "md:flex", 
-            !isMobileOpen && "hidden md:flex" 
+            "flex h-full flex-col px-3 py-4 transition-all duration-300 relative bg-[#050816]",
+            // Mobile specific visibility
+             !isMobileOpen && "hidden md:flex"
         )}>
             {/* Close Button (Mobile Only) */}
             <div className="md:hidden flex justify-end mb-4 px-2">
