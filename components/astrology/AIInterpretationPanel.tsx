@@ -2,20 +2,41 @@
 
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import { exportReportAsPdf } from "@/lib/pdf";
 
 interface AIInterpretationPanelProps {
   chartData: any;
   chartName: string;
+  birthDetails?: {
+    date: string;
+    time: string;
+    location: string;
+  };
+  // Lifted state props for persistence across tab switches
+  completion: string;
+  setCompletion: (value: string) => void;
+  isLoading: boolean;
+  setIsLoading: (value: boolean) => void;
+  error: string | null;
+  setError: (value: string | null) => void;
+  onClear?: () => void;
 }
 
-export default function AIInterpretationPanel({ chartData, chartName }: AIInterpretationPanelProps) {
-  // Manual state management for full control over the stream
-  const [completion, setCompletion] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // AbortController to handle stopping the requested
+export default function AIInterpretationPanel({
+  chartData,
+  chartName,
+  birthDetails,
+  completion,
+  setCompletion,
+  isLoading,
+  setIsLoading,
+  error,
+  setError,
+  onClear,
+}: AIInterpretationPanelProps) {
+  // AbortController stays local (it's transient per-generation)
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
 
   const stop = () => {
     if (abortController) {
@@ -68,12 +89,14 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
       if (!reader) throw new Error("No response body");
 
       const decoder = new TextDecoder();
+      let accumulated = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
         const text = decoder.decode(value, { stream: true });
-        setCompletion((prev) => prev + text);
+        accumulated += text;
+        setCompletion(accumulated);
       }
 
     } catch (err: any) {
@@ -89,6 +112,31 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
     }
   };
 
+  const handleDownloadPdf = async () => {
+    setDownloadingPdf(true);
+    try {
+      // Wait for hidden PDF element to render
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const fileName = `${chartName.replace(/\s+/g, "_")}_AI_Reading.pdf`;
+      await exportReportAsPdf({ 
+        elementId: "ai-insights-pdf-root", 
+        fileName 
+      });
+    } catch (err) {
+      console.error("PDF download failed:", err);
+      setError("Failed to download PDF. Please try again.");
+    } finally {
+      setDownloadingPdf(false);
+    }
+  };
+
+  const handleStartNew = () => {
+    if (onClear) {
+      onClear();
+    }
+  };
+
   return (
     <div className="w-full max-w-4xl mx-auto space-y-6">
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-700 pb-6">
@@ -101,6 +149,7 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
           </p>
         </div>
         
+        {/* Initial state - show Generate button */}
         {!isLoading && !completion && (
             <button
             onClick={handleGenerate}
@@ -110,6 +159,7 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
             </button>
         )}
         
+        {/* Loading state - show Stop button */}
         {isLoading && (
             <button
             onClick={stop}
@@ -117,6 +167,44 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
             >
             <span>⏹</span> Stop Generation
             </button>
+        )}
+
+        {/* Completed state - show action buttons */}
+        {!isLoading && completion && (
+          <div className="flex gap-3 flex-wrap">
+            <button
+              onClick={handleDownloadPdf}
+              disabled={downloadingPdf}
+              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 
+                         hover:from-emerald-500 hover:to-teal-500 
+                         text-white font-medium rounded-xl shadow-lg 
+                         shadow-emerald-500/20 transition-all 
+                         disabled:opacity-50 disabled:cursor-not-allowed
+                         flex items-center gap-2"
+            >
+              {downloadingPdf ? (
+                <>
+                  <span className="animate-spin">⏳</span>
+                  Generating PDF...
+                </>
+              ) : (
+                <>
+                  <span>📥</span>
+                  Download PDF
+                </>
+              )}
+            </button>
+            
+            <button
+              onClick={handleStartNew}
+              className="px-4 py-2.5 text-sm text-slate-400 hover:text-white 
+                         border border-slate-600 hover:border-slate-500 
+                         rounded-xl transition-all flex items-center gap-2"
+            >
+              <span>🔄</span>
+              Start New Reading
+            </button>
+          </div>
         )}
       </div>
 
@@ -162,6 +250,78 @@ export default function AIInterpretationPanel({ chartData, chartName }: AIInterp
             </p>
          </div>
       )}
+
+      {/* Hidden PDF Template (rendered when completion exists) */}
+      {completion && (
+        <div className="absolute -z-50 opacity-0 pointer-events-none h-0 w-0 overflow-hidden">
+          <AIInsightsPdfTemplate
+            chartName={chartName}
+            birthDetails={birthDetails}
+            insight={completion}
+            generatedAt={new Date()}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Hidden PDF Template Component for html2canvas capture
+ */
+function AIInsightsPdfTemplate({
+  chartName,
+  birthDetails,
+  insight,
+  generatedAt,
+}: {
+  chartName: string;
+  birthDetails?: { date: string; time: string; location: string };
+  insight: string;
+  generatedAt: Date;
+}) {
+  return (
+    <div 
+      id="ai-insights-pdf-root" 
+      className="bg-white text-slate-900 p-8"
+      style={{ width: '210mm', minHeight: '297mm' }}
+    >
+      {/* Header */}
+      <div className="text-center border-b-2 border-orange-500 pb-6 mb-6">
+        <div className="text-4xl mb-2">🔮</div>
+        <h1 className="text-2xl font-bold text-slate-800">AI Jyotish Reading</h1>
+        <p className="text-slate-500 mt-1">For {chartName}</p>
+      </div>
+
+      {/* Birth Details */}
+      {birthDetails && (
+        <div className="bg-slate-50 rounded-lg p-4 mb-6 text-sm">
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <span className="text-slate-500">Date:</span>{" "}
+              <span className="font-medium">{birthDetails.date}</span>
+            </div>
+            <div>
+              <span className="text-slate-500">Time:</span>{" "}
+              <span className="font-medium">{birthDetails.time}</span>
+            </div>
+            <div>
+              <span className="text-slate-500">Place:</span>{" "}
+              <span className="font-medium">{birthDetails.location}</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reading Content */}
+      <div className="prose prose-sm prose-slate max-w-none leading-relaxed">
+        <ReactMarkdown>{insight}</ReactMarkdown>
+      </div>
+
+      {/* Footer */}
+      <div className="mt-8 pt-4 border-t border-slate-200 text-center text-xs text-slate-400">
+        <p>Generated by Jyotishya AI Astrologer • {generatedAt.toLocaleString()}</p>
+      </div>
     </div>
   );
 }

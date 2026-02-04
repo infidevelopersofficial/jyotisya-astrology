@@ -39,6 +39,19 @@ export function useBirthChart() {
   const [error, setError] = useState<string | null>(null);
   const [selectedDivisional, setSelectedDivisional] = useState<string>("D1");
 
+  // AI Insights state - lifted here so it persists across tab switches
+  const [aiInsights, setAiInsights] = useState<{
+    completion: string;
+    isLoading: boolean;
+    error: string | null;
+    generatedAt?: Date;
+  } | null>(null);
+
+  /**
+   * Clear AI insights and reset to initial state
+   */
+  const clearAiInsights = () => setAiInsights(null);
+
   /**
    * Generate birth chart from current birth data
    */
@@ -180,6 +193,7 @@ export function useBirthChart() {
     activeTab,
     showHelp,
     expandedPlanet,
+    aiInsights,
 
     // Setters
     setBirthData,
@@ -187,9 +201,11 @@ export function useBirthChart() {
     setShowHelp,
     setExpandedPlanet,
     setError,
+    setAiInsights,
 
     // Actions
     generateBirthChart,
     selectDivisional,
+    clearAiInsights,
   };
 }

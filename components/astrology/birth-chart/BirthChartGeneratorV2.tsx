@@ -22,6 +22,7 @@ import { useDasha } from "@/hooks/astrology/useDasha";
 import { Yoga, YogaSummary, DashaResult } from "@/types/astrology/birthChart.types";
 import { calculateDignity, calculateFunctionalNature, calculateStrengthScore } from "@/lib/astrology/calculations/Dignity";
 import { NAKSHATRA_DATA } from "@/lib/astrology/calculations/NakshatraInfo";
+import { RASHI_LORDS } from "@/lib/astrology/calculations/VedicMath";
 import { generateRemedies, Remedy } from "@/lib/astrology/calculations/Remedies";
 import { transformChartData } from "@/services/astrology/birthChartTransformers";
 
@@ -39,13 +40,16 @@ export default function BirthChartGeneratorV2({
     activeTab,
     showHelp,
     expandedPlanet,
+    aiInsights,
     setBirthData,
     setActiveTab,
     setShowHelp,
     setExpandedPlanet,
     setError,
+    setAiInsights,
     generateBirthChart,
     selectDivisional,
+    clearAiInsights,
   } = useBirthChart();
 
   const {
@@ -91,21 +95,18 @@ export default function BirthChartGeneratorV2({
     
     // Safely map planets with Dignity Calculation
     const mappedPlanets = planets.map((p) => {
-       const signNum = Math.floor(p.normDegree / 30) + 1;
+       // FIX: Use fullDegree for sign calculation (normDegree is 0-30 within sign)
+       const signNum = Math.floor(p.fullDegree / 30) + 1;
        
-       // Calculate Rulership (Approximate Host for Dignity)
-       // This needs a helper really, but we can do a simplified check for now OR
-       // improve calculateDignity to take sign number since we have OWN_SIGNS.
-       // My calculateDignity uses signPosition (number). HostPlanet is needed for friendship.
-       // Let's create a quick host lookup here or update Dignity.ts? 
-       // For now, I will use a simple mapping for host.
+       // Use shared RASHI_LORDS constant (single source of truth)
+       const host = RASHI_LORDS[signNum] || "Neutral";
        
-       const signOwners = [null, "Mars", "Venus", "Mercury", "Moon", "Sun", "Mercury", "Venus", "Mars", "Jupiter", "Saturn", "Saturn", "Jupiter"];
-       const host = signOwners[signNum] || "Neutral";
+       // Calculate house using Whole Sign system (Rashi-based)
+       const house = ((signNum - ascendantSign + 12) % 12) + 1;
 
-       const dignity = calculateDignity(p.name, signNum, p.normDegree % 30, host);
+       const dignity = calculateDignity(p.name, signNum, p.fullDegree % 30, host);
        const nature = calculateFunctionalNature(p.name, ascendantSign);
-       const strength = calculateStrengthScore(dignity, p.isRetro === true || p.isRetro === "true");
+       const strength = calculateStrengthScore(dignity, !!p.isRetro);
 
        return {
          name: p.name,
@@ -113,8 +114,7 @@ export default function BirthChartGeneratorV2({
          longitude: p.fullDegree,
          nakshatra: p.nakshatra || "-",
          pada: "-", 
-         // Advanced Props
-         house: 1, // Placeholder, calculated later in D1
+         house,
          isRetro: !!p.isRetro,
          dignity,
          nature,
@@ -549,6 +549,34 @@ export default function BirthChartGeneratorV2({
          <AIInterpretationPanel 
             chartData={state.chartData.data}
             chartName={state.birthData.chartName || "User"}
+            birthDetails={{
+              date: new Date(state.birthData.dateTime).toLocaleDateString(),
+              time: new Date(state.birthData.dateTime).toLocaleTimeString(),
+              location: state.birthData.location,
+            }}
+            // Lifted state props
+            completion={aiInsights?.completion ?? ""}
+            setCompletion={(val) => setAiInsights(prev => ({ 
+              completion: val, 
+              isLoading: prev?.isLoading ?? false, 
+              error: prev?.error ?? null,
+              generatedAt: prev?.generatedAt 
+            }))}
+            isLoading={aiInsights?.isLoading ?? false}
+            setIsLoading={(val) => setAiInsights(prev => ({ 
+              completion: prev?.completion ?? "", 
+              isLoading: val, 
+              error: prev?.error ?? null,
+              generatedAt: val ? undefined : new Date() 
+            }))}
+            error={aiInsights?.error ?? null}
+            setError={(val) => setAiInsights(prev => ({ 
+              completion: prev?.completion ?? "", 
+              isLoading: prev?.isLoading ?? false, 
+              error: val,
+              generatedAt: prev?.generatedAt 
+            }))}
+            onClear={clearAiInsights}
          />
       )}
       

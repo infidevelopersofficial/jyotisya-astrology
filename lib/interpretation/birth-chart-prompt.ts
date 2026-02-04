@@ -27,7 +27,7 @@ Instructions:
 3. Identify 2 potential challenges or karmic lessons (Saturn, Rahu/Ketu influence).
 4. Suggest 3 practical Vedic remedies (Gemstones, Mantras, or Charity) suitable for modern life.
 5. Keep the narrative engaging and empathetic.
-6. Structure the response in JSON format with keys: "narrative", "strengths", "challenges", "remedies".
+6. Structure with clear markdown headings: ## Narrative, ## Key Strengths, ## Challenges, ## Recommended Remedies.
 `;
 
   return prompt;
