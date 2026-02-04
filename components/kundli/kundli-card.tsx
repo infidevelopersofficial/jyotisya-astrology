@@ -16,6 +16,7 @@ interface Kundli {
   timezone: string;
   chartData: Record<string, unknown>;
   isPublic: boolean;
+  isFavorite: boolean; 
   createdAt: Date;
   updatedAt: Date;
 }
@@ -23,11 +24,15 @@ interface Kundli {
 interface KundliCardProps {
   kundli: Kundli;
   onDelete: (id: string) => void;
+  onRename: (id: string, newName: string) => void;
+  onToggleFavorite: (id: string) => void;
 }
 
-export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
+export default function KundliCard({ kundli, onDelete, onRename, onToggleFavorite }: KundliCardProps) {
   const [deleting, setDeleting] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editName, setEditName] = useState(kundli.name);
 
   const chartData = kundli.chartData;
   const dataObj = chartData?.data as Record<string, unknown> | undefined;
@@ -90,12 +95,65 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
     }
   };
 
+  const saveRename = () => {
+    if (editName.trim() && editName !== kundli.name) {
+        onRename(kundli.id, editName);
+    }
+    setIsEditing(false);
+  };
+
   return (
-    <div className="group rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+    <div className="group relative rounded-2xl border border-white/10 bg-white/5 p-6 transition hover:bg-white/10">
+      
+      {/* Favorite Button (Absolute Top Right) */}
+      <button 
+        onClick={() => onToggleFavorite(kundli.id)}
+        className="absolute top-4 right-4 text-slate-400 hover:text-pink-500 transition"
+        title={kundli.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+      >
+        <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 24 24" 
+            fill={kundli.isFavorite ? "currentColor" : "none"} 
+            stroke="currentColor" 
+            className={`w-6 h-6 ${kundli.isFavorite ? "text-pink-500" : ""}`}
+        >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      </button>
+
       {/* Kundli Header */}
-      <div className="mb-4 flex items-start justify-between">
+      <div className="mb-4 flex items-start justify-between pr-8">
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-white">{kundli.name}</h3>
+          {isEditing ? (
+            <div className="flex items-center gap-2 mb-1">
+                <input 
+                    type="text" 
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="bg-black/20 border border-white/20 rounded px-2 py-1 text-white text-sm w-full"
+                    autoFocus
+                    onBlur={saveRename}
+                    onKeyDown={(e) => e.key === 'Enter' && saveRename()}
+                />
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+                <h3 className="text-lg font-semibold text-white truncate max-w-[180px]" title={kundli.name}>
+                    {kundli.name}
+                </h3>
+                <button 
+                    onClick={() => setIsEditing(true)}
+                    className="text-slate-500 hover:text-white transition opacity-0 group-hover:opacity-100"
+                    title="Rename"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125" />
+                    </svg>
+                </button>
+            </div>
+          )}
+          
           <p className="text-sm text-slate-400">
             {new Date(kundli.birthDate).toLocaleDateString("en-US", {
               year: "numeric",
@@ -104,11 +162,6 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
             })}
           </p>
         </div>
-        {kundli.isPublic && (
-          <span className="rounded-full bg-green-500/10 px-2 py-1 text-xs font-medium text-green-400">
-            Public
-          </span>
-        )}
       </div>
 
       {/* Birth Details */}
@@ -153,7 +206,7 @@ export default function KundliCard({ kundli, onDelete }: KundliCardProps) {
 
       {/* Primary Action */}
       <Link
-        href={`/my-kundlis/${kundli.id}`}
+        href={`/dashboard/saved-charts/${kundli.id}`}
         className="mb-3 block rounded-lg bg-gradient-to-r from-orange-500 to-pink-500 px-4 py-2 text-center text-sm font-medium text-white transition hover:opacity-90"
       >
         View Full Chart
