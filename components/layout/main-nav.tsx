@@ -14,10 +14,8 @@ const LINKS = [
   { href: "/", key: "home" },
   { href: "/consultations", key: "consult" },
   { href: "/matching", key: "match" },
-  { href: "/dashboard/transits", key: "transits" },
   { href: "/dashboard", key: "dashboard" },
-  { href: "/dashboard/reports", key: "reports" },
-  { href: "/shop", key: "shop" },
+  { href: "/store", key: "store" },
 ] as const;
 
 export default function MainNav(): React.ReactElement {

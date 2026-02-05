@@ -2,7 +2,7 @@
  * Hook for fetching Vimsottari Dasha periods
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 
 interface Antardasha {
   planet: string;
@@ -78,8 +78,19 @@ export function useDasha(): UseDashaReturn {
   const [dasha, setDasha] = useState<DashaResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pendingRequest = useRef<string | null>(null);
 
   const fetchDasha = useCallback(async (options: DashaOptions) => {
+    // Create request key for deduplication
+    const requestKey = `${options.dateTime}-${options.latitude}-${options.longitude}`;
+    
+    // Skip if same request is already in flight
+    if (pendingRequest.current === requestKey) {
+      console.log("[useDasha] Skipping duplicate request");
+      return;
+    }
+    
+    pendingRequest.current = requestKey;
     setLoading(true);
     setError(null);
 
@@ -105,6 +116,7 @@ export function useDasha(): UseDashaReturn {
       throw err;
     } finally {
       setLoading(false);
+      pendingRequest.current = null;
     }
   }, []);
 

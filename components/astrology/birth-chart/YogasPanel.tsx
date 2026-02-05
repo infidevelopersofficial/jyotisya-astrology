@@ -4,7 +4,7 @@
  * YogasPanel - Beautiful display of detected Yogas (planetary combinations)
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useYogas, YOGA_TYPE_INFO, STRENGTH_COLORS, getPlanetIcon, getYogasSummaryText } from "@/hooks/astrology/useYogas";
 import type { Yoga } from "@/types/astrology/birthChart.types";
 
@@ -21,12 +21,22 @@ interface YogasPanelProps {
 export default function YogasPanel({ birthData, showHelp = false }: YogasPanelProps) {
   const { yogas, categories, summary, loading, error, fetchYogas } = useYogas();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const lastFetchedKey = useRef<string | null>(null);
 
   useEffect(() => {
+    // Create a stable cache key from primitive values
+    const cacheKey = `${birthData.dateTime}-${birthData.latitude}-${birthData.longitude}-${birthData.timezone}`;
+    
+    // Skip if already fetched with same parameters
+    if (lastFetchedKey.current === cacheKey) {
+      return;
+    }
+
     if (birthData.dateTime) {
+      lastFetchedKey.current = cacheKey;
       fetchYogas(birthData);
     }
-  }, [birthData, fetchYogas]);
+  }, [birthData.dateTime, birthData.latitude, birthData.longitude, birthData.timezone, fetchYogas]);
 
   // Get filtered yogas based on selected category
   const filteredYogas = selectedCategory === "all" 

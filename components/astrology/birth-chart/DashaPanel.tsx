@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   useDasha,
   PLANET_COLORS,
@@ -22,9 +22,19 @@ interface DashaPanelProps {
 
 export default function DashaPanel({ birthData, showHelp = false }: DashaPanelProps) {
   const { dasha, loading, error, fetchDasha } = useDasha();
+  const lastFetchedKey = useRef<string | null>(null);
 
   useEffect(() => {
+    // Create a stable cache key from primitive values
+    const cacheKey = `${birthData.dateTime}-${birthData.latitude}-${birthData.longitude}-${birthData.timezone}`;
+    
+    // Skip if already fetched with same parameters
+    if (lastFetchedKey.current === cacheKey) {
+      return;
+    }
+
     if (birthData.dateTime && birthData.latitude && birthData.longitude) {
+      lastFetchedKey.current = cacheKey;
       fetchDasha({
         dateTime: birthData.dateTime,
         latitude: birthData.latitude,
@@ -33,7 +43,7 @@ export default function DashaPanel({ birthData, showHelp = false }: DashaPanelPr
         yearsToCalculate: 80,
       });
     }
-  }, [birthData, fetchDasha]);
+  }, [birthData.dateTime, birthData.latitude, birthData.longitude, birthData.timezone, fetchDasha]);
 
   if (loading) {
     return (
