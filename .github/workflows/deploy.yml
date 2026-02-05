@@ -183,7 +183,6 @@ jobs:
     if: false # Temporarily disabled
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    -admin
 
     steps:
       - name: Checkout code
