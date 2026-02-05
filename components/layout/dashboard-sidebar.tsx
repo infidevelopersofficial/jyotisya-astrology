@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +23,7 @@ function cn(...inputs: (string | undefined | null | false)[]) {
   return clsx(inputs);
 }
 
+const STORAGE_KEY = "jyotishya-sidebar-collapsed";
 
 const LINKS = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
@@ -34,10 +35,38 @@ const LINKS = [
 ];
 
 export default function DashboardSidebar() {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Initialize with null to indicate "not yet loaded from storage"
+  const [isCollapsed, setIsCollapsed] = useState<boolean | null>(null);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const pathname = usePathname();
+
+  // Load saved sidebar state from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved !== null) {
+        setIsCollapsed(JSON.parse(saved));
+      } else {
+        setIsCollapsed(false); // Default to expanded if no saved preference
+      }
+    } catch {
+      setIsCollapsed(false); // Default to expanded on error
+    }
+  }, []);
+
+  // Toggle sidebar and persist to localStorage
+  const toggleCollapsed = useCallback(() => {
+    setIsCollapsed((prev) => {
+      const newValue = !prev;
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(newValue));
+      } catch {
+        // Ignore storage errors
+      }
+      return newValue;
+    });
+  }, []);
 
   // Handle window resize to switch modes
   useEffect(() => {
@@ -72,6 +101,21 @@ export default function DashboardSidebar() {
     };
   }, [isMobileOpen]);
 
+  // Don't render until we've loaded the saved state to avoid flash
+  const sidebarCollapsed = isCollapsed ?? false;
+
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (isMobileOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMobileOpen]);
+
   const sidebarVariants = {
     mobile: {
       width: "85%", // Covers most of the screen but leaves a sliver
@@ -79,7 +123,7 @@ export default function DashboardSidebar() {
       transition: { type: "spring", damping: 25, stiffness: 200 }
     },
     desktop: {
-      width: isCollapsed ? 80 : 288,
+      width: sidebarCollapsed ? 80 : 288,
       x: 0,
       transition: { type: "spring", damping: 25, stiffness: 200 }
     }
@@ -139,16 +183,16 @@ export default function DashboardSidebar() {
             </div>
 
             {/* Desktop Header */}
-            <div className={cn("hidden md:flex mb-6 items-center px-2", isCollapsed ? "justify-center" : "justify-between")}>
-                 {!isCollapsed && (
+            <div className={cn("hidden md:flex mb-6 items-center px-2", sidebarCollapsed ? "justify-center" : "justify-between")}>
+                 {!sidebarCollapsed && (
                      <span className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Menu</span>
                  )}
                  {/* Desktop Collapse Toggle */}
                  <button
-                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    onClick={toggleCollapsed}
                     className="p-1.5 rounded-lg text-slate-400 hover:bg-white/5 hover:text-white transition-colors"
                  >
-                    {isCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
+                    {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <ChevronLeft className="w-5 h-5" />}
                  </button>
             </div>
 
@@ -156,8 +200,8 @@ export default function DashboardSidebar() {
             <nav className="space-y-2 flex-1 overflow-y-auto no-scrollbar">
                 {LINKS.map((link) => {
                     const isActive = pathname === link.href;
-                    // On mobile, show labels even if "isCollapsed" might be true (conceptually mobile doesn't collapse)
-                    const showLabel = isMobile || !isCollapsed; 
+                    // On mobile, show labels even if sidebar might be collapsed (conceptually mobile doesn't collapse)
+                    const showLabel = isMobile || !sidebarCollapsed; 
 
                     return (
                         <Link
@@ -169,7 +213,7 @@ export default function DashboardSidebar() {
                                     ? "bg-gradient-to-r from-orange-500/10 to-pink-500/10 text-orange-400" 
                                     : "text-slate-400 hover:bg-white/5 hover:text-white",
                                 // Center icon if collapsed on desktop
-                                (!isMobile && isCollapsed) ? "justify-center" : ""
+                                (!isMobile && sidebarCollapsed) ? "justify-center" : ""
                             )}
                         >
                             {isActive && (
@@ -184,7 +228,7 @@ export default function DashboardSidebar() {
                             <link.icon className={cn(
                                 "transition-colors shrink-0",
                                 isActive ? "text-orange-400" : "text-slate-500 group-hover:text-white",
-                                (!isMobile && isCollapsed) ? "w-6 h-6" : "w-5 h-5"
+                                (!isMobile && sidebarCollapsed) ? "w-6 h-6" : "w-5 h-5"
                             )} />
                             
                             {showLabel && (
@@ -198,7 +242,7 @@ export default function DashboardSidebar() {
                             )}
                             
                             {/* Hover Tooltip for Collapsed State (Desktop Only) */}
-                            {!isMobile && isCollapsed && (
+                            {!isMobile && sidebarCollapsed && (
                                 <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
                                     {link.label}
                                 </div>
@@ -210,7 +254,7 @@ export default function DashboardSidebar() {
 
             {/* Bottom/Footer Area */}
             <div className="mt-auto border-t border-white/5 pt-4">
-                {(isMobile || !isCollapsed) ? (
+                {(isMobile || !sidebarCollapsed) ? (
                     <div className="rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 p-4 border border-indigo-500/20 overflow-hidden relative">
                         <div className="absolute top-0 right-0 -mt-2 -mr-2 bg-indigo-500/20 w-12 h-12 rounded-full blur-xl" />
                         <p className="text-xs font-semibold uppercase tracking-wider text-indigo-400 mb-1">Pro Tip</p>

@@ -26,7 +26,8 @@ const translations = {
         match: "Matchmaking",
         transits: "Transits",
         reports: "Reports",
-        shop: "Marketplace"
+        shop: "Marketplace",
+        store: "Store"
       },
       actions: { signIn: "Sign In", book: "Book Muhurat" },
     },
@@ -57,7 +58,8 @@ const translations = {
         match: "कुंडली मिलान",
         transits: "गोचर",
         reports: "रिपोर्ट्स",
-        shop: "मार्केटप्लेस"
+        shop: "मार्केटप्लेस",
+        store: "स्टोर"
       },
       actions: { signIn: "साइन इन", book: "मुहूर्त बुक करें" },
     },
@@ -89,6 +91,7 @@ const translations = {
         transits: "கோச்சாரம்",
         reports: "அறிக்கைகள்",
         shop: "மார்க்கெட்ப்ளேஸ்",
+        store: "ஸ்டோர்",
       },
       actions: { signIn: "உள்நுழை", book: "முஹூர்த்தம் புக்" },
     },

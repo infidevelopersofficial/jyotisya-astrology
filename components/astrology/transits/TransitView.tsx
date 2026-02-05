@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useSupabaseAuth } from "@/hooks/use-supabase-auth";
-import { Card } from "@digital-astrology/ui";
 import TransitReport from "@/components/reports/TransitReport";
 import { generatePdf } from "@/lib/reports/generatePdf";
 import { useToast } from "@/components/ui/toast";
+import { TransitSkeleton } from "@/components/ui/skeleton";
 
 interface TransitAspect {
   transitPlanet: string;
@@ -80,19 +80,53 @@ export default function TransitView({ birthDetails }: TransitViewProps) {
   }, [birthDetails, user]);
 
   if (loading) {
-    return (
-      <div className="flex animate-pulse flex-col gap-4">
-        <div className="h-32 rounded-xl bg-white/5" />
-        <div className="h-64 rounded-xl bg-white/5" />
-      </div>
-    );
+    return <TransitSkeleton />;
   }
+
+  const refetchTransits = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/astrology/transits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dateTime: birthDetails.dateTime,
+          latitude: birthDetails.latitude,
+          longitude: birthDetails.longitude,
+        }),
+      });
+      if (!response.ok) throw new Error("Failed to fetch transits");
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (error) {
     return (
-      <Card className="border-red-500/20 bg-red-500/10 p-6 text-center text-red-200">
-        <p>Error loading transits: {error}</p>
-      </Card>
+      <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 max-w-full">
+        <div className="flex items-start gap-3">
+          <span className="text-2xl shrink-0">⚠️</span>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-red-200">Unable to load transit data</p>
+            <p className="mt-1 text-sm text-red-300/90">{error}</p>
+            <p className="mt-2 text-xs text-red-300/70">
+              💡 This could be a temporary issue. Check your connection and try again.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={refetchTransits}
+          className="mt-4 w-full flex items-center justify-center gap-2 rounded-lg bg-red-500/20 border border-red-500/30 px-4 py-2.5 text-sm font-medium text-red-200 transition-all hover:bg-red-500/30"
+        >
+          <span>🔄</span>
+          <span>Try Again</span>
+        </button>
+      </div>
     );
   }
 

@@ -2,7 +2,7 @@
  * Hook for fetching Yogas (Planetary Combinations)
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { Yoga, YogasResponse, YogaSummary } from "@/types/astrology/birthChart.types";
 
 interface YogasOptions {
@@ -44,8 +44,19 @@ export function useYogas(): UseYogasReturn {
   const [summary, setSummary] = useState<YogaSummary | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const pendingRequest = useRef<string | null>(null);
 
   const fetchYogas = useCallback(async (options: YogasOptions) => {
+    // Create request key for deduplication
+    const requestKey = `${options.dateTime}-${options.latitude}-${options.longitude}`;
+    
+    // Skip if same request is already in flight
+    if (pendingRequest.current === requestKey) {
+      console.log("[useYogas] Skipping duplicate request");
+      return;
+    }
+    
+    pendingRequest.current = requestKey;
     setLoading(true);
     setError(null);
 
@@ -73,6 +84,7 @@ export function useYogas(): UseYogasReturn {
       throw err; // Re-throw to caller
     } finally {
       setLoading(false);
+      pendingRequest.current = null;
     }
   }, []);
 

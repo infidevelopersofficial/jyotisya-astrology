@@ -6,6 +6,7 @@ import { ArrowRight, Sparkles, User, Calendar, Percent, Moon, ArrowUpCircle } fr
 import { useSavedCharts } from "@/hooks/user/useSavedCharts";
 import { getSunSignFromDate, getSignName } from "@/services/astrology/birthChartService";
 import { BirthChartResponse } from "@/types/astrology/birthChart.types";
+import { WelcomeSkeleton } from "@/components/ui/skeleton";
 
 interface SmartWelcomeProps {
     displayName: string;
@@ -64,8 +65,14 @@ export default function SmartWelcome({ displayName }: SmartWelcomeProps) {
         }
     }, [charts, loading]);
 
+    // Show skeleton while loading
+    if (loading) {
+        return <WelcomeSkeleton />;
+    }
+
     return (
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#1a1f3c] to-[#0f1225] p-4 sm:p-6 shadow-xl border border-white/5">
+
             {/* Background Decorations */}
             <div className="absolute right-0 top-0 -mr-16 -mt-16 h-64 w-64 rounded-full bg-indigo-500/10 blur-3xl" />
             <div className="absolute bottom-0 left-0 -ml-10 -mb-10 h-40 w-40 rounded-full bg-purple-500/10 blur-2xl" />
