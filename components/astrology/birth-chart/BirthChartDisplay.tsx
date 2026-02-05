@@ -85,7 +85,7 @@ export default function BirthChartDisplay({
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-x-hidden">
       {/* Success Banner */}
       <div className="animate-in fade-in slide-in-from-top-4 duration-500 rounded-xl border border-green-500/30 bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-5">
         <p className="flex items-center gap-2.5 text-lg font-semibold text-green-100">
@@ -347,7 +347,7 @@ export default function BirthChartDisplay({
 
         <div
           id="rasi-chart"
-          className="flex justify-center rounded-xl bg-slate-900 p-4 sm:p-6 md:p-8 shadow-inner overflow-x-auto"
+          className="flex justify-center items-center rounded-xl bg-slate-900 p-4 sm:p-6 md:p-8 shadow-inner overflow-hidden max-w-full"
         >
           {chartData.data.planets && chartData.data.ascendant !== undefined ? (
             chartStyle === "north" ? (

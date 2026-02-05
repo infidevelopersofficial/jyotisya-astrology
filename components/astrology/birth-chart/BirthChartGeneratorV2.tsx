@@ -16,6 +16,7 @@ import {
   DIVISIONAL_CHARTS,
 } from "@/services/astrology/birthChartService";
 import { useToast } from "@/components/ui/toast";
+import { BirthChartSkeleton } from "@/components/ui/skeleton";
 import { calculateDignity, calculateFunctionalNature, calculateStrengthScore } from "@/lib/astrology/calculations/Dignity";
 import { RASHI_LORDS } from "@/lib/astrology/calculations/VedicMath";
 import { Planet } from "@/types/astrology/birthChart.types";
@@ -159,6 +160,11 @@ export default function BirthChartGeneratorV2({
   };
 
   if (!state.chartData) {
+    // Show loading skeleton while chart is being generated
+    if (state.loading) {
+      return <BirthChartSkeleton />;
+    }
+
     return (
       <BirthChartForm
           birthData={state.birthData}

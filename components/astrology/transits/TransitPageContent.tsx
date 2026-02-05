@@ -67,13 +67,27 @@ export default function TransitPageContent({ initialBirthData }: TransitPageCont
       </div>
 
       {activeView === "form" && (
-        <div className="mx-auto max-w-2xl">
-            <div className="mb-6 text-center">
+        <div className="mx-auto max-w-2xl space-y-6">
+            {/* Transit-specific intro */}
+            <div className="text-center">
                 <h2 className="mb-2 text-2xl font-bold text-white">Enter Birth Details</h2>
                 <p className="text-slate-400">
                     To calculate your personal transits (Gochar), we need your exact birth details.
                 </p>
             </div>
+
+            {/* Pro Tip Card */}
+            <div className="rounded-xl border border-purple-500/20 bg-purple-500/10 p-4">
+              <p className="flex items-center gap-2 text-sm font-medium text-purple-200">
+                <span className="text-lg">💫</span>
+                <span>Pro Tip</span>
+              </p>
+              <p className="mt-1 text-sm text-purple-300/80">
+                Transits are calculated from your Moon sign, so accurate birth time is essential 
+                for precise predictions. Check your birth certificate!
+              </p>
+            </div>
+
             <BirthChartForm
                 birthData={birthData}
                 setBirthData={setBirthData}
