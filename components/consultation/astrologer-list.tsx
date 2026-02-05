@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Button, Card } from "@digital-astrology/ui";
 import BookingModal from "./booking-modal";
+import { AstrologerCardSkeleton } from "@/components/ui/skeleton";
 
 interface Astrologer {
   id: string;
@@ -100,9 +101,18 @@ export default function AstrologerList({ initialAstrologers = [] }: AstrologerLi
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-orange-500 border-r-transparent"></div>
-        <p className="mt-4 text-slate-300">Loading astrologers...</p>
+      <div className="space-y-6">
+        {/* Skeleton filters */}
+        <div className="flex gap-4 mb-6">
+          <div className="h-10 w-32 rounded-lg bg-white/10 animate-pulse" />
+          <div className="h-10 w-36 rounded-lg bg-white/10 animate-pulse" />
+        </div>
+        {/* Skeleton grid */}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <AstrologerCardSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
