@@ -45,29 +45,30 @@ export const supabaseAuth = {
    * Sign in with Magic Link (passwordless email link)
    */
   async signInWithMagicLink(email: string, redirectTo?: string) {
-  const supabase = createClient();
+    const supabase = createClient();
 
-  if (!validateEmail(email)) {
-    throw new Error("Please enter a valid email address");
-  }
+    if (!validateEmail(email)) {
+      throw new Error("Please enter a valid email address");
+    }
 
-  // Optional: Explicit env check (window.location.origin already handles this)
-  const origin = typeof window !== 'undefined' 
-    ? window.location.origin 
-    : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-  
-  const callbackUrl = redirectTo || `${origin}/auth/callback`;
+    // Use window.location.origin in browser — this correctly gives
+    // http://localhost:3000 locally and https://yourapp.com in production.
+    // NOTE: For this to work locally, http://localhost:3000/** must be in
+    // the Supabase Dashboard > Authentication > URL Configuration > Redirect URLs.
+    const origin =
+      typeof window !== "undefined"
+        ? window.location.origin
+        : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
-  console.log('Using callbackUrl:', callbackUrl); // Debug log
+    const callbackUrl = redirectTo || `${origin}/auth/callback`;
 
-  return await supabase.auth.signInWithOtp({
-    email: email.trim().toLowerCase(),
-    options: {
-      emailRedirectTo: callbackUrl,
-    },
-  });
-}
-,
+    return await supabase.auth.signInWithOtp({
+      email: email.trim().toLowerCase(),
+      options: {
+        emailRedirectTo: callbackUrl,
+      },
+    });
+  },
 
   /**
    * Sign in with OTP (email or phone)
@@ -85,9 +86,11 @@ export const supabaseAuth = {
       if (!validateEmail(emailOrPhone)) {
         throw new Error("Please enter a valid email address");
       }
-      const origin = typeof window !== 'undefined' 
-        ? window.location.origin 
-        : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+
+      const origin =
+        typeof window !== "undefined"
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
       return await supabase.auth.signInWithOtp({
         email: emailOrPhone.trim().toLowerCase(),

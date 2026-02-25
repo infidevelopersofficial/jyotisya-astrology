@@ -72,7 +72,7 @@ export async function exportChartAsPdf(
   const imgData = canvas.toDataURL("image/png");
   const pageWidth = 210; // A4 mm
   const pageHeight = 297;
-  const margin = 10;
+  const margin = 5;
   const imgAspect = canvas.height / canvas.width;
   const useLandscape = imgAspect > 1;
   const contentWidth = (useLandscape ? pageHeight : pageWidth) - 2 * margin;
@@ -180,5 +180,184 @@ export async function exportReportAsPdf(
   }
 
   const fileName = options.fileName ?? "report.pdf";
+  pdf.save(fileName);
+}
+
+/**
+ * Export AI Jyotish reading as a native PDF using jsPDF text rendering.
+ *
+ * Unlike html2canvas-based exports, this renders markdown directly as
+ * PDF-native text — always crisp at any zoom level.
+ *
+ * Supports: # h1, ## h2, ### h3, - bullets, **bold** (stripped), paragraphs
+ */
+export async function exportAIReportAsPdf({
+  chartName,
+  birthDetails,
+  content,
+  fileName,
+  title,
+}: {
+  chartName: string;
+  birthDetails?: { date: string; time: string; location: string };
+  content: string;
+  fileName: string;
+  title: string;
+}): Promise<void> {
+  if (!isBrowser()) throw new Error("PDF export requires browser environment");
+
+  const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+
+  const pageW = 210;
+  const pageH = 297;
+  const mLeft = 18;
+  const mRight = 18;
+  const mTop = 20;
+  const mBottom = 18;
+  const contentW = pageW - mLeft - mRight;
+  let y = mTop;
+
+  const newPage = () => {
+    pdf.addPage();
+    y = mTop;
+  };
+
+  const needsPageBreak = (h: number) => {
+    if (y + h > pageH - mBottom) newPage();
+  };
+
+  // Strip inline bold/italic markers
+  const clean = (s: string) =>
+    s.replace(/\*\*(.*?)\*\*/g, "$1").replace(/\*(.*?)\*/g, "$1").replace(/__([^_]+)__/g, "$1");
+
+  // ── Title block ────────────────────────────────────────────────────────────
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(22);
+  pdf.setTextColor(20, 20, 80);
+  const titleLines = pdf.splitTextToSize(title, contentW);
+  titleLines.forEach((line: string) => {
+    needsPageBreak(10);
+    pdf.text(line, mLeft, y);
+    y += 10;
+  });
+
+  y += 2;
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(12);
+  pdf.setTextColor(80, 80, 120);
+  pdf.text(`For: ${chartName}`, mLeft, y);
+  y += 6;
+
+  if (birthDetails) {
+    pdf.setFontSize(10);
+    pdf.setTextColor(100, 100, 100);
+    pdf.text(
+      `Date: ${birthDetails.date}  •  Time: ${birthDetails.time}  •  Place: ${birthDetails.location}`,
+      mLeft,
+      y,
+    );
+    y += 5;
+  }
+
+  // Divider
+  y += 3;
+  pdf.setDrawColor(220, 120, 40);
+  pdf.setLineWidth(0.6);
+  pdf.line(mLeft, y, pageW - mRight, y);
+  y += 7;
+
+  // ── Markdown content ───────────────────────────────────────────────────────
+  const lines = content.split("\n");
+
+  for (const rawLine of lines) {
+    const line = rawLine.trimEnd();
+
+    if (/^#{1}\s/.test(line)) {
+      // H1
+      const text = clean(line.replace(/^#\s+/, ""));
+      needsPageBreak(10);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(18);
+      pdf.setTextColor(20, 40, 120);
+      pdf.splitTextToSize(text, contentW).forEach((l: string) => {
+        needsPageBreak(9);
+        pdf.text(l, mLeft, y);
+        y += 9;
+      });
+      y += 2;
+    } else if (/^#{2}\s/.test(line)) {
+      // H2
+      const text = clean(line.replace(/^##\s+/, ""));
+      needsPageBreak(9);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(15);
+      pdf.setTextColor(30, 60, 150);
+      pdf.splitTextToSize(text, contentW).forEach((l: string) => {
+        needsPageBreak(8);
+        pdf.text(l, mLeft, y);
+        y += 8;
+      });
+      y += 2;
+    } else if (/^#{3}\s/.test(line)) {
+      // H3
+      const text = clean(line.replace(/^###\s+/, ""));
+      needsPageBreak(7);
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(12);
+      pdf.setTextColor(60, 80, 160);
+      pdf.splitTextToSize(text, contentW).forEach((l: string) => {
+        needsPageBreak(6.5);
+        pdf.text(l, mLeft, y);
+        y += 6.5;
+      });
+      y += 1;
+    } else if (/^[-*]\s/.test(line)) {
+      // Bullet
+      const text = clean(line.replace(/^[-*]\s+/, ""));
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.setTextColor(40, 40, 40);
+      const wrapped = pdf.splitTextToSize(text, contentW - 6);
+      wrapped.forEach((l: string, i: number) => {
+        needsPageBreak(5.5);
+        pdf.text(i === 0 ? `•  ${l}` : `    ${l}`, mLeft + 2, y);
+        y += 5.5;
+      });
+    } else if (line.trim() === "") {
+      // Blank line → small paragraph gap
+      y += 3;
+    } else {
+      // Normal paragraph text
+      const text = clean(line.trim());
+      if (!text) continue;
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(11);
+      pdf.setTextColor(40, 40, 40);
+      const wrapped = pdf.splitTextToSize(text, contentW);
+      wrapped.forEach((l: string) => {
+        needsPageBreak(5.5);
+        pdf.text(l, mLeft, y);
+        y += 5.5;
+      });
+      y += 2; // paragraph spacing
+    }
+  }
+
+  // ── Page footers ───────────────────────────────────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const totalPages = (pdf.internal as any).getNumberOfPages();
+  for (let i = 1; i <= totalPages; i++) {
+    pdf.setPage(i);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(160, 160, 160);
+    pdf.text(
+      `Generated by Jyotishya AI Astrologer  •  Page ${i} of ${totalPages}`,
+      pageW / 2,
+      pageH - 8,
+      { align: "center" },
+    );
+  }
+
   pdf.save(fileName);
 }

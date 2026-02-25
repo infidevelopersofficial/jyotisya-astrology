@@ -11,6 +11,18 @@ import {
   CalendarDays,
   MessageCircle,
   Orbit,
+  Gem,
+  BriefcaseBusiness,
+  Hash,
+  TextQuote,
+  Building2,
+  Baby,
+  CalendarCheck,
+  Home,
+  CircleDot,
+  Timer,
+  ShieldAlert,
+  Flower2,
   ChevronLeft,
   ChevronRight,
   Menu,
@@ -25,14 +37,61 @@ function cn(...inputs: (string | undefined | null | false)[]) {
 
 const STORAGE_KEY = "jyotishya-sidebar-collapsed";
 
-const LINKS = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/birth-chart", label: "Kundli Generator", icon: Sparkles },
-  { href: "/dashboard/charts", label: "Saved Charts", icon: FolderHeart },
-  { href: "/dashboard/panchang", label: "Daily Panchang", icon: CalendarDays },
-  { href: "/dashboard/consultations", label: "My Consultations", icon: MessageCircle },
-  { href: "/dashboard/transits", label: "Transits", icon: Orbit },
+interface NavLink { href: string; label: string; icon: React.ComponentType<{ className?: string }> }
+interface NavGroup { label: string; links: NavLink[] }
+
+const NAV_GROUPS: NavGroup[] = [
+  {
+    label: "Overview",
+    links: [
+      { href: "/dashboard",              label: "Dashboard",        icon: LayoutDashboard },
+      { href: "/dashboard/birth-chart",  label: "Kundli Generator", icon: Sparkles },
+      { href: "/dashboard/charts",       label: "Saved Charts",     icon: FolderHeart },
+      { href: "/dashboard/panchang",     label: "Daily Panchang",   icon: CalendarDays },
+    ],
+  },
+  {
+    label: "Jyotish",
+    links: [
+      { href: "/dashboard/annual-horoscope", label: "Annual Horoscope",  icon: CircleDot },
+      { href: "/dashboard/yoga-detection",   label: "Yoga Detection",    icon: Sparkles },
+      { href: "/dashboard/dasha-reading",    label: "Dasha Reading",     icon: Timer },
+      { href: "/dashboard/sade-sati",        label: "Sade Sati Report",  icon: Orbit },
+      { href: "/dashboard/dosha-analysis",   label: "Dosha Analysis",    icon: ShieldAlert },
+      { href: "/dashboard/transits",         label: "Transits",          icon: Orbit },
+      { href: "/dashboard/career-report",    label: "Career Report",     icon: BriefcaseBusiness },
+      { href: "/dashboard/gemstone-report",  label: "Gemstone Report",   icon: Gem },
+    ],
+  },
+  {
+    label: "Numerology",
+    links: [
+      { href: "/dashboard/name-numerology", label: "Name Numerology", icon: TextQuote },
+      { href: "/dashboard/lucky-report",    label: "Lucky Numbers",   icon: Hash },
+      { href: "/dashboard/business-name",   label: "Business Name",   icon: Building2 },
+      { href: "/dashboard/baby-names",      label: "Baby Names",      icon: Baby },
+    ],
+  },
+  {
+    label: "Timing & Advisory",
+    links: [
+      { href: "/dashboard/muhurat",      label: "Muhurat",          icon: CalendarCheck },
+      { href: "/dashboard/vastu",        label: "Vastu Advisory",   icon: Home },
+      { href: "/dashboard/upay-report",  label: "Upay & Remedies",  icon: Flower2 },
+    ],
+  },
+  {
+    label: "Other",
+    links: [
+      { href: "/dashboard/consultations", label: "My Consultations", icon: MessageCircle },
+    ],
+  },
 ];
+
+// Flat list still used internally for active-link matching
+const ALL_LINKS = NAV_GROUPS.flatMap(g => g.links);
+void ALL_LINKS; // suppress unused warning
+
 
 export default function DashboardSidebar() {
   // Initialize with null to indicate "not yet loaded from storage"
@@ -196,60 +255,66 @@ export default function DashboardSidebar() {
                  </button>
             </div>
 
-            {/* Navigation Links */}
-            <nav className="space-y-2 flex-1 overflow-y-auto no-scrollbar">
-                {LINKS.map((link) => {
-                    const isActive = pathname === link.href;
-                    // On mobile, show labels even if sidebar might be collapsed (conceptually mobile doesn't collapse)
-                    const showLabel = isMobile || !sidebarCollapsed; 
+            {/* Navigation Links — Grouped */}
+            <nav className="space-y-1 flex-1 overflow-y-auto no-scrollbar">
+              {NAV_GROUPS.map((group) => (
+                <div key={group.label}>
+                  {/* Group label — hidden when collapsed */}
+                  {(isMobile || !sidebarCollapsed) && (
+                    <p className="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">
+                      {group.label}
+                    </p>
+                  )}
+                  {!sidebarCollapsed && <div className="h-px bg-white/5 mx-3 mb-1" />}
 
+                  {group.links.map((link) => {
+                    const isActive = pathname === link.href;
+                    const showLabel = isMobile || !sidebarCollapsed;
                     return (
-                        <Link
-                            key={link.href}
-                            href={link.href}
-                            className={cn(
-                                "group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 relative",
-                                isActive 
-                                    ? "bg-gradient-to-r from-orange-500/10 to-pink-500/10 text-orange-400" 
-                                    : "text-slate-400 hover:bg-white/5 hover:text-white",
-                                // Center icon if collapsed on desktop
-                                (!isMobile && sidebarCollapsed) ? "justify-center" : ""
-                            )}
-                        >
-                            {isActive && (
-                                <motion.div
-                                    layoutId="active-nav"
-                                    className="absolute left-0 w-1 h-8 bg-gradient-to-b from-orange-500 to-pink-500 rounded-r-full"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    transition={{ duration: 0.2 }}
-                                />
-                            )}
-                            <link.icon className={cn(
-                                "transition-colors shrink-0",
-                                isActive ? "text-orange-400" : "text-slate-500 group-hover:text-white",
-                                (!isMobile && sidebarCollapsed) ? "w-6 h-6" : "w-5 h-5"
-                            )} />
-                            
-                            {showLabel && (
-                                <motion.span
-                                    initial={{ opacity: 0, x: -10 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    className="whitespace-nowrap"
-                                >
-                                    {link.label}
-                                </motion.span>
-                            )}
-                            
-                            {/* Hover Tooltip for Collapsed State (Desktop Only) */}
-                            {!isMobile && sidebarCollapsed && (
-                                <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
-                                    {link.label}
-                                </div>
-                            )}
-                        </Link>
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        className={cn(
+                          "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 relative",
+                          isActive
+                            ? "bg-gradient-to-r from-orange-500/10 to-pink-500/10 text-orange-400"
+                            : "text-slate-400 hover:bg-white/5 hover:text-white",
+                          (!isMobile && sidebarCollapsed) ? "justify-center" : ""
+                        )}
+                      >
+                        {isActive && (
+                          <motion.div
+                            layoutId="active-nav"
+                            className="absolute left-0 w-1 h-8 bg-gradient-to-b from-orange-500 to-pink-500 rounded-r-full"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.2 }}
+                          />
+                        )}
+                        <link.icon className={cn(
+                          "transition-colors shrink-0",
+                          isActive ? "text-orange-400" : "text-slate-500 group-hover:text-white",
+                          (!isMobile && sidebarCollapsed) ? "w-6 h-6" : "w-4 h-4"
+                        )} />
+                        {showLabel && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            className="whitespace-nowrap text-sm"
+                          >
+                            {link.label}
+                          </motion.span>
+                        )}
+                        {!isMobile && sidebarCollapsed && (
+                          <div className="absolute left-full ml-2 px-2 py-1 bg-slate-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                            {link.label}
+                          </div>
+                        )}
+                      </Link>
                     );
-                })}
+                  })}
+                </div>
+              ))}
             </nav>
 
             {/* Bottom/Footer Area */}
