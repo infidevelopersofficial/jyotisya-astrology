@@ -190,11 +190,12 @@ async function handlePaymentCaptured(paymentEntity: any): Promise<void> {
       return;
     }
 
-    // Update payment status to PAID
+    // Update payment status to PAID and store Razorpay payment ID
     await prisma.consultation.update({
       where: { id: consultation.id },
       data: {
         paymentStatus: "PAID",
+        razorpayPaymentId: paymentId,
         updatedAt: new Date(),
       },
     });
@@ -343,33 +344,28 @@ async function handleRefund(refundEntity: any): Promise<void> {
     return;
   }
 
-  // const paymentId = refundEntity.payment_id // TODO: Use when razorpayPaymentId field is added
+  const paymentId = refundEntity.payment_id;
   const refundId = refundEntity.id;
   const refundAmount = refundEntity.amount ? refundEntity.amount / 100 : 0;
   const refundStatus = refundEntity.status;
 
   try {
-    // Find consultation by payment ID (note: this is the Razorpay payment ID, not order ID)
-    // We need to search by the paymentId field which contains the order ID
-    // For refunds, we'll need to search across all consultations
-    const consultations = await prisma.consultation.findMany({
+    // Find consultation by Razorpay payment ID
+    const consultation = await prisma.consultation.findFirst({
       where: {
-        paymentStatus: "PAID",
+        razorpayPaymentId: paymentId,
       },
     });
 
-    // In a production system, you would store the Razorpay payment ID separately
-    // For now, we'll just update the first matching consultation
-    // This is a limitation that should be addressed by adding a razorpayPaymentId field
-
-    if (consultations.length === 0) {
-      Sentry.captureMessage("No paid consultations found for refund webhook", {
+    if (!consultation) {
+      Sentry.captureMessage("Consultation not found for refund webhook", {
         level: "error",
         tags: {
           operation: "refund_processing",
-          error_type: "no_consultations_found",
+          error_type: "consultation_not_found",
         },
         extra: {
+          paymentId,
           refundId,
           refundAmount,
           refundStatus,
@@ -378,32 +374,35 @@ async function handleRefund(refundEntity: any): Promise<void> {
       return;
     }
 
-    // For now, log a warning about the limitation
-    Sentry.captureMessage(
-      "Refund processing limitation: Cannot match refund to specific consultation",
-      {
-        level: "warning",
-        tags: {
-          operation: "refund_processing",
-          limitation: "missing_razorpay_payment_id_field",
-        },
-        extra: {
-          refundId,
-          refundAmount,
-          refundStatus,
-          paidConsultationsCount: consultations.length,
-          message: "TODO: Add razorpayPaymentId field to Consultation model",
-        },
+    // Update payment status to REFUNDED
+    await prisma.consultation.update({
+      where: { id: consultation.id },
+      data: {
+        paymentStatus: "REFUNDED",
+        updatedAt: new Date(),
       },
-    );
+    });
 
-    // TODO: Add razorpayPaymentId field to Consultation model and update this logic
+    Sentry.addBreadcrumb({
+      category: "payment",
+      message: "Refund processed successfully",
+      level: "info",
+      data: {
+        consultationId: consultation.id,
+        paymentId,
+        refundId,
+        refundAmount,
+        refundStatus,
+        userId: consultation.userId,
+      },
+    });
   } catch (error: unknown) {
     Sentry.captureException(error, {
       tags: {
         operation: "refund_processing_failed",
       },
       extra: {
+        paymentId,
         refundId,
         refundAmount,
         refundStatus,

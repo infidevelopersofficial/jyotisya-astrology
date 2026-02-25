@@ -202,7 +202,8 @@ model Consultation {
   // Payment
   amount        Int
   paymentStatus PaymentStatus @default(PENDING)
-  paymentId     String?
+  paymentId     String?       // Razorpay order ID
+  razorpayPaymentId String?   // Razorpay payment ID (for matching refunds)
 
   // Review
   rating        Int?
@@ -215,6 +216,7 @@ model Consultation {
   @@index([astrologerId])
   @@index([scheduledAt])
   @@index([status])
+  @@index([razorpayPaymentId])
   @@map("consultations")
 }
 

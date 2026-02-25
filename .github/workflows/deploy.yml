@@ -56,7 +56,6 @@ jobs:
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
 
     steps:
       - name: Checkout code
@@ -67,33 +66,27 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache yarn dependencies
+      - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('digital-astrology/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-npm-
 
       - name: Install dependencies
-        run: yarn install --immutable
+        run: npm ci
+        working-directory: ./digital-astrology
 
       - name: Generate Prisma Client
-        run: |
-          cd packages/schemas
-          npx prisma generate
+        run: npx prisma generate --schema=./prisma/schema.prisma
+        working-directory: ./digital-astrology
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
-      - name: Build all packages
-        run: yarn build
+      - name: Build
+        run: npm run build
+        working-directory: ./digital-astrology
         env:
           NODE_ENV: production
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -106,10 +99,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: deployment-build
-          path: |
-            apps/web/.next
-            apps/admin/.next
-            packages/
+          path: digital-astrology/.next
           retention-days: 7
 
   # ============================================================================
@@ -211,7 +201,6 @@ jobs:
     if: needs.setup.outputs.deploy == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    
 
     steps:
       - name: Checkout code
@@ -222,16 +211,13 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Install dependencies
-        run: yarn install --immutable
+        run: npm ci
+        working-directory: ./digital-astrology
 
       - name: Run Prisma migrations
-        run: |
-          cd packages/schemas
-          npx prisma migrate deploy
+        run: npx prisma migrate deploy --schema=./prisma/schema.prisma
+        working-directory: ./digital-astrology
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
 
