@@ -111,7 +111,7 @@ export default function GemstoneReportClient({ userId: _userId, userEmail: _user
 
   // Auto-generate when chart is ready
   const handleGenerateFromChart = async () => {
-    if (!state.chartData?.data?.planets || !state.chartData?.data?.ascendant === undefined) return;
+    if (!state.chartData?.data?.planets || state.chartData?.data?.ascendant === undefined) return;
     setLoading(true);
     try {
       const res = await fetch("/api/astrology/gemstone", {

@@ -41,12 +41,15 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     // Validate and sanitize room placements
     const sanitizedPlacements: Partial<Record<FacingDirection, RoomType[]>> = {};
-    if (body.roomPlacements && typeof body.roomPlacements === "object") {
-      for (const [dir, rooms] of Object.entries(body.roomPlacements)) {
-        if (VALID_DIRECTIONS.includes(dir as FacingDirection) && Array.isArray(rooms)) {
-          sanitizedPlacements[dir as FacingDirection] = (rooms as string[]).filter(
-            r => VALID_ROOMS.includes(r as RoomType)
-          ) as RoomType[];
+    if (body.roomPlacements && typeof body.roomPlacements === "object" && !Array.isArray(body.roomPlacements)) {
+      for (const dir of VALID_DIRECTIONS) {
+        if (Object.prototype.hasOwnProperty.call(body.roomPlacements, dir)) {
+          const rooms = body.roomPlacements[dir];
+          if (Array.isArray(rooms)) {
+            sanitizedPlacements[dir] = rooms.filter(
+              r => VALID_ROOMS.includes(r as RoomType)
+            ) as RoomType[];
+          }
         }
       }
     }

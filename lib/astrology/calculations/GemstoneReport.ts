@@ -179,8 +179,8 @@ export function generateGemstoneReport(planets: {
 
     if (!detail) continue;
 
-    let priority: GemstoneRecommendation["priority"] = "Secondary";
-    let reason = "";
+    let priority: GemstoneRecommendation["priority"];
+    let reason: string;
 
     if (nature === "Functional Malefic") {
       priority = "Avoid";
