@@ -218,6 +218,8 @@ export default function CareerReportClient({ userId: _userId, userEmail: _userEm
         chartData={state.chartData!.data}
         chartName={chartName}
         birthDetails={birthDetails}
+        birthDate={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toISOString().split("T")[0] : undefined}
+        birthTime={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }) : undefined}
         completion={aiInsights?.completion ?? ""}
         setCompletion={(val) =>
           setAiInsights((prev: any) => ({ ...prev, completion: val, isLoading: prev?.isLoading ?? false, error: prev?.error ?? null }))
