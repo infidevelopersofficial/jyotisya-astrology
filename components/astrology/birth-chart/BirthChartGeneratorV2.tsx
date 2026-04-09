@@ -216,6 +216,8 @@ export default function BirthChartGeneratorV2({
          <AIInterpretationPanel
             chartData={processedChartData!.data}
             chartName={state.birthData.chartName || "User"}
+            birthDate={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toISOString().split("T")[0] : undefined}
+            birthTime={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }) : undefined}
             completion={aiInsights?.completion ?? ""}
             setCompletion={(val) => setAiInsights((prev: any) => ({
               completion: val,
@@ -327,6 +329,8 @@ export default function BirthChartGeneratorV2({
          <DetailedReportSection 
              chartData={processedChartData!.data} 
              chartName={state.birthData.chartName || "User"}
+             birthDate={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toISOString().split("T")[0] : undefined}
+             birthTime={state.birthData?.dateTime ? new Date(state.birthData.dateTime).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", hour12: false }) : undefined}
              birthDetails={{
                 date: new Date(state.birthData.dateTime).toLocaleDateString(),
                 time: new Date(state.birthData.dateTime).toLocaleTimeString(),
@@ -342,7 +346,7 @@ export default function BirthChartGeneratorV2({
 }
 
 // Local wrapper for Detailed Report to manage its own state independent of the summary
-function DetailedReportSection({ chartData, chartName, birthDetails }: { chartData: any, chartName: string, birthDetails: any }) {
+function DetailedReportSection({ chartData, chartName, birthDetails, birthDate, birthTime }: { chartData: any, chartName: string, birthDetails: any, birthDate?: string, birthTime?: string }) {
    const [completion, setCompletion] = useState("");
    const [isLoading, setIsLoading] = useState(false);
    const [error, setError] = useState<string | null>(null);
@@ -363,6 +367,8 @@ function DetailedReportSection({ chartData, chartName, birthDetails }: { chartDa
         chartData={chartData}
         chartName={chartName}
         birthDetails={birthDetails}
+        birthDate={birthDate}
+        birthTime={birthTime}
         completion={completion}
         setCompletion={setCompletion}
         isLoading={isLoading}

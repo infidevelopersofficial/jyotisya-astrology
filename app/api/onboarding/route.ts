@@ -186,13 +186,15 @@ export async function POST(request: Request): Promise<NextResponse> {
       birthLongitude,
       birthTimezone,
       preferredSystem,
+      birthTimeKnown,
     } = body;
 
-    // Validate required fields
+    // Validate required fields (birthTime is optional when birthTimeKnown is false)
+    const isBirthTimeKnown = birthTimeKnown !== false;
     if (
       !name ||
       !birthDate ||
-      !birthTime ||
+      (isBirthTimeKnown && !birthTime) ||
       !birthPlace ||
       birthLatitude === undefined ||
       birthLongitude === undefined ||
@@ -226,7 +228,8 @@ export async function POST(request: Request): Promise<NextResponse> {
     }
 
     // Validate birth date format and ensure it's not in the future
-    const birthDateTime = new Date(`${birthDate}T${birthTime}`);
+    const effectiveBirthTime = isBirthTimeKnown ? birthTime : "12:00";
+    const birthDateTime = new Date(`${birthDate}T${effectiveBirthTime}`);
 
     if (isNaN(birthDateTime.getTime())) {
       return NextResponse.json({ error: "Invalid birth date or time format" }, { status: 400 });
@@ -281,7 +284,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     const onboardingData = {
       name, // Update name in case they changed it
       birthDate: birthDateTime,
-      birthTime,
+      birthTime: effectiveBirthTime,
       birthPlace,
       birthLatitude,
       birthLongitude,
@@ -292,6 +295,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       risingSign,
       risingDegree,
       preferredSystem,
+      birthTimeKnown: isBirthTimeKnown,
       onboardingCompleted: true,
       updatedAt: new Date(),
     };
@@ -374,6 +378,7 @@ export async function GET(): Promise<NextResponse> {
         birthLongitude: true,
         birthTimezone: true,
         preferredSystem: true,
+        birthTimeKnown: true,
         sunSign: true,
         moonSign: true,
         risingSign: true,

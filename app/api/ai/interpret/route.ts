@@ -5,6 +5,11 @@ import { requireAuth } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/route-handler";
 import { rateLimit } from "@/lib/rate-limit";
 import { logger } from "@/lib/monitoring/logger";
+import {
+  buildEnrichedChartContext,
+  serializeContextForPrompt,
+  type ChartPlanet,
+} from "@/lib/interpretation/chart-context-builder";
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -12,6 +17,9 @@ export const maxDuration = 30;
 interface InterpretRequestBody {
   chartData: Record<string, unknown>;
   prompt?: string;
+  birthDate?: string;
+  birthTime?: string;
+  birthTimeKnown?: boolean;
 }
 
 function isValidRequestBody(body: unknown): body is InterpretRequestBody {
@@ -20,7 +28,10 @@ function isValidRequestBody(body: unknown): body is InterpretRequestBody {
   return (
     typeof candidate.chartData === "object" &&
     candidate.chartData !== null &&
-    (candidate.prompt === undefined || typeof candidate.prompt === "string")
+    (candidate.prompt === undefined || typeof candidate.prompt === "string") &&
+    (candidate.birthDate === undefined || typeof candidate.birthDate === "string") &&
+    (candidate.birthTime === undefined || typeof candidate.birthTime === "string") &&
+    (candidate.birthTimeKnown === undefined || typeof candidate.birthTimeKnown === "boolean")
   );
 }
 
@@ -42,41 +53,67 @@ export async function POST(req: NextRequest): Promise<Response> {
     const body: unknown = await req.json();
     if (!isValidRequestBody(body)) {
       return NextResponse.json(
-        { error: "Invalid request body", required: ["chartData"], optional: ["prompt"] },
+        { error: "Invalid request body", required: ["chartData"], optional: ["prompt", "birthDate", "birthTime"] },
         { status: 400 },
       );
     }
 
-    const { chartData, prompt } = body;
+    const { chartData, prompt, birthDate, birthTime, birthTimeKnown } = body;
 
     logger.info("AI interpret request", {
       userId: user.id,
       hasChartData: !!chartData,
       promptLength: prompt?.length,
+      hasBirthDate: !!birthDate,
     });
 
-    // 4. Construct the System Prompt
+    // Build enriched astrological context from the chart data
+    let enrichedContextMarkdown = "";
+    try {
+      const rawChart = chartData as { ascendant?: number; planets?: ChartPlanet[] };
+      if (rawChart.ascendant !== undefined && Array.isArray(rawChart.planets)) {
+        const enrichedCtx = buildEnrichedChartContext({
+          ascendant: rawChart.ascendant,
+          planets: rawChart.planets,
+          birthDate,
+          birthTime,
+          birthTimeKnown: birthTimeKnown ?? true,
+        });
+        enrichedContextMarkdown = serializeContextForPrompt(enrichedCtx);
+        logger.info("Enriched chart context built", {
+          yogasFound: enrichedCtx.yogas.length,
+          hasDasha: !!enrichedCtx.dasha,
+          doshaLevel: enrichedCtx.doshas.overallDosha,
+          sadeSatiActive: enrichedCtx.sadeSati.isActive,
+          transitsFound: enrichedCtx.topTransits.length,
+        });
+      }
+    } catch (ctxErr: unknown) {
+      logger.warn("Failed to build enriched context, falling back to raw data", { error: String(ctxErr) });
+    }
+
+    // 4. Construct the System Prompt (enhanced with enriched context instructions)
     const systemPrompt = `
 You are an expert Vedic Astrologer (Jyotish Acharya) with deep knowledge of Parashara Hora Sastra.
 Your role is to analyze the provided birth chart data and offer profound, empathetic, and actionable insights.
 
-### Guidelines:
-1.  **Data-Driven**: Base your entire analysis STRICTLY on the provided JSON chart data (Planets, Signs, Houses, Nakshatras). Do not hallucinate planetary positions.
-2.  **Tone**: Empowering, identifying strengths and growth areas. Avoid fatalistic or fear-mongering language (e.g., do not predict death or unavoidable tragedy).
-3.  **Structure**: Use clear Markdown headings.
-4.  **Audience**: The user is likely a layperson. Explain technical terms (like "Ascendant" or "Dasha") simply when you use them.
+### CRITICAL GUIDELINES:
+1.  **Data-Driven**: Base your entire analysis STRICTLY on the provided computed chart data. You are given pre-computed house lordships, functional benefic/malefic status, Dasha periods, detected Yogas, Dosha analysis, Sade Sati status, and active transits. Use these DIRECTLY — do not re-derive or contradict them.
+2.  **Specificity**: You MUST reference specific house lordships and Dasha periods in your analysis. Example: "Your 10th lord Saturn is debilitated in Aries (House 6), which may cause career setbacks through health or workplace conflicts. During your current Rahu Mahadasha (ending 2028), this effect is amplified." NEVER give generic advice like "career will improve".
+3.  **Tone**: Empowering, identifying strengths and growth areas. Avoid fatalistic or fear-mongering language (e.g., do not predict death or unavoidable tragedy).
+4.  **Structure**: Use clear Markdown headings.
+5.  **Audience**: The user is likely a layperson. Explain technical terms (like "Ascendant" or "Dasha") simply when you first use them.
+6.  **Dasha Context**: If Dasha data is provided, you MUST explain what the current Mahadasha planet signifies for this specific ascendant and how the Antardasha modifies it.
+7.  **Yoga References**: If Yogas are detected, explain their practical impact on the native's life based on the houses involved.
+8.  **Transit Awareness**: If transit data is provided, mention how current transits are influencing the native's chart RIGHT NOW.
 
 ### Analysis Framework:
--   **Ascendant (Lagna)**: Core personality, physical vitality, and general approach to life.
--   **Moon Sign (Rashi)**: Emotional nature and mind.
--   **Key Planetary Influences**: Highlight 1-2 planets that are particularly strong (Exalted, Own Sign, Dig Bala) or challenging (Debilitated, in Dusthana 6/8/12).
--   **Current Context**: If Dasha/Transit data is provided, mention the current time period's focus.
-
-### Input Data Context:
-The user will provide a JSON object containing:
--   Ascendant Sign & Degree
--   Planetary Positions (Sign, House, Nakshatra, Dignity)
--   (Optional) Current Dasha
+-   **Ascendant (Lagna)**: Core personality, physical vitality, and life direction. Reference the ascendant lord's placement.
+-   **Moon Sign (Rashi)**: Emotional nature and mind. Reference Moon's house and dignity.
+-   **Key Planetary Influences**: Focus on planets marked as "Yoga Karaka" or "Functional Benefic" (strengths) and those that are "Debilitated" or in Dusthana houses 6/8/12 (challenges).
+-   **Current Dasha Period**: What life themes are active based on the Mahadasha/Antardasha lords and the houses they rule.
+-   **Active Doshas**: If Kaal Sarp or Manglik doshas are present, explain their practical impact and severity.
+-   **Sade Sati**: If active, explain the current phase and its implications for the Moon sign.
 `;
 
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
@@ -130,6 +167,16 @@ The system analyzes *Shadbala* (planetary strength) and *Avasthas* (dignity) to 
         apiKey: apiKey,
     });
 
+    // Build user message with enriched context (or fall back to raw JSON)
+    const chartSection = enrichedContextMarkdown
+      ? `Here is the pre-computed astrological analysis of the birth chart:
+
+${enrichedContextMarkdown}`
+      : `Here is the birth chart data:
+\`\`\`json
+${JSON.stringify(chartData, null, 2)}
+\`\`\``;
+
     const result = streamText({
       model: google("gemini-flash-latest"), 
       system: systemPrompt,
@@ -137,10 +184,7 @@ The system analyzes *Shadbala* (planetary strength) and *Avasthas* (dignity) to 
       messages: [
         {
           role: "user",
-          content: `Here is the birth chart data:
-\`\`\`json
-${JSON.stringify(chartData, null, 2)}
-\`\`\`
+          content: `${chartSection}
 
 User Question/Focus: ${prompt || "Please provide a general overview of my birth chart, focusing on my core personality and major strengths."}`,
         },

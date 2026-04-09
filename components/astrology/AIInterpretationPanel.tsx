@@ -12,6 +12,10 @@ interface AIInterpretationPanelProps {
     time: string;
     location: string;
   };
+  // Birth data for enriched AI context (Dasha calculation)
+  birthDate?: string;   // ISO date string e.g. "1990-01-15"
+  birthTime?: string;   // HH:MM format e.g. "10:30"
+  birthTimeKnown?: boolean;  // false = Surya Kundli (noon default)
   // Lifted state props for persistence across tab switches
   completion: string;
   setCompletion: (value: string) => void;
@@ -32,6 +36,9 @@ export default function AIInterpretationPanel({
   chartData,
   chartName,
   birthDetails,
+  birthDate,
+  birthTime,
+  birthTimeKnown,
   completion,
   setCompletion,
   isLoading,
@@ -71,6 +78,7 @@ export default function AIInterpretationPanel({
           ascendant, 
           planets: planets.map((p: any) => ({ 
               name: p.name, 
+              fullDegree: p.fullDegree,
               sign: p.sign, 
               house: p.house, 
               nakshatra: p.nakshatra,
@@ -88,7 +96,10 @@ export default function AIInterpretationPanel({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ 
            chartData: minimalData,
-           prompt: customPrompt || defaultPrompt
+           prompt: customPrompt || defaultPrompt,
+           birthDate,
+           birthTime,
+           birthTimeKnown,
         }),
         signal: controller.signal
       });

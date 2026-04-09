@@ -44,6 +44,7 @@ model User {
 
   // Preferences
   preferredSystem  AstrologySystem @default(VEDIC)
+  birthTimeKnown   Boolean         @default(true)
   onboardingCompleted Boolean @default(false)
 
   // Relations

@@ -17,6 +17,7 @@ interface UserData {
   birthLongitude: number | null;
   birthTimezone: string | null;
   preferredSystem: "VEDIC" | "WESTERN";
+  birthTimeKnown: boolean;
   onboardingCompleted: boolean;
 }
 
@@ -36,6 +37,7 @@ export default function OnboardingPage(): React.ReactElement {
     birthLongitude: 77.209,
     birthTimezone: 5.5,
     preferredSystem: "VEDIC" as "VEDIC" | "WESTERN",
+    birthTimeKnown: true,
   });
 
   // Load existing user data if editing
@@ -69,6 +71,7 @@ export default function OnboardingPage(): React.ReactElement {
             birthLongitude: user.birthLongitude ?? 77.209,
             birthTimezone: user.birthTimezone ? parseFloat(user.birthTimezone) : 5.5,
             preferredSystem: user.preferredSystem || "VEDIC",
+            birthTimeKnown: user.birthTimeKnown !== false, // default to true for existing users
           });
         }
 
@@ -112,11 +115,17 @@ export default function OnboardingPage(): React.ReactElement {
 
     try {
       // Validate
-      if (!formData.name || !formData.birthDate || !formData.birthTime || !formData.birthPlace) {
+      if (!formData.name || !formData.birthDate || !formData.birthPlace) {
         throw new Error("Please fill in all required fields");
       }
 
-      const birthDateTime = `${formData.birthDate}T${formData.birthTime}`;
+      // If birth time is unknown, default to noon (Surya Kundli convention)
+      const effectiveBirthTime = formData.birthTimeKnown ? formData.birthTime : "12:00";
+      if (formData.birthTimeKnown && !formData.birthTime) {
+        throw new Error("Please enter your birth time, or select 'I don't know my birth time'");
+      }
+
+      const birthDateTime = `${formData.birthDate}T${effectiveBirthTime}`;
       const birthDateObj = new Date(birthDateTime);
 
       if (isNaN(birthDateObj.getTime())) {
@@ -130,7 +139,10 @@ export default function OnboardingPage(): React.ReactElement {
       const response = await fetch("/api/onboarding", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          birthTime: formData.birthTimeKnown ? formData.birthTime : "12:00",
+        }),
       });
 
       const data = await response.json();
@@ -149,7 +161,7 @@ export default function OnboardingPage(): React.ReactElement {
     }
   };
 
-  const isValid = formData.name && formData.birthDate && formData.birthTime && formData.birthPlace;
+  const isValid = formData.name && formData.birthDate && (formData.birthTimeKnown ? formData.birthTime : true) && formData.birthPlace;
 
   // Loading state while fetching user data
   if (!dataLoaded) {
@@ -206,19 +218,64 @@ export default function OnboardingPage(): React.ReactElement {
             {/* Birth Date & Time */}
             <div>
               <label className="block text-sm font-medium text-slate-200 mb-2">
-                Birth Date & Time <span className="text-red-400">*</span>
+                Birth Date {formData.birthTimeKnown && "& Time"} <span className="text-red-400">*</span>
               </label>
-              <DateTimePicker
-                value={
-                  formData.birthDate && formData.birthTime
-                    ? `${formData.birthDate}T${formData.birthTime}`
-                    : ""
-                }
-                onChange={handleDateTimeChange}
-              />
-              <p className="mt-2 text-xs text-slate-400">
-                💡 Accurate birth time is crucial for chart calculations
-              </p>
+              {formData.birthTimeKnown ? (
+                <DateTimePicker
+                  value={
+                    formData.birthDate && formData.birthTime
+                      ? `${formData.birthDate}T${formData.birthTime}`
+                      : ""
+                  }
+                  onChange={handleDateTimeChange}
+                />
+              ) : (
+                <input
+                  type="date"
+                  value={formData.birthDate}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, birthDate: e.target.value }))}
+                  style={{ colorScheme: "dark" }}
+                  className="w-full rounded-lg border border-white/20 bg-white/10 px-4 py-3 text-white focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/50"
+                />
+              )}
+
+              {/* Birth Time Unknown Toggle */}
+              <label className="flex items-center gap-3 mt-3 cursor-pointer group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={!formData.birthTimeKnown}
+                    onChange={(e) => {
+                      setFormData((prev) => ({
+                        ...prev,
+                        birthTimeKnown: !e.target.checked,
+                        birthTime: e.target.checked ? "12:00" : prev.birthTime,
+                      }));
+                    }}
+                    className="sr-only peer"
+                  />
+                  <div className="w-9 h-5 bg-white/10 border border-white/20 rounded-full peer-checked:bg-amber-500/30 peer-checked:border-amber-500/40 transition-all" />
+                  <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-slate-400 rounded-full peer-checked:translate-x-4 peer-checked:bg-amber-400 transition-all" />
+                </div>
+                <span className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
+                  I don't know my exact birth time
+                </span>
+              </label>
+
+              {/* Info box when birth time is unknown */}
+              {!formData.birthTimeKnown && (
+                <div className="mt-3 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3">
+                  <p className="text-xs text-amber-300 leading-relaxed">
+                    <strong>📋 Surya Kundli Mode:</strong> We'll use 12:00 noon as a default, which gives accurate planet sign positions but house placements may vary. You can update your exact birth time later for full accuracy.
+                  </p>
+                </div>
+              )}
+
+              {formData.birthTimeKnown && (
+                <p className="mt-2 text-xs text-slate-400">
+                  💡 Accurate birth time is crucial for chart calculations
+                </p>
+              )}
             </div>
 
             {/* Birth Place */}
