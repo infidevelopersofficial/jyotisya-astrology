@@ -5,6 +5,7 @@ import { getSunSignFromDate } from "@/services/astrology/birthChartService";
 import { DailyHoroscopePanel } from "@/components/astrology/DailyHoroscopePanel";
 import { detectYogas, buildPlanetDataFromChart } from "@/lib/astrology/calculations/YogaDetector";
 import { getSignName } from "@/lib/astrology/calculations/VedicMath";
+import { WhatsAppShareButton } from "@/components/ui/whatsapp-share-button";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -154,7 +155,7 @@ export default async function SavedChartDetailPage({ params }: PageProps) {
                 })} • {kundli.birthTime} • {kundli.birthPlace}
             </p>
           </div>
-           {/* Visual badge for favorite/type could go here */}
+          <WhatsAppShareButton text={`Check out my Kundli on Jyotishya!\n\nAscendant: ${risingSign}\nMoon Sign: ${moonSign}\nSun Sign: ${sunSign}`} />
         </div>
 
         {/* 1. Summary Section */}

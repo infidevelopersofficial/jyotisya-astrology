@@ -5,6 +5,7 @@
  * Falls back to mock data if API is unavailable.
  */
 
+import { MockHoroscopeClient } from "./horoscope";
 import type { HoroscopeClient, HoroscopeResponse, HoroscopeEntry } from "./horoscope";
 
 const ASTRO_CORE_URL = process.env.ASTRO_CORE_URL || "https://jyotishya-astro-api.vercel.app";
@@ -172,6 +173,5 @@ export function createHoroscopeClient(): HoroscopeClient {
   }
   
   // Fall back to mock
-  const { MockHoroscopeClient } = require("./horoscope");
   return new MockHoroscopeClient();
 }

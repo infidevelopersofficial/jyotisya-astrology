@@ -5,25 +5,25 @@
  * planetary positions (VSOP87 theory).
  */
 
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import { julian } from 'astronomia';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import { planetposition } from 'astronomia';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import { moonposition } from 'astronomia';
 
 // Load VSOP87 calculation data
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import earth from 'astronomia/data/vsop87Bearth';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import mars from 'astronomia/data/vsop87Bmars';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import mercury from 'astronomia/data/vsop87Bmercury';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import jupiter from 'astronomia/data/vsop87Bjupiter';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import venus from 'astronomia/data/vsop87Bvenus';
-// @ts-ignore
+// @ts-expect-error No type declarations available
 import saturn from 'astronomia/data/vsop87Bsaturn';
 
 import { 
@@ -88,7 +88,7 @@ export function calculateAscendant(date: Date, latitude: number, longitude: numb
   const numer = -Math.cos(lstRad);
   const denom = Math.sin(lstRad) * Math.cos(epsRad) + Math.tan(latRad) * Math.sin(epsRad);
   
-  let ascRad = Math.atan2(numer, denom);
+  const ascRad = Math.atan2(numer, denom);
   let ascDeg = ascRad * 180 / Math.PI;
   
   ascDeg = (ascDeg % 360 + 360) % 360;
